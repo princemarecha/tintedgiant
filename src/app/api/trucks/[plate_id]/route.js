@@ -11,7 +11,7 @@ export async function GET(req, context) {
   console.log(plate_id)
 
   // Fetch the truck document using the specified field
-  const data = await db.collection("trucks").findOne({ plateID: plate_id });
+  const data = await db.collection("trucks").findOne({ plate_id: plate_id });
 
   // Return the truck data as a JSON response
   return NextResponse.json(data);
@@ -26,7 +26,7 @@ export async function DELETE(req, context) {
   console.log("Deleting truck with national ID:", plate_id);
 
   // Delete the truck document using the specified national ID
-  const result = await db.collection("trucks").deleteOne({ nationalID: plate_id });
+  const result = await db.collection("trucks").deleteOne({ plate_id: plate_id });
 
   if (result.deletedCount === 0) {
     return NextResponse.json({ message: "truck not found" }, { status: 404 });
@@ -44,11 +44,11 @@ export async function PATCH(req, context) {
   // Parse the request body for updated fields
   const updates = await req.json();
 
-  console.log("Updating truck with national ID:", plate_id, "with fields:", updates);
+  console.log("Updating truck with truck ID:", plate_id, "with fields:", updates);
 
   // Update the truck document with the provided fields
   const result = await db.collection("trucks").updateOne(
-    { nationalID: plate_id },
+    { plate_id: plate_id },
     { $set: updates }
   );
 
