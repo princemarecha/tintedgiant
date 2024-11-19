@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "exceljs": "^4.4.0",
+    "flowbite-react": "^0.10.2",
     "jspdf": "^2.5.2",
     "mongodb": "^6.10.0",
     "mongoose": "^8.8.0",
