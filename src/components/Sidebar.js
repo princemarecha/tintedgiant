@@ -16,14 +16,30 @@ export default function Sidebar() {
 
   return (
     <div>
-              <button
-        data-drawer-target="logo-sidebar"
-        data-drawer-toggle="logo-sidebar"
-        aria-controls="logo-sidebar"
-        type="button"
-        className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-        onClick={toggleSidebar}
-      />
+      <button
+  data-drawer-target="logo-sidebar"
+  data-drawer-toggle="logo-sidebar"
+  aria-controls="logo-sidebar"
+  type="button"
+  className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+  onClick={toggleSidebar}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    className="w-6 h-6"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M4 6h16M4 12h16M4 18h16"
+    />
+  </svg>
+</button>
+
     <aside
       id="logo-sidebar"
       className={`fixed top-0 left-0 z-40 w-72 h-screen transition-transform ${
@@ -68,7 +84,11 @@ export default function Sidebar() {
   <li>
     <Link
       href="/"
-      className="flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000] dark:text-white hover:border-2 hover:border-gray-100 group"
+      className={`block px-4 py-2 rounded ${
+        currentPath.length ==1
+          ? "flex items-center p-2 text-white rounded-lg border-2 border-white  dark:text-white hover:border-2 hover:border-gray-100 group" // Active styling
+          : "flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      }`}
     >
      <Image
       src="/images/icons/dashboard.png" // Replace with your image path
@@ -107,7 +127,11 @@ export default function Sidebar() {
   <li>
     <a
       href="/trucks"
-      className="flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      className={`block px-4 py-2 rounded ${
+        currentPath.startsWith("/trucks")
+          ? "flex items-center p-2 text-white rounded-lg border-2 border-white  dark:text-white hover:border-2 hover:border-gray-100 group" // Active styling
+          : "flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      }`}
     >
      <Image
       src="/images/icons/truck.png" // Replace with your image path
@@ -124,7 +148,11 @@ export default function Sidebar() {
   <li>
     <a
       href="/expenses"
-      className="flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000] dark:text-white hover:border-2 hover:border-gray-100 group"
+      className={`block px-4 py-2 rounded ${
+        currentPath.startsWith("/expenses")
+          ? "flex items-center p-2 text-white rounded-lg border-2 border-white  dark:text-white hover:border-2 hover:border-gray-100 group" // Active styling
+          : "flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      }`}
     >
      <Image
       src="/images/icons/expenses.png" // Replace with your image path
@@ -141,7 +169,11 @@ export default function Sidebar() {
   <li>
     <a
       href="/journeys"
-      className="flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      className={`block px-4 py-2 rounded ${
+        currentPath.startsWith("/journeys")
+          ? "flex items-center p-2 text-white rounded-lg border-2 border-white  dark:text-white hover:border-2 hover:border-gray-100 group" // Active styling
+          : "flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      }`}
     >
      <Image
       src="/images/icons/journey.png" // Replace with your image path
@@ -158,7 +190,11 @@ export default function Sidebar() {
   <li>
     <a
       href="/customs"
-      className="flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      className={`block px-4 py-2 rounded ${
+        currentPath.startsWith("/customs")
+          ? "flex items-center p-2 text-white rounded-lg border-2 border-white  dark:text-white hover:border-2 hover:border-gray-100 group" // Active styling
+          : "flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      }`}
     >
      <Image
       src="/images/icons/customs.png" // Replace with your image path
@@ -175,7 +211,11 @@ export default function Sidebar() {
   <li>
     <a
       href="/my_account"
-      className="flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      className={`block px-4 py-2 rounded ${
+        currentPath.startsWith("/my_account")
+          ? "flex items-center p-2 text-white rounded-lg border-2 border-white  dark:text-white hover:border-2 hover:border-gray-100 group" // Active styling
+          : "flex items-center p-2 text-white rounded-lg border-2 border-[#AC0000]  dark:text-white hover:border-2 hover:border-gray-100 group"
+      }`}
     >
      {/* Image Replacement */}
      <Image
