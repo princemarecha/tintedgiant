@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Link from "next/link";
 
 export default function ViewEmployees() {
   const [employees, setEmployees] = useState([]);
@@ -57,11 +58,18 @@ export default function ViewEmployees() {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
 
+  const getLink = (id)=>{
+    let link = `/employees/${id}`
+    return link
+  }
+
   return (
     <div className="bg-white h-screen relative">
       <Layout>
         <div>
           <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Employees</p>
+
+          <p className="text-sm text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Employee Management</span> <span>&gt;</span><span>Employees </span></p>
 
           {/* Search and Filter Section */}
           <div className="grid grid-cols-12 mb-4">
@@ -93,7 +101,7 @@ export default function ViewEmployees() {
                 onChange={handleRoleChange} // Update role on change
                 value={role}
               >
-                <option value=""  selected>
+                <option value=""  defaultValue>
                   Select Role...
                 </option>
                 <option value="Driver">Driver</option>
@@ -109,6 +117,7 @@ export default function ViewEmployees() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16 font-bold md:p-2">
             {employees.map((employee, index) => (
               <div id="emp" key={index}>
+                <Link href= {getLink(employee.nationalID)} passHref>
                 <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-40 rounded bg-white shadow-2xl">
                   <div className="col-span-1 flex items-center justify-center font-bold">
                     <Image
@@ -145,6 +154,7 @@ export default function ViewEmployees() {
                     </div>
                   </div>
                 </div>
+                </Link>
               </div>
             ))}
           </div>
