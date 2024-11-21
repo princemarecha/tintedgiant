@@ -92,19 +92,20 @@ export default function MyComponent({ params }) {
       <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Employees</p>
 
 <p className="text-sm text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Employee Management</span> <span>&gt;</span><span>Employees </span><span>&gt;</span><span>{nationalID}</span></p>
-        <div className="grid grid-cols-12 gap-x-2">
-            <div className="col-span-4">
-            <Image
-                src="/images/employee.jpg"
-                alt="Search Icon"
-                width={400}
-                height={400}
-                className="transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl"
-              />
-            </div>
+        <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
+        <div className="col-span-3  md:col-span-2 lg:col-span-4 xl:col-span-4 flex justify-center items-center bg-gray-100">
+          <Image
+            src="/images/employee.jpg"
+            alt="Search Icon"
+            width={400}
+            height={400}
+            className="transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl object-contain"
+          />
+        </div>
+
             
             {employeeData ? (
-              <div className="col-span-5 p-10 text-black shadow-xl rounded border border-gray-100 grid grid-cols-3">
+              <div className="col-span-3  text-xs 2xl:text-lg 2xl:gap-y-1 2xl:py-2 md:col-span-2 lg:col-span-8 xl:col-span-5 p-6 lg:p-6 xl:p-8 text-black shadow-xl rounded border border-gray-100 grid grid-cols-3">
                 <div className="font-bold" >Name</div> <div className="col-span-2">{employeeData.name || "Not provided"}</div> 
                 <div className="font-bold" >Age </div> <div className="col-span-2">{employeeData.age || "Not provided"}</div> 
                 <div className="font-bold" >Phone</div> <div className="col-span-2">{employeeData.phoneNumber || "Not provided"}</div> 
@@ -124,18 +125,18 @@ export default function MyComponent({ params }) {
               nationalID && <div>Loading employee data...</div>
             )}
             {employeeData ? (
-              <div className="col-span-3  py-4  text-black shadow-xl rounded bg-[#AC0000] ">
-                <p className="text-2xl mx-6 font-black text-white">Current Journey</p> 
-                <hr className="my-4 border-white" /> {/* Horizontal line */}
-                <p className="text-lg mx-6 font-black text-white">From</p> 
-                <p className="text-lg mx-6 font-medium text-white mb-2">Harare, Zimbabwe</p> 
-                <p className="text-lg mx-6 font-black text-white">To</p> 
-                <p className="text-lg mx-6 font-medium text-white mb-2">Pretoria, South Africa</p> 
-                <p className="text-lg mx-6 font-black text-white">Truck</p> 
-                <p className="text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-2">Toyota Streamliner</p> 
+              <div className="col-span-3 md:col-span-2 lg:col-span-5 xl:col-span-3  py-4  text-black shadow-xl rounded bg-[#AC0000] ">
+                <p className="xl:text-lg mx-6 font-black text-white 2xl:text-2xl">Current Journey</p> 
+                <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">From</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Harare, Zimbabwe</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">To</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Pretoria, South Africa</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">Truck</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-1">Toyota Streamliner</p> 
 
-                <hr className="my-4 border-white" /> {/* Horizontal line */}
-                <div className="grid grid-cols-4 mx-6 text-white gap-y-2">
+                <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
+                <div className="text-sm 2xl:text-lg grid grid-cols-4 mx-6 text-white gap-y-2">
                 <div className="font-bold col-span-2" >Departure</div> <div className="col-span-2">21/11/24</div> 
                 <div className="font-bold col-span-2" >Arrival(Est) </div> <div className="col-span-2">23/11/24</div> 
                 <div className="font-bold col-span-2" >Distance</div> <div className="col-span-2">243 km</div> 
@@ -147,7 +148,7 @@ export default function MyComponent({ params }) {
               nationalID && <div>Loading employee data...</div>
             )}
         </div>
-        <div className="my-4 flex justify-between">
+        <div className="my-4 flex justify-between text-sm 2xl:text-lg ">
           <button
                 onClick={() => alert("Button clicked!")}
                 className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
@@ -166,7 +167,7 @@ export default function MyComponent({ params }) {
 
           <button
                 onClick={() => alert("Button clicked!")}
-                className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
+                className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150 "
               >
                 <p className="flex justify-between"><span>Edit</span><span>
                 <Image
@@ -181,7 +182,7 @@ export default function MyComponent({ params }) {
           </button>
 
         </div>
-        <div className="my-4 flex justify-end">
+        <div className="my-4 flex justify-end text-sm 2xl:text-lg">
         <button
             onClick={deleteEmployee}
             className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
