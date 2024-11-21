@@ -83,30 +83,35 @@ export async function GET(request) {
     // Establish connection
     await connectToDatabase();
 
-    // Parse query parameters for pagination and search
+    // Parse query parameters for pagination, search, and role
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
     const limit = parseInt(searchParams.get('limit')) || 9; // Default limit to 9 items per page
     const search = searchParams.get('search') || ''; // Search query (empty by default)
+    const role = searchParams.get('role') || ''; // Role filter (empty by default)
 
     // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Build search query
+    // Build query object
     let query = {};
     if (search) {
       query = {
+        ...query,
         $or: [
           { name: { $regex: search, $options: "i" } }, // Case-insensitive match on name
-          { occupation: { $regex: search, $options: "i" } }, // Case-insensitive match on occupation
         ],
       };
+    }
+
+    if (role) {
+      query.occupation = role; // Filter by selected role
     }
 
     // Fetch total count for pagination
     const totalEmployees = await Employee.countDocuments(query);
 
-    // Fetch paginated employees based on the search query
+    // Fetch paginated employees based on the search and role filters
     const employees = await Employee.find(query)
       .skip(skip)
       .limit(limit);

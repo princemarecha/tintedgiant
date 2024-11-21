@@ -10,16 +10,18 @@ export default function ViewEmployees() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [role, setRole] = useState(""); // State for selected role
   const itemsPerPage = 9; // Items to show per page
 
   // Fetch employee data
-  const fetchEmployees = async (page = 1, search = "") => {
+  const fetchEmployees = async (page = 1, search = "", role = "") => {
     try {
       const response = await axios.get(`/api/employee`, {
         params: {
           page,
           limit: itemsPerPage,
           search,
+          role, // Pass the selected role to the backend
         },
       });
       setEmployees(response.data.employees);
@@ -30,14 +32,20 @@ export default function ViewEmployees() {
   };
 
   useEffect(() => {
-    fetchEmployees(currentPage, searchTerm);
-  }, [currentPage, searchTerm]);
+    fetchEmployees(currentPage, searchTerm, role);
+  }, [currentPage, searchTerm, role]); // Fetch data when search or role changes
 
   // Handle Search
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
     setCurrentPage(1); // Reset to the first page for new search
+  };
+
+  // Handle Role Change
+  const handleRoleChange = (e) => {
+    setRole(e.target.value);
+    setCurrentPage(1); // Reset to the first page for new role selection
   };
 
   // Pagination Controls
@@ -76,19 +84,23 @@ export default function ViewEmployees() {
               />
             </div>
             <div className="hidden md:block"></div>
+
             {/* Role Dropdown */}
             <div className="flex flex-col col-span-8 md:col-span-3 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
               <select
                 id="dropdown"
                 className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
+                onChange={handleRoleChange} // Update role on change
+                value={role}
               >
-                <option value="" disabled selected>
+                <option value=""  selected>
                   Select Role...
                 </option>
-                <option value="driver">Driver</option>
-                <option value="accountant">Accountant</option>
-                <option value="manager">Manager</option>
-                <option value="administrator">Administrator</option>
+                <option value="Driver">Driver</option>
+                <option value="Accountant">Accountant</option>
+                <option value="Manager">Manager</option>
+                <option value="Administrator">Administrator</option>
+                <option value="Software Engineer">Software Engineer</option>
               </select>
             </div>
           </div>
