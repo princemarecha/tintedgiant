@@ -9,35 +9,126 @@ export async function POST(request) {
     await connectToDatabase();
 
     // Parse the JSON body
-    const { name, age, gender, nationality, nationalID, passportNumber, occupation, kmtravelled, avg_km, journeys, opCosts, avg_op_costs, photo } = await request.json();
+    const {
+      name,
+      age,
+      phoneNumber,
+      gender,
+      nationality,
+      nationalID,
+      passportNumber,
+      occupation,
+      kmtravelled,
+      avg_km,
+      journeys,
+      opCosts,
+      avg_op_costs,
+      photo,
+    } = await request.json();
 
-    console.log('Inserting Employee:', name, age, gender, nationality, nationalID, passportNumber, occupation, kmtravelled, avg_km, journeys, opCosts, avg_op_costs, photo);
+    console.log('Inserting Employee:', {
+      name,
+      age,
+      phoneNumber,
+      gender,
+      nationality,
+      nationalID,
+      passportNumber,
+      occupation,
+      kmtravelled,
+      avg_km,
+      journeys,
+      opCosts,
+      avg_op_costs,
+      photo,
+    });
 
     // Create a new Employee instance
-    const newEmployee = new Employee({ name, age, gender, nationality, nationalID, passportNumber, occupation, kmtravelled, avg_km, journeys, opCosts, avg_op_costs, photo });
+    const newEmployee = new Employee({
+      name,
+      age,
+      phoneNumber,
+      gender,
+      nationality,
+      nationalID,
+      passportNumber,
+      occupation,
+      kmtravelled,
+      avg_km,
+      journeys,
+      opCosts,
+      avg_op_costs,
+      photo,
+    });
 
     // Save to the database
     await newEmployee.save();
 
-    return NextResponse.json({ message: 'Employee added successfully', newEmployee });
+    return NextResponse.json({
+      message: 'Employee added successfully',
+      newEmployee,
+    });
   } catch (error) {
     console.error('Error adding employee:', error);
-    return NextResponse.json({ message: 'Error adding employee', error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Error adding employee', error: error.message },
+      { status: 500 }
+    );
   }
 }
 
-// Add GET handler to retrieve all employees
-export async function GET() {
+// Add GET handler to retrieve paginated and searchable employees
+export async function GET(request) {
   try {
     // Establish connection
     await connectToDatabase();
 
-    // Fetch all employees
-    const employees = await Employee.find({});
+    // Parse query parameters for pagination and search
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
+    const limit = parseInt(searchParams.get('limit')) || 9; // Default limit to 9 items per page
+    const search = searchParams.get('search') || ''; // Search query (empty by default)
 
-    return NextResponse.json({ employees });
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Build search query
+    let query = {};
+    if (search) {
+      query = {
+        $or: [
+          { name: { $regex: search, $options: "i" } }, // Case-insensitive match on name
+          { occupation: { $regex: search, $options: "i" } }, // Case-insensitive match on occupation
+        ],
+      };
+    }
+
+    // Fetch total count for pagination
+    const totalEmployees = await Employee.countDocuments(query);
+
+    // Fetch paginated employees based on the search query
+    const employees = await Employee.find(query)
+      .skip(skip)
+      .limit(limit);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalEmployees / limit);
+
+    return NextResponse.json({
+      employees,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalEmployees,
+        limit,
+      },
+    });
   } catch (error) {
     console.error('Error fetching employees:', error);
-    return NextResponse.json({ message: 'Error fetching employees', error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Error fetching employees', error: error.message },
+      { status: 500 }
+    );
   }
 }
+

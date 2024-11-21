@@ -4,6 +4,7 @@ import {Schema, models, model} from 'mongoose';
 const EmployeeSchema = new Schema({
     name: { type: String, required: true },
     age: { type: Number, required: true },
+    phoneNumber: { type: String, required: true },
     gender: { type: String, required: true },
     nationality: { type: String, required: true },
     nationalID: { type: String, required: true },

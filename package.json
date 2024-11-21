@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "axios": "^1.7.7",
     "exceljs": "^4.4.0",
     "flowbite-react": "^0.10.2",
     "jspdf": "^2.5.2",
