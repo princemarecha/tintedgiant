@@ -27,7 +27,7 @@ export default function Trucks() {
                     </p>
                   </div>
               </Link>
-              <Link href="/employees/add" passHref>
+              <Link href="/trucks/add" passHref>
                 <div className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800 opacity-75">
                   <Image
                     src="/images/icons/add.png" // Replace with your image path

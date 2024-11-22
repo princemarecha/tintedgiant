@@ -1,13 +1,25 @@
 "use client";
 
 import Layout from "@/components/Layout";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function MyComponent({ params }) {
   const router = useRouter();
+  const [plateId, setPlateId] = useState("");
+
+  // Unwrap params using React.use()
+  useEffect(() => {
+    async function fetchParams() {
+      // Unwrap params promise and set the plateId
+      const resolvedParams = await params;
+      setPlateId(resolvedParams.plate_id); // assuming the plate_id is in the params
+    }
+
+    fetchParams();
+  }, [params]);
 
   const initialFormData = {
     name: "",
@@ -17,7 +29,7 @@ export default function MyComponent({ params }) {
     trailer: false,
     trailerPlate: "",
     colour: "",
-    plate_id: "",
+    plate_id: "", // Initialize with the current plate_id
     mileage: "",
     fuel: "",
     journeys: "",
@@ -29,7 +41,7 @@ export default function MyComponent({ params }) {
 
   // Form state
   const [formData, setFormData] = useState(initialFormData);
-  
+
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,24 +54,34 @@ export default function MyComponent({ params }) {
   // Compare form data with initial data and return only the changed fields
   const getChangedFields = () => {
     const updatedFields = {};
+
+    // Only add fields to the payload if their values have changed
     Object.keys(formData).forEach((key) => {
       if (formData[key] !== initialFormData[key]) {
         updatedFields[key] = formData[key];
       }
     });
+
+    // If only the name is changed, return the name field as a separate object
+    if (updatedFields.name && Object.keys(updatedFields).length === 1) {
+      return { name: updatedFields.name };
+    }
+
     return updatedFields;
   };
 
-  // Submit the form
+  // Submit the form (PATCH request)
   const handleSubmit = async () => {
     try {
       const updatedFields = getChangedFields();  // Get only the changed fields
+
       if (Object.keys(updatedFields).length === 0) {
         alert("No changes detected!");
         return;
       }
 
-      const response = await axios.post("/api/trucks", updatedFields);
+      // Send PATCH request to update truck using plate_id
+      const response = await axios.patch(`/api/trucks/${plateId}`, updatedFields);
       if (response.status === 200) {
         alert("Truck information updated successfully!");
         setFormData(initialFormData);  // Reset form to initial state
@@ -76,11 +98,11 @@ export default function MyComponent({ params }) {
         <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Trucks</p>
 
         <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8">
-          <Link href="/" passHref><span>Home </span></Link> <span>&gt;</span> 
+          <Link href="/" passHref><span>Home </span></Link> <span>&gt;</span>
           <Link href="/trucks" passHref><span>Truck Management</span></Link> <span>&gt;</span>
           <Link href="/trucks/all" passHref><span>Trucks </span></Link>
           <span>&gt;</span>
-          <span>Add New</span>
+          <span>Edit Truck</span>
         </p>
 
         <div className="grid grid-cols-4 gap-4">

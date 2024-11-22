@@ -170,8 +170,8 @@ export default function MyComponent({ params }) {
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Harare, Zimbabwe</p> 
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">To</p> 
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Pretoria, South Africa</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">Truck</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-1">Toyota Streamliner</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">Driver</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-1">Prince Marecha</p> 
 
                 <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
                 <div className="text-sm 2xl:text-lg grid grid-cols-4 mx-6 text-white gap-y-2">
@@ -234,7 +234,7 @@ export default function MyComponent({ params }) {
           </button>
 
           <button
-                onClick={() => alert("Button clicked!")}
+                onClick={() => router.push(`/trucks/${plateID}/edit`)}
                 className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150 "
               >
                 <p className="flex justify-between"><span>Edit</span><span>

@@ -11,18 +11,18 @@ export default function ViewTrucks() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [role, setRole] = useState(""); // State for selected role
+  const [make, setMake] = useState(""); // State for selected make
   const itemsPerPage = 4; // Items to show per page
 
   // Fetch truck data
-  const fetchEmployees = async (page = 1, search = "", role = "") => {
+  const fetchEmployees = async (page = 1, search = "", make = "") => {
     try {
       const response = await axios.get(`/api/trucks`, {
         params: {
           page,
           limit: itemsPerPage,
           search,
-          role, // Pass the selected role to the backend
+          make, // Pass the selected make to the backend
         },
       });
       setTrucks(response.data.trucks);
@@ -33,8 +33,8 @@ export default function ViewTrucks() {
   };
 
   useEffect(() => {
-    fetchEmployees(currentPage, searchTerm, role);
-  }, [currentPage, searchTerm, role]); // Fetch data when search or role changes
+    fetchEmployees(currentPage, searchTerm, make);
+  }, [currentPage, searchTerm, make]); // Fetch data when search or make changes
 
   // Handle Search
   const handleSearch = (e) => {
@@ -43,10 +43,10 @@ export default function ViewTrucks() {
     setCurrentPage(1); // Reset to the first page for new search
   };
 
-  // Handle Role Change
-  const handleRoleChange = (e) => {
-    setRole(e.target.value);
-    setCurrentPage(1); // Reset to the first page for new role selection
+  // Handle make Change
+  const handleMakeChange = (e) => {
+    setMake(e.target.value);
+    setCurrentPage(1); // Reset to the first page for new make selection
   };
 
   // Pagination Controls
@@ -67,9 +67,11 @@ export default function ViewTrucks() {
     <div className="bg-white h-screen relative">
       <Layout>
         <div>
-          <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Trucks</p>
+        <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Trucks</p>
 
-          <p className="text-sm text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Truck Management</span> <span>&gt;</span><span>Trucks </span></p>
+        <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8">
+        <Link href="/" passHref><span>Home </span></Link> <span>&gt;</span>  <Link href="/trucks" passHref><span>Truck Management</span></Link> <span>&gt;</span>
+        <Link href="/trucks/all" passHref><span>Trucks </span></Link></p>
 
           {/* Search and Filter Section */}
           <div className="grid grid-cols-12 mb-4">
@@ -93,13 +95,13 @@ export default function ViewTrucks() {
             </div>
             <div className="hidden md:block"></div>
 
-            {/* Role Dropdown */}
+            {/* make Dropdown */}
             <div className="flex flex-col col-span-8 md:col-span-3 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
               <select
                 id="dropdown"
                 className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
-                onChange={handleRoleChange} // Update role on change
-                value={role}
+                onChange={handleMakeChange} // Update make on change
+                value={make}
               >
                 <option value=""  defaultValue>
                   Select Make...
@@ -128,7 +130,7 @@ export default function ViewTrucks() {
                       className="mb-2 transition duration-75 group-hover:opacity-80 rounded 2xl:w-200 2xl:h-200  ml-1"
                     />
                   </div>
-                  <div className=" col-span-2 text-gray-600 grid grid-cols-2 gap-y-2">
+                  <div className=" col-span-2 text-gray-600 grid grid-cols-2 gap-y-1">
                     <div className="col-span-2 font-black"> {truck.name}</div> 
                     <div className="font-bold" >Status</div> <div className="col-span-1"> {truck.status}</div> 
                     <div className="font-bold" >Location </div> <div className="col-span-1"> {truck.location}</div>
@@ -136,6 +138,7 @@ export default function ViewTrucks() {
                     <div className="font-bold" >Trailer </div> <div className="col-span-1"> {truck.trailer?"Yes":"No"}</div>
                     <div className="font-bold" >Colour</div> <div className="col-span-1"> {truck.colour}</div> 
                     <div className="font-bold" >Plate Id </div> <div className="col-span-1"> {truck.plate_id}</div>
+                    <div className="font-bold" >Make</div> <div className="col-span-1"> {truck.make}</div>
         
 
 
