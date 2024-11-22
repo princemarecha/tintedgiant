@@ -91,7 +91,7 @@ export async function GET(request) {
     const role = searchParams.get('role') || ''; // Role filter (empty by default)
 
     // Calculate pagination
-    const skip = (page - 1) * limit;
+    const skip = (page - 1) * limit; 
 
     // Build query object
     let query = {};
