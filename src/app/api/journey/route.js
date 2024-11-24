@@ -40,17 +40,42 @@ export async function POST(request) {
 }
 
 // Add GET handler to retrieve all journeys
-export async function GET() {
+export async function GET(req) {
   try {
     // Establish connection
     await connectToDatabase();
 
-    // Fetch all journeys
-    const journeys = await Journey.find({});
+    // Parse query parameters for pagination
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1", 10); // Default to page 1 if not provided
+    const itemsPerPage = 4; // Items per page
 
-    return NextResponse.json({ journeys });
+    // Calculate the number of items to skip
+    const skip = (page - 1) * itemsPerPage;
+
+    // Fetch paginated journeys
+    const journeys = await Journey.find({})
+      .skip(skip)
+      .limit(itemsPerPage);
+
+    // Get the total count of journeys for pagination metadata
+    const totalJourneys = await Journey.countDocuments();
+
+    // Return response with pagination info
+    return NextResponse.json({
+      journeys,
+      pagination: {
+        currentPage: page,
+        itemsPerPage,
+        totalJourneys,
+        totalPages: Math.ceil(totalJourneys / itemsPerPage),
+      },
+    });
   } catch (error) {
-    console.error('Error fetching journeys:', error);
-    return NextResponse.json({ message: 'Error fetching journeys', error: error.message }, { status: 500 });
+    console.error("Error fetching journeys:", error);
+    return NextResponse.json(
+      { message: "Error fetching journeys", error: error.message },
+      { status: 500 }
+    );
   }
 }

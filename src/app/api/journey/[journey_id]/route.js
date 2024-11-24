@@ -1,61 +1,67 @@
 import { connectToDatabase } from "@/utils/mongo";
 import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 
-export async function GET(req, context) {
+// GET method: Fetch a single journey by journey_id
+export async function GET(req, { params }) {
   const { db } = await connectToDatabase();
 
-  // Access empID directly from context.params
-  const {params} = context;
+  //console.log("Received params:", params); // Log the params object for debugging
 
-  const {journey_id} = await params
-  
-  console.log(journey_id)
+  const { journey_id } = await params; // Extract `journey_id` from `params`
 
-  // Fetch the journey document using the specified field
-  const data = await db.collection("journeys").findOne({ journey_id: journey_id });
+  try {
+    if (!journey_id) {
+      return NextResponse.json({ message: "Journey ID is required" }, { status: 400 });
+    }
 
-  // Return the journey data as a JSON response
-  return NextResponse.json(data);
-}
+    // Fetch the journey by its `journey_id`
+    const journey = await db.collection("journeys").findOne({ _id: new ObjectId(journey_id) });
 
-export async function DELETE(req, context) {
-  const { db } = await connectToDatabase();
-  const {params} = context;
+    if (!journey) {
+      return NextResponse.json({ message: "Journey not found" }, { status: 404 });
+    }
 
-  const {journey_id} = await params
-
-  console.log("Deleting journey with journey ID:", journey_id);
-
-  // Delete the journey document using the specified national ID
-  const result = await db.collection("journeys").deleteOne({ journey_id: journey_id });
-
-  if (result.deletedCount === 0) {
-    return NextResponse.json({ message: "journey not found" }, { status: 404 });
+    return NextResponse.json(journey); // Return the journey
+  } catch (error) {
+    console.error("Error fetching journey:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
-
-  return NextResponse.json({ message: "journey deleted successfully" });
 }
 
-export async function PATCH(req, context) {
+// PATCH method: Update a single journey by journey_id
+export async function PATCH(req, { params }) {
   const { db } = await connectToDatabase();
-  const {params} = context;
+  const { journey_id } = await params; // Extract `journey_id` from `params`
 
-  const {journey_id} = await params
+  try {
+    if (!journey_id) {
+      return NextResponse.json({ message: "Journey ID is required" }, { status: 400 });
+    }
 
-  // Parse the request body for updated fields
-  const updates = await req.json();
+    // Parse the request body for updates
+    const updates = await req.json();
 
-  console.log("Updating journey with journey ID:", journey_id, "with fields:", updates);
+    // Update the journey document
+    const result = await db.collection("journeys").updateOne(
+      { _id: new ObjectId(journey_id) },
+      { $set: updates }
+    );
 
-  // Update the journey document with the provided fields
-  const result = await db.collection("journeys").updateOne(
-    { journey_id: journey_id },
-    { $set: updates }
-  );
+    if (result.matchedCount === 0) {
+      return NextResponse.json({ message: "Journey not found" }, { status: 404 });
+    }
 
-  if (result.matchedCount === 0) {
-    return NextResponse.json({ message: "journey not found" }, { status: 404 });
+    // Fetch the updated journey
+    const updatedJourney = await db.collection("journeys").findOne({ _id: new ObjectId(journey_id) });
+
+    return NextResponse.json({
+      message: "Journey updated successfully",
+      journey: updatedJourney,
+    });
+  } catch (error) {
+    console.error("Error updating journey:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
-
-  return NextResponse.json({ message: "journey updated successfully" });
 }
+
