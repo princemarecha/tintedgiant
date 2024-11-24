@@ -155,7 +155,7 @@ export default function Manage() {
                     </div>
                     
                     <div className="grid grid-cols-1 text-[#AC0000] font-bold">
-                        <div className="font-bold" >Total Cost</div> <div > {journey.cargo?"$400.00 USD":"$560.00 USD"}</div>
+                        <div className="font-bold" >Distance</div> <div > {journey.distance} km</div>
                     </div> 
 
                     <div className="grid grid-cols-1">

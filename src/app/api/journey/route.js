@@ -53,8 +53,9 @@ export async function GET(req) {
     // Calculate the number of items to skip
     const skip = (page - 1) * itemsPerPage;
 
-    // Fetch paginated journeys
+    // Fetch paginated journeys sorted from latest to oldest
     const journeys = await Journey.find({})
+      .sort({ _id: -1 }) // Sort in descending order by ID
       .skip(skip)
       .limit(itemsPerPage);
 

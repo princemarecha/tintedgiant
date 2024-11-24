@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
+import Link from "next/link";
 
 async function getID(params) {
   // Simulate fetching or processing to get the plate ID
@@ -88,13 +89,16 @@ export default function Journey({ params }) {
         <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">
           Journey Details
         </p>
-        <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8">
-          <span>Home </span> <span>&gt;</span>{" "}
-          <span>Journey and Tracking</span> <span>&gt;</span>{" "}
-          <span>Journey</span>
+        <p className="text-sm  text-[#AC0000] font-bold mt-8 md:mt-6 mb-8">
+          <span className="hover:underline">Home </span> <span>&gt;</span>{" "}
+          <Link href={"/journeys"} passHref><span className="hover:underline">Journey and Tracking</span></Link> <span>&gt;</span>
+          <span>{journey?journey.from:""} - {journey?journey.to:""}</span>
         </p>
 
-        <p className="text-2xl font-bold text-[#AC0000]">Journey</p>
+        <div className="flex justify-between">
+          <p className="text-2xl font-bold text-[#AC0000]">Journey</p>
+          <p className="text-xl font-bold text-gray-500">{formatDateTime(journey?journey.departure:"")}</p>
+        </div>
         <hr className="border border-black my-2"/>
 
         {error ? (
