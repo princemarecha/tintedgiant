@@ -1,7 +1,7 @@
-// models/Customs.js
-import {Schema, models, model} from 'mongoose';
+import { Schema, models, model } from 'mongoose';
 
-const CustomsSchema = new Schema({
+const CustomsSchema = new Schema(
+  {
     date: { type: String, required: true },
     reference: { type: String, required: true },
     transporter: { type: String, required: true },
@@ -9,18 +9,16 @@ const CustomsSchema = new Schema({
     importer: { type: String, required: true },
     trailerPlate: { type: String, required: false },
     cargo: { type: String, required: true, default: false },
-    status: { type: String, required: true },
     BOE: { type: Number, required: true },
     horse_plate: { type: String, required: true },
-    trailer_plate: { type: Number, required: false },
+    trailer_plate: { type: String, required: false },
     invoice: { type: Number, required: false },
-    invoice_photo: { type: Number, required: false },
+    attachments: { type: [String], required: false },  // Changed to an array of strings
     duty: { type: Number, required: false },
     cleared: { type: Boolean, required: false, default: false },
-    
-}, { timestamps: true });
-
+  },
+  { timestamps: true }
+);
 
 const Customs = models.Customs || model('Customs', CustomsSchema);
-export default Customs
-
+export default Customs;

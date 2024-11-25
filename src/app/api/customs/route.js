@@ -9,9 +9,37 @@ export async function POST(request) {
     await connectToDatabase();
 
     // Parse the JSON body
-    const { date, reference, transporter, exporter, importer, trailerPlate, cargo, status, BOE, horse_plate, trailer_plate, invoice, invoice_photo, duty } = await request.json();
+    const {
+      date,
+      reference,
+      transporter,
+      exporter,
+      importer,
+      trailerPlate,
+      cargo,
+      BOE,
+      horse_plate,
+      trailer_plate,
+      invoice,
+      duty,
+      attachments, // Added attachments field for storing image URLs
+    } = await request.json();
 
-    console.log('Inserting Customs Entry:', { date, reference, transporter, exporter, importer, trailerPlate, cargo, status, BOE, horse_plate, trailer_plate, invoice, invoice_photo, duty });
+    console.log('Inserting Customs Entry:', {
+      date,
+      reference,
+      transporter,
+      exporter,
+      importer,
+      trailerPlate,
+      cargo,
+      BOE,
+      horse_plate,
+      trailer_plate,
+      invoice,
+      duty,
+      attachments,
+    });
 
     // Create a new Customs entry
     const newCustoms = new Customs({
@@ -22,29 +50,34 @@ export async function POST(request) {
       importer,
       trailerPlate,
       cargo,
-      status,
       BOE,
       horse_plate,
       trailer_plate,
       invoice,
-      invoice_photo,
-      duty
+      duty,
+      attachments, // Store the attachments URLs here
     });
 
     // Save to the database
     await newCustoms.save();
 
-    return NextResponse.json({ message: 'Customs entry added successfully', newCustoms });
+    return NextResponse.json({
+      message: 'Customs entry added successfully',
+      newCustoms,
+    });
   } catch (error) {
     console.error('Error adding customs entry:', error);
-    return NextResponse.json({ message: 'Error adding customs entry', error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: 'Error adding customs entry', error: error.message },
+      { status: 500 }
+    );
   }
 }
 
 export async function GET(req) {
   try {
     // Parse query parameters
-    const { search = "", filter = "", page = 1, limit = 10 } = Object.fromEntries(
+    const { search = '', filter = '', page = 1, limit = 10 } = Object.fromEntries(
       new URL(req.url).searchParams
     );
 
@@ -61,16 +94,16 @@ export async function GET(req) {
     // Add search condition
     if (search) {
       query.$or = [
-        { reference: { $regex: search, $options: "i" } },
-        { exporter: { $regex: search, $options: "i" } },
-        { importer: { $regex: search, $options: "i" } },
-        { transporter: { $regex: search, $options: "i" } },
+        { reference: { $regex: search, $options: 'i' } },
+        { exporter: { $regex: search, $options: 'i' } },
+        { importer: { $regex: search, $options: 'i' } },
+        { transporter: { $regex: search, $options: 'i' } },
       ];
     }
 
     // Add filter condition
     if (filter) {
-      query.cleared = filter === "Cleared";
+      query.cleared = filter === 'Cleared';
     }
 
     // Fetch filtered, paginated, and sorted results
@@ -91,9 +124,9 @@ export async function GET(req) {
       },
     });
   } catch (error) {
-    console.error("Error fetching customs entries:", error);
+    console.error('Error fetching customs entries:', error);
     return NextResponse.json(
-      { message: "Error fetching customs entries", error: error.message },
+      { message: 'Error fetching customs entries', error: error.message },
       { status: 500 }
     );
   }
