@@ -6,9 +6,9 @@ const CustomsSchema = new Schema({
     reference: { type: String, required: true },
     transporter: { type: String, required: true },
     exporter: { type: String, required: true },
-    importer: { type: Boolean, required: true },
+    importer: { type: String, required: true },
     trailerPlate: { type: String, required: false },
-    cargo: { type: String, required: true },
+    cargo: { type: String, required: true, default: false },
     status: { type: String, required: true },
     BOE: { type: Number, required: true },
     horse_plate: { type: String, required: true },
@@ -16,6 +16,8 @@ const CustomsSchema = new Schema({
     invoice: { type: Number, required: false },
     invoice_photo: { type: Number, required: false },
     duty: { type: Number, required: false },
+    cleared: { type: Boolean, required: false, default: false },
+    
 }, { timestamps: true });
 
 

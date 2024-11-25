@@ -173,11 +173,14 @@ export default function Manage() {
         </thead>
 
         {/* Styled <hr /> */}
-        <tr>
-            <td colSpan="7">
-            <hr className="border-t border-[#AC0000] my-2" />
-            </td>
-        </tr>
+        <tbody>
+           <tr>
+                <td colSpan="7">
+                <hr className="border-t border-[#AC0000] my-2" />
+                </td>
+            </tr>
+        </tbody>
+           
 
         <tbody className="text-[#AC0000] text-sm">
             {rowsToRender.map((row, index) => (

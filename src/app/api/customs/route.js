@@ -41,18 +41,60 @@ export async function POST(request) {
   }
 }
 
-// Add GET handler to retrieve all customs entries
-export async function GET() {
+export async function GET(req) {
   try {
-    // Establish connection
+    // Parse query parameters
+    const { search = "", filter = "", page = 1, limit = 10 } = Object.fromEntries(
+      new URL(req.url).searchParams
+    );
+
+    // Convert page and limit to numbers
+    const pageNumber = parseInt(page, 10) || 1;
+    const limitNumber = parseInt(limit, 10) || 10;
+
+    // Connect to the database
     await connectToDatabase();
 
-    // Fetch all customs entries
-    const customsEntries = await Customs.find({});
+    // Build query object
+    const query = {};
 
-    return NextResponse.json({ customsEntries });
+    // Add search condition
+    if (search) {
+      query.$or = [
+        { reference: { $regex: search, $options: "i" } },
+        { exporter: { $regex: search, $options: "i" } },
+        { importer: { $regex: search, $options: "i" } },
+        { transporter: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Add filter condition
+    if (filter) {
+      query.cleared = filter === "Cleared";
+    }
+
+    // Fetch filtered, paginated, and sorted results
+    const totalEntries = await Customs.countDocuments(query);
+    const customsEntries = await Customs.find(query)
+      .sort({ createdAt: -1 }) // Latest entries first
+      .skip((pageNumber - 1) * limitNumber)
+      .limit(limitNumber);
+
+    // Prepare response
+    return NextResponse.json({
+      data: customsEntries,
+      pagination: {
+        totalEntries,
+        totalPages: Math.ceil(totalEntries / limitNumber),
+        currentPage: pageNumber,
+        limit: limitNumber,
+      },
+    });
   } catch (error) {
-    console.error('Error fetching customs entries:', error);
-    return NextResponse.json({ message: 'Error fetching customs entries', error: error.message }, { status: 500 });
+    console.error("Error fetching customs entries:", error);
+    return NextResponse.json(
+      { message: "Error fetching customs entries", error: error.message },
+      { status: 500 }
+    );
   }
 }

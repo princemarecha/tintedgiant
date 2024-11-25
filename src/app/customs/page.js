@@ -3,6 +3,7 @@
 
 import Layout from "@/components/Layout";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Employee() {
   return (
@@ -12,20 +13,22 @@ export default function Employee() {
           <div className="">
           
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+              <Link href={"/customs/manage"} passHref>
+                <div className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800">
+                  <Image
+                    src="/images/icons/customs.png" // Replace with your image path
+                    alt="Dashboard Icon" // Alternative text for the image
+                    width={80} // Default width
+                    height={80} // Default height
+                    className="mb-2 transition duration-75 group-hover:opacity-80 sm:w-16 sm:h-16" // Scales image on smaller screens
+                  />
+                  <p className="text-xs lg:text-xl ">
+                    Manage Clearances
+                  </p>
+                </div>
+                </Link>
 
-              <div className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800">
-                <Image
-                  src="/images/icons/customs.png" // Replace with your image path
-                  alt="Dashboard Icon" // Alternative text for the image
-                  width={80} // Default width
-                  height={80} // Default height
-                  className="mb-2 transition duration-75 group-hover:opacity-80 sm:w-16 sm:h-16" // Scales image on smaller screens
-                />
-                <p className="text-xs lg:text-xl ">
-                  Manage Clearances
-                </p>
-              </div>
-
+                <Link href={"/customs/add"} passHref>
               <div className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800 opacity-75">
                 <Image
                   src="/images/icons/add.png" // Replace with your image path
@@ -39,6 +42,7 @@ export default function Employee() {
                   Add New Clearance
                 </p>
               </div>
+              </Link>
 
               </div>
           </div>
