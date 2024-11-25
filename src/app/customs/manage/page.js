@@ -162,6 +162,7 @@ export default function Manage() {
                   </td>
                   <td className="text-center">
                     {row.date ? (
+                      <Link href={`/customs/${row.reference}`}>
                       <Image
                         src="/images/icons/eye.png"
                         alt="View Details"
@@ -169,6 +170,7 @@ export default function Manage() {
                         height={20}
                         className="cursor-pointer mx-auto"
                       />
+                      </Link>
                     ) : (
                       "-"
                     )}
