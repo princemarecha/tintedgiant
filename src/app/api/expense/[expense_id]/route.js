@@ -2,19 +2,20 @@ import { connectToDatabase } from "@/utils/mongo";
 import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 
-// GET method: Fetch a single expense by _id
 export async function GET(req, { params }) {
   const { db } = await connectToDatabase();
+  const { expense_id } = await params; // Extract `expense_id` from `params`
 
-  const { expense_id } = params; // Extract `expense_id` from `params`
-  console.log(expense_id)
+
+  console.log("Expense ID:", expense_id);
 
   try {
-    if (!expense_id) {
-      return NextResponse.json({ message: "Expense ID is required" }, { status: 400 });
+    // Validate expense_id format
+    if (!expense_id || !ObjectId.isValid(expense_id)) {
+      return NextResponse.json({ message: "Invalid Expense ID" }, { status: 400 });
     }
 
-    // Fetch the expense by its `_id`
+    // Convert expense_id to ObjectId
     const expense = await db.collection("expenses").findOne({ _id: new ObjectId(expense_id) });
 
     if (!expense) {
@@ -56,6 +57,7 @@ export async function DELETE(req, { params }) {
 export async function PATCH(req, { params }) {
   const { db } = await connectToDatabase();
   const { expense_id } = await params; // Extract `expense_id` from `params`
+  console.log("Patching this and this"+ expense_id)
 
   try {
     if (!expense_id) {
