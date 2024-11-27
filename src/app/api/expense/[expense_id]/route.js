@@ -1,61 +1,89 @@
 import { connectToDatabase } from "@/utils/mongo";
 import { NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
 
-export async function GET(req, context) {
+// GET method: Fetch a single expense by _id
+export async function GET(req, { params }) {
   const { db } = await connectToDatabase();
 
-  // Access empID directly from context.params
-  const {params} = context;
-
-  const {expense_id} = await params
-  
+  const { expense_id } = params; // Extract `expense_id` from `params`
   console.log(expense_id)
 
-  // Fetch the expense document using the specified field
-  const data = await db.collection("expenses").findOne({ expense_id: expense_id });
+  try {
+    if (!expense_id) {
+      return NextResponse.json({ message: "Expense ID is required" }, { status: 400 });
+    }
 
-  // Return the expense data as a JSON response
-  return NextResponse.json(data);
+    // Fetch the expense by its `_id`
+    const expense = await db.collection("expenses").findOne({ _id: new ObjectId(expense_id) });
+
+    if (!expense) {
+      return NextResponse.json({ message: "Expense not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(expense); // Return the expense
+  } catch (error) {
+    console.error("Error fetching expense:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+  }
 }
 
-export async function DELETE(req, context) {
+// DELETE method: Delete a single expense by _id
+export async function DELETE(req, { params }) {
   const { db } = await connectToDatabase();
-  const {params} = context;
+  const { expense_id } = params; // Extract `expense_id` from `params`
 
-  const {expense_id} = await params
+  try {
+    if (!expense_id) {
+      return NextResponse.json({ message: "Expense ID is required" }, { status: 400 });
+    }
 
-  console.log("Deleting expense with expense ID:", expense_id);
+    // Delete the expense by its `_id`
+    const result = await db.collection("expenses").deleteOne({ _id: new ObjectId(expense_id) });
 
-  // Delete the expense document using the specified national ID
-  const result = await db.collection("expenses").deleteOne({ expense_id: expense_id });
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ message: "Expense not found" }, { status: 404 });
+    }
 
-  if (result.deletedCount === 0) {
-    return NextResponse.json({ message: "expense not found" }, { status: 404 });
+    return NextResponse.json({ message: "Expense deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting expense:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
-
-  return NextResponse.json({ message: "expense deleted successfully" });
 }
 
-export async function PATCH(req, context) {
+// PATCH method: Update a single expense by _id
+export async function PATCH(req, { params }) {
   const { db } = await connectToDatabase();
-  const {params} = context;
+  const { expense_id } = await params; // Extract `expense_id` from `params`
 
-  const {expense_id} = await params
+  try {
+    if (!expense_id) {
+      return NextResponse.json({ message: "Expense ID is required" }, { status: 400 });
+    }
 
-  // Parse the request body for updated fields
-  const updates = await req.json();
+    // Parse the request body for updates
+    const updates = await req.json();
 
-  console.log("Updating expense with expense ID:", expense_id, "with fields:", updates);
+    // Update the expense document
+    const result = await db.collection("expenses").updateOne(
+      { _id: new ObjectId(expense_id) },
+      { $set: updates }
+    );
 
-  // Update the expense document with the provided fields
-  const result = await db.collection("expenses").updateOne(
-    { expense_id: expense_id },
-    { $set: updates }
-  );
+    if (result.matchedCount === 0) {
+      return NextResponse.json({ message: "Expense not found" }, { status: 404 });
+    }
 
-  if (result.matchedCount === 0) {
-    return NextResponse.json({ message: "expense not found" }, { status: 404 });
+    // Fetch the updated expense
+    const updatedExpense = await db.collection("expenses").findOne({ _id: new ObjectId(expense_id) });
+
+    return NextResponse.json({
+      message: "Expense updated successfully",
+      expense: updatedExpense,
+    });
+  } catch (error) {
+    console.error("Error updating expense:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
-
-  return NextResponse.json({ message: "expense updated successfully" });
 }

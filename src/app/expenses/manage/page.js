@@ -8,82 +8,57 @@ import Link from "next/link";
 
 export default function Manage() {
   const [expenses, setExpenses] = useState([]);
-  const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [expenseType, setExpenseType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+  const rowsPerPage = 9; // Matches backend limit
+  const [totalPages, setTotalPages] = useState(0);
 
   // Fetch expenses data
-  const fetchExpenses = async () => {
+  const fetchExpenses = async (page = 1, search = "", type = "") => {
     try {
-      const response = await axios.get("/api/expense/manage");
-      const { frameworks } = response.data;
+      const response = await axios.get("/api/expense", {
+        params: { page, limit: rowsPerPage, search, type },
+      });
 
-      if (frameworks.length > 0) {
-        const { regular, other } = frameworks[0];
-        const allExpenses = [
-          ...regular.map((item) => ({
-            type: "Regular",
-            date: "2024-11-21", // Sample date
-            trip: "Trip #1234",
-            driver: "John Doe",
-            amount: "$200.00",
-            expense: item,
-          })),
-          ...other.map((item) => ({
-            type: "Other",
-            date: "2024-11-22",
-            trip: "Trip #1235",
-            driver: "Jane Doe",
-            amount: "$150.00",
-            expense: item,
-          })),
-        ];
-        setExpenses(allExpenses);
-        setFilteredExpenses(allExpenses);
-      }
+      const data = response.data;
+      setExpenses(data.expenses);
+      setTotalPages(data.totalPages); // Total pages from backend
     } catch (error) {
       console.error("Error fetching expenses:", error);
     }
   };
 
-  // Handle search
+  // Handle search input
   const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
+    const query = e.target.value;
     setSearchQuery(query);
-    filterExpenses(query, expenseType);
+    setCurrentPage(1); // Reset to page 1
+    fetchExpenses(1, query, expenseType);
   };
 
-  // Handle dropdown change
+  // Handle dropdown change for expense type
   const handleTypeChange = (e) => {
     const selectedType = e.target.value;
     setExpenseType(selectedType);
-    filterExpenses(searchQuery, selectedType);
+    setCurrentPage(1); // Reset to page 1
+    fetchExpenses(1, searchQuery, selectedType);
   };
 
-  // Filter expenses based on search and dropdown
-  const filterExpenses = (query, type) => {
-    const filtered = expenses.filter(
-      (expense) =>
-        expense.expense.toLowerCase().includes(query) &&
-        (type === "" || expense.type === type)
-    );
-    setFilteredExpenses(filtered);
-    setCurrentPage(1); // Reset to first page after filtering
+  // Handle page change for pagination
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchExpenses(page, searchQuery, expenseType);
   };
 
-  // Handle pagination
-  const totalPages = Math.ceil(filteredExpenses.length / rowsPerPage);
-  const currentRows = filteredExpenses.slice(
-    (currentPage - 1) * rowsPerPage,
-    currentPage * rowsPerPage
-  );
+  useEffect(() => {
+    fetchExpenses(currentPage, searchQuery, expenseType); // Initial fetch
+  }, []);
 
   // Add empty rows if necessary to fill up to rowsPerPage
   const rowsToRender = [
-    ...currentRows,
-    ...Array.from({ length: rowsPerPage - currentRows.length }).map(() => ({
+    ...expenses,
+    ...Array.from({ length: rowsPerPage - expenses.length }).map(() => ({
       date: "",
       expense: "",
       type: "",
@@ -92,14 +67,6 @@ export default function Manage() {
       amount: "",
     })),
   ];
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-  };
-
-  useEffect(() => {
-    fetchExpenses();
-  }, []);
 
   return (
     <div className="bg-white h-screen relative">
@@ -139,7 +106,8 @@ export default function Manage() {
               className="transition duration-75 group-hover:opacity-80 sm:w-8 sm:h-8"
             />
           </div>
-            <div></div>
+
+          <div></div>
           {/* Expense Type Dropdown */}
           <div className="flex flex-col col-span-8 md:col-span-3 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
             <select
@@ -151,77 +119,96 @@ export default function Manage() {
               <option value="" defaultValue>
                 Expense Type
               </option>
-              <option value="Regular">Regular</option>
-              <option value="Other">Other</option>
+              <option value="Trip">Trip</option>
+              <option value="General">General</option>
             </select>
           </div>
         </div>
 
         {/* Table Section */}
-        <div className="overflow-x-auto ">
-        <table className="w-full text-left border-separate border-spacing-y-4 min-w-[800px] w-full">
-        <thead className="text-[#AC0000] font-bold">
-            <tr>
-            <th>Date</th>
-            <th>Expenses</th>
-            <th>Type</th>
-            <th>Trip</th>
-            <th>Driver</th>
-            <th>Amount</th>
-            <th>Action</th>
-            </tr>
-        </thead>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-separate border-spacing-y-4 min-w-[800px] w-full">
+            <thead className="text-[#AC0000] font-bold text-sm">
+              <tr>
+                <th>Date</th>
+                <th>Expenses</th>
+                <th>Type</th>
+                <th>Trip</th>
+                <th>Amt (USD)</th>
+                <th>Amt (ZAR)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
 
-        {/* Styled <hr /> */}
-        <tbody>
-           <tr>
-                <td colSpan="7">
-                <hr className="border-t border-[#AC0000] my-2" />
-                </td>
-            </tr>
-        </tbody>
-           
-
-        <tbody className="text-[#AC0000] text-sm">
-            {rowsToRender.map((row, index) => (
-            <tr key={index} className="hover:bg-gray-100">
-                <td>{row.date || ""}</td>
-                <td>{row.expense || ""}</td>
-                <td>{row.type || ""}</td>
-                <td>{row.trip || ""}</td>
-                <td>{row.driver || ""}</td>
-                <td>{row.amount || ""}</td>
-                <td>{row.amount?
-                <Image
-                    src="/images/icons/eye.png"
-                    alt="View Details"
-                    width={20}
-                    height={20}
-                />:"-"}
-                </td>
-            </tr>
-            ))}
-        </tbody>
-        </table>
-
-
+            <tbody className="text-[#AC0000] text-xs">
+              {rowsToRender.map((row, index) => (
+                <tr key={index} className="hover:bg-gray-100">
+                  <td>{row.date || ""}</td>
+                  <td>{row.expenses ? row.expenses.length : ""}</td>
+                  <td>{row.type || ""}</td>
+                  <td>{row.trip ? row.trip.route : ""}</td>
+                  <td>
+                    {row.total_amount
+                      ? `$${row.total_amount.find((item) => item.currency === "USD")?.amount || "0.00"}`
+                      : ""}
+                  </td>
+                  <td>
+                    {row.total_amount
+                      ? `ZAR${row.total_amount.find((item) => item.currency === "ZAR")?.amount || "0.00"}`
+                      : ""}
+                  </td>
+                  <td className="text-center">
+                    {row.date ? (
+                      <Link href={`/expenses/${row._id}`} passHref>
+                        <Image
+                          src="/images/icons/eye.png"
+                          alt="View Details"
+                          width={20}
+                          height={20}
+                          className="mx-auto"
+                        />
+                      </Link>
+                    ) : (
+                      <span className="text-gray-300">-</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Pagination */}
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 mx-1 ${
+              currentPage === 1 ? "bg-gray-400" : "bg-[#AC0000] text-white"
+            } rounded`}
+          >
+            Previous
+          </button>
           {Array.from({ length: totalPages }).map((_, index) => (
             <button
               key={index}
               className={`px-4 py-2 mx-1 ${
-                currentPage === index + 1
-                  ? "bg-[#AC0000] text-white"
-                  : "bg-gray-200 text-[#AC0000]"
+                currentPage === index + 1 ? "bg-[#AC0000] text-white" : "bg-gray-200 text-[#AC0000]"
               } rounded`}
               onClick={() => handlePageChange(index + 1)}
             >
               {index + 1}
             </button>
           ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 mx-1 ${
+              currentPage === totalPages ? "bg-gray-400" : "bg-[#AC0000] text-white"
+            } rounded`}
+          >
+            Next
+          </button>
         </div>
       </Layout>
     </div>

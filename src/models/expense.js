@@ -1,24 +1,29 @@
 // models/Expense.js
-import {Schema, models, model} from 'mongoose';
+import { Schema, models, model } from 'mongoose';
 
 const expenses = new Schema({
-    type: {type:String, required:true},
-    amount: {type:String, required:false},
-    trip: { type: String, required: false },
-    truck: { type: String, required: false },
-    driver: { type: String, required: false },
-})
+  name: { type: String, required: true },
+  amount: { type: String, required: false },
+});
+
+const total = new Schema({
+  currency: { type: String, required: true },
+  amount: { type: String, required: false },
+});
+
+const trip = new Schema({
+  route: { type: String, required: true, default: 'N/A' }, // Default value for currency
+  id: { type: String, required: false, default: '0' },     // Default value for amount
+});
 
 const ExpenseSchema = new Schema({
-    date: { type: String, required: true },
-    expenses: [expenses],
-    type: { type: String, required: true },
-    total_amount: { type: String, required: true },
-    attachments: { type: String, required: true },
-    expense_id: { type: String, required: true }
+  date: { type: String, required: true },
+  expenses: [expenses],
+  trip: { type: trip, default: {route: "N/A", id: "N/A" } }, // Set default value as empty object for trip
+  type: { type: String, required: true },
+  total_amount: [total],
+  attachments: { type: String, required: true },
 }, { timestamps: true });
 
-
 const Expense = models.Expense || model('Expense', ExpenseSchema);
-export default Expense
-
+export default Expense;
