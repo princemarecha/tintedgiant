@@ -9,9 +9,9 @@ export async function POST(request) {
     await connectToDatabase();
 
     // Parse the JSON body
-    const { from, to, departure, arrival, cargo, expense, delivered, journey_id, distance, status, truck, driver } = await request.json();
+    const { from, to, departure, arrival, cargo, expense, delivered, distance, status, truck, driver } = await request.json();
 
-    console.log('Inserting Journey:', { from, to, departure, arrival, cargo, expense, delivered, journey_id, distance, status, truck, driver });
+    console.log('Inserting Journey:', { from, to, departure, arrival, cargo, expense, delivered, distance, status, truck, driver });
 
     // Create a new Journey instance
     const newJourney = new Journey({
@@ -22,7 +22,6 @@ export async function POST(request) {
       cargo,
       expense,
       delivered,
-      journey_id,
       distance,
       status,
       truck,

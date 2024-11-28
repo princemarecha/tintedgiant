@@ -16,17 +16,17 @@ export default function Journey({ params }) {
   const [journey, setJourney] = useState(null); // State to store journey data
   const [error, setError] = useState(null); // State to handle errors
   const [journeyID, setID] = useState(null);
+  const [expenseData, setExpenseData] = useState({})
 
-  // Function to fetch the journey by ID
-  const fetchJourney = async (id) => {
+  // Function to fetch expense details
+  const fetchExpense = async (expenseID) => {
     try {
-      const response = await axios.get(`/api/journey/${id}`);
-      setJourney(response.data);
+      const response = await axios.get(`/api/expense/${expenseID}`);
+      setExpenseData(response.data);
     } catch (err) {
-      setError("Failed to load journey details. Please try again.");
+      setError("Failed to fetch expense details");
     }
   };
-
   async function fetchAJourneyData(journeyID) {
     // Fetch truck data from the endpoint
   
@@ -60,13 +60,22 @@ export default function Journey({ params }) {
           setJourney(data);
           console.log("done")
         } catch (err) {
-          setError("Failed to fetch truck data");
+          setError("Failed to fetch journey data");
         }
       }
 
       fetchAJourney();
+
     }
   }, [journeyID]);
+
+  // Fetch expense data when journey data is loaded
+  useEffect(() => {
+    if (journey?.expenses) {
+      fetchExpense(journey.expenses);
+    }
+  }, [journey]);
+  
 
   // Utility function to format date and time
   const formatDateTime = (dateTimeString) => {
@@ -143,27 +152,43 @@ export default function Journey({ params }) {
         )}
 
         {/* Expenses */}
-        <p className="text-xl font-bold text-black">Expenses</p>
-        <hr className="border border-black my-2"/>
+        {expenseData?.expenses ? <div>
+          <p className="text-xl font-bold text-black">Expenses</p>
+          <hr className="border border-black my-2"/>
+        </div>:""}
 
-        <div className="p-4   text-black grid grid-cols-2 gap-y-6 mb-4 text-sm">
-        <div className="grid grid-cols-1">
-              <span className="font-bold">Fuel</span> $245.50 USD
+        {expenseData?.expenses ? (
+            <div className="p-4 text-black grid grid-cols-6 gap-y-6 mb-4 text-sm">
+              {expenseData.expenses.map((expense) => (
+                <div key={expense._id} className="grid grid-cols-1">
+                  <span className="font-bold">{expense.name}</span> ${expense.amount} USD
+                </div>
+              ))}
             </div>
-        </div>
+          ) : (
+            <p>No Expense Attached</p>
+          )}
 
-        <hr className="border border-black my-2"/>
+
+        {expenseData?.total_amount ?<hr className="border border-black my-2"/>:""}
          {/* Totals Section */}
-         <div className="mt-6 mb-4 text-[#4F4F4F] flex">
-          <p className="font-bold text-sm mr-10">totals</p>
-          
-            <p  className="mr-4">
-              <span className="text-xs">USD</span> 
-              <span className="font-black text-3xl">567.50</span>
-            </p>
-        
-        </div>
-        <hr className="border border-black my-2"/>
+         {expenseData?.total_amount ? (
+            <div className="mt-6 mb-4 text-[#4F4F4F] flex">
+              <p className="font-bold text-sm mr-10">totals</p>
+              <div className="flex">
+                {expenseData.total_amount.map((total) => (
+                  <div key={total._id} className="mr-4">
+                    <span className="text-xs">{total.currency}</span>
+                    <span className="font-black text-3xl"> {total.amount}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <p>Loading totals...</p>
+          )}
+
+        {expenseData?.total_amount ?<hr className="border border-black my-2"/>:""}
         <div className="flex justify-between mt-6 text-sm">
         <p className="font-bold text-[#AC0000] text-sm mr-10">Delete Journey</p>
         <button
@@ -181,6 +206,26 @@ export default function Journey({ params }) {
                   </span>
                   </p>
           </button>
+        </div>
+
+        <div className="flex justify-end mt-6 text-sm">
+          <Link href={`/journeys/${journeyID}/edit`}>
+        <button
+                onClick={() => alert("Button clicked!")}
+                className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150 "
+              >
+                <p className="flex justify-between"><span>Edit</span><span>
+                <Image
+                src="/images/icons/edit.png"
+                alt="Search Icon"
+                width={20}
+                height={20}
+                className="transition duration-75 group-hover:opacity-80 ml-2 sm:w-6 sm:h-6"
+              />
+                  </span>
+                  </p>
+          </button>
+          </Link>
         </div>
       </Layout>
     </div>
