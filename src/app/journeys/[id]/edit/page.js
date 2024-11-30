@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 
 
@@ -26,6 +27,8 @@ export default function Driver({params}) {
   const [journeyID, setID] = useState(null);
   const [cargoEnabled, setCargoEnabled] = useState(null);
   const [formData, setFormData] = useState(defaultForm);
+
+  const router  = useRouter();
 
 
    // Unwrap params using React.use()
@@ -58,6 +61,34 @@ export default function Driver({params}) {
 
     fetchTruckDrivers(); // Fetch only on initial render
   }, []); // Empty dependency array ensures it runs once
+
+  // Fetch journey details
+  useEffect(() => {
+    const fetchJourneyDetails = async () => {
+      if (!journeyID) return; // Wait until journeyID is set
+      try {
+        const response = await axios.get(`/api/journey/${journeyID}`);
+        const journey = response.data;
+
+        // Update formData with fetched journey data
+        setFormData({
+          departure: journey.departure || "",
+          arrival: journey.arrival || "",
+          driver: journey.driver?.name || "",
+          truck: journey.truck?.name || "",
+          from: journey.from || "",
+          to: journey.to || "",
+          distance: journey.distance || "",
+          status: journey.status || "",
+          cargo: journey.cargo || "",
+        });
+      } catch (error) {
+        console.error("Error fetching journey details:", error);
+      }
+    };
+
+    fetchJourneyDetails();
+  }, [journeyID]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -103,7 +134,7 @@ export default function Driver({params}) {
     try {
       const response = await axios.patch(`/api/journey/${journeyID}`, filteredData);
       console.log("Journey updated:", response.data);
-  
+      router.push(`/journeys/${journeyID}`)
       // Reset form
       setFormData(defaultForm);
   
