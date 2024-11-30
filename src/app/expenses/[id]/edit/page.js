@@ -5,6 +5,7 @@ import axios from "axios";
 import Layout from "@/components/Layout";
 import Link from "next/link";
 import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
 
 export default function Manage() {
   const [rows, setRows] = useState([]);
@@ -13,6 +14,10 @@ export default function Manage() {
   const [attachments, setAttachments] = useState(""); // For managing attachment input
   const [type, setType] = useState(""); // Type of expense (e.g., trip, misc)
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // Default to today's date
+
+  const router  = useRouter()
+
+  const { id } = useParams();
 
   // Currency symbol map
   const currencySymbols = {
@@ -76,10 +81,22 @@ export default function Manage() {
     setRows(updatedRows);
   };
 
-  const handleDateChange = (e) => {
-    setDate(e.target.value);
+  // Fetch an existing expense by ID
+  const fetchExpenseById = async () => {
+    try {
+      const response = await axios.get(`/api/expense/${id}`);
+      const expenseData = response.data;
+
+      // Initialize state based on fetched data
+      setDate(expenseData.date);
+      setType(expenseData.type);
+      setRows(expenseData.expenses);
+      setAttachments(expenseData.attachments || "");
+    } catch (error) {
+      console.error("Error fetching expense by ID:", error);
+      alert("Failed to fetch expense data. Please try again.");
+    }
   };
-  
 
   const deleteRow = (index) => {
     const updatedRows = rows.filter((_, rowIndex) => rowIndex !== index);
@@ -136,7 +153,7 @@ export default function Manage() {
     formData.append("file", file);
 
     axios
-      .post("/api/upload", formData)
+      .axios("/api/upload", formData)
       .then(() => alert("File uploaded successfully"))
       .catch((error) => console.error("Error uploading file:", error));
   };
@@ -171,23 +188,29 @@ export default function Manage() {
           type,
           expenses: rows,
           total_amount: totalAmount,
-          trip: { route: "N/A", id: "N/A" }, // Adjust if trip data is available
+         
           attachments,
         };
   
-        const response = await axios.post("/api/expense", payload);
+        const response = await axios.patch(`/api/expense/${id}`, payload);
   
-        alert("Expense saved successfully!");
-        setRows([]); // Clear rows
+        alert("Expense updated successfully!");
+        router.push(`/expenses/${id}`)
       } catch (error) {
-        console.error("Error saving expense:", error);
-        alert("Failed to save expense. Please try again.");
+        console.error("Error updating expense:", error);
+        alert("Failed to update expense. Please try again.");
       }
     };
 
   useEffect(() => {
     fetchExpenses();
   }, []);
+
+  useEffect(() => {
+    if (id) {
+      fetchExpenseById(); // Fetch the expense when the component mounts and ID is available
+    }
+  }, [id]);
 
   return (
     <div className="bg-white h-screen relative">
@@ -199,18 +222,22 @@ export default function Manage() {
           <p className="text-sm text-[#AC0000] font-bold mt-8 md:mt-6 mb-8">
             <span>Home </span> <span>&gt;</span>{" "}
             <Link href="/expenses" passHref>
-              <span>Expenses Management</span>
+              <span className="hover:underline">Expenses Management</span>
             </Link>{" "}
             <span>&gt;</span>
             <Link href="/expenses/manage" passHref>
-              <span> Manage Expenses</span>
+              <span className="hover:underline"> Manage Expenses</span>
             </Link>{" "}
             <span>&gt;</span>
-            <span> Add Expenses </span>
+            <Link href={`/expenses/${id}/`} passHref>
+              <span className="hover:underline"> Expense Detail</span>
+            </Link>{" "}
+            <span>&gt;</span>
+            <span > Edit Expense </span>
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-black">
               {/* Row 1 */}
               <div>
                 <label
@@ -220,13 +247,14 @@ export default function Manage() {
                   Date
                 </label>
                 <input
-                  type="date"
-                  id="departure"
-                  name="departure"
-                  value={date} // Bind the input value to the state
-                 onChange={handleDateChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                />
+                    type="date"
+                    id="departure"
+                    name="departure"
+                    value={date} // Bind the input value to the state
+                    onChange={(e) => setDate(e.target.value)} // Update the state
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+                  />
+
               </div>
               <div>
                 <label
@@ -253,7 +281,7 @@ export default function Manage() {
               </div>
 
         {/* Table Section */}
-        <div className="h-96">
+        <div className="h-96 mt-4">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead className="text-[#AC0000] font-bold border-b border-[#AC0000]">

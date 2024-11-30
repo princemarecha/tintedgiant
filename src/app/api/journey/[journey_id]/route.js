@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 // GET method: Fetch a single journey by journey_id
 export async function GET(req, { params }) {
   const { db } = await connectToDatabase();
-  const { journey_id } = params;
+  const { journey_id } = await params;
 
   try {
     if (!journey_id) {
@@ -28,7 +28,7 @@ export async function GET(req, { params }) {
 // PATCH method: Update a single journey by journey_id
 export async function PATCH(req, { params }) {
   const { db } = await connectToDatabase();
-  const { journey_id } = params;
+  const { journey_id } = await params;
 
   try {
     if (!journey_id) {
@@ -61,7 +61,7 @@ export async function PATCH(req, { params }) {
 // DELETE method: Remove a journey by journey_id
 export async function DELETE(req, { params }) {
   const { db } = await connectToDatabase();
-  const { journey_id } = params;
+  const { journey_id } = await params;
 
   try {
     if (!journey_id) {

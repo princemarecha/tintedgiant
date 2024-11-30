@@ -100,8 +100,13 @@ export default function Journey({ params }) {
       const confirmDelete = window.confirm("Are you sure you want to delete this journey?");
       if (!confirmDelete) return;
   
+      const payload = {
+        trip:{route: "N/A", id: "N/A" }
+      }
+
       await axios.delete(`/api/journey/${journeyID}`);
       alert("journey deleted successfully!");
+      await axios.patch(`/api/expense/${expenseData._id}`, payload)
       // Optionally, redirect to another page or refresh the list
       router.push("/journeys/manage");
     } catch (error) {

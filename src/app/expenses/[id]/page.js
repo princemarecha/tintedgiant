@@ -134,8 +134,13 @@ export default function Expense() {
     try {
       const confirmDelete = window.confirm("Are you sure you want to delete this expense?");
       if (!confirmDelete) return;
+
+      const payload = {
+        expenses:"N/A"
+      }
   
       await axios.delete(`/api/expense/${id}`);
+      await axios.patch(`/api/journey/${journeyDetails._id}`, payload)
       alert("Expense deleted successfully!");
       // Optionally, redirect to another page or refresh the list
       router.push("/expenses/manage");
@@ -210,7 +215,8 @@ export default function Expense() {
             id="journeyDropdown"
             className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
             onChange={handleJourneyChange}
-            value={selectedJourney.from}
+            value={selectedJourney?.from}
+
           >
             <option className="text-xs" value="">
               Select a Journey
@@ -250,7 +256,7 @@ export default function Expense() {
         {expense?.expenses?.map((expenseItem) => (
         
           <div key={expenseItem._id} className="grid grid-cols-1">
-          <span className="font-bold">{expenseItem.name}</span> ${expenseItem.amount}
+          <span className="font-bold">{expenseItem.name}</span> {expenseItem.currency == "USD"? expenseItem.currency +" $":expenseItem.currency}{expenseItem.amount}
           </div>
         
         ))}
@@ -298,10 +304,12 @@ export default function Expense() {
         </div>
         <div className="flex justify-end my-4 text-sm">
             <button
-                onClick={() => alert("Button clicked!")}
                 className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150 "
               >
-                <p className="flex justify-between"><span>Edit</span><span>
+                <p className="flex justify-between"   onClick={(event) => {
+                      event.preventDefault(); // Prevent the default form or button behavior
+                      router.push(`/expenses/${id}/edit`);
+                    }}><span>Edit</span><span>
                 <Image
                 src="/images/icons/edit.png"
                 alt="Search Icon"
