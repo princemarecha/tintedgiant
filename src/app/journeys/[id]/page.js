@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 async function getID(params) {
   // Simulate fetching or processing to get the plate ID
@@ -17,6 +18,8 @@ export default function Journey({ params }) {
   const [error, setError] = useState(null); // State to handle errors
   const [journeyID, setID] = useState(null);
   const [expenseData, setExpenseData] = useState({})
+
+  const router = useRouter();
 
   // Function to fetch expense details
   const fetchExpense = async (expenseID) => {
@@ -92,6 +95,22 @@ export default function Journey({ params }) {
     return date.toLocaleString("en-US", options).replace(",", "");
   };
 
+  const handleDeleteJourney = async () => {
+    try {
+      const confirmDelete = window.confirm("Are you sure you want to delete this journey?");
+      if (!confirmDelete) return;
+  
+      await axios.delete(`/api/journey/${journeyID}`);
+      alert("journey deleted successfully!");
+      // Optionally, redirect to another page or refresh the list
+      router.push("/journeys/manage");
+    } catch (error) {
+      console.error("Error deleting journey:", error);
+      alert("Failed to delete journey. Please try again.");
+    }
+  };
+  
+
   return (
     <div className="bg-white h-screen relative">
       <Layout>
@@ -110,7 +129,7 @@ export default function Journey({ params }) {
         </div>
         <hr className="border border-black my-2"/>
 
-        {error ? (
+        {!journey ? (
           <p className="text-red-500">{error}</p>
         ) : journey ? (
           <div className="p-4   text-black text-sm grid grid-cols-2 gap-y-6 mb-4">
@@ -131,10 +150,10 @@ export default function Journey({ params }) {
               {formatDateTime(journey.arrival)}
             </div>
             <div className="grid grid-cols-1">
-              <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 w-1/2 text-white rounded text-center">{journey.driver}</span>
+              <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 w-1/2 text-white rounded text-center">{journey.driver.name}</span>
             </div>
             <div className="grid grid-cols-1">
-              <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 w-1/2 text-white rounded text-center">{journey.truck}</span>
+              <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 w-1/2 text-white rounded text-center">{journey.truck.name}</span>
             </div>
             <div className="grid grid-cols-1">
               <span className="font-bold">Status</span> {journey.status}
@@ -188,9 +207,15 @@ export default function Journey({ params }) {
             <p>Loading totals...</p>
           )}
 
-        {expenseData?.total_amount ?<hr className="border border-black my-2"/>:""}
+        {journey?.total_amount ?<hr className="border border-black my-2"/>:""}
         <div className="flex justify-between mt-6 text-sm">
-        <p className="font-bold text-[#AC0000] text-sm mr-10">Delete Journey</p>
+        <p
+          className="font-bold text-[#AC0000] text-sm mr-10 cursor-pointer hover:underline"
+          onClick={handleDeleteJourney}
+        >
+          Delete Expense
+        </p>
+
         <button
                 onClick={() => alert("Button clicked!")}
                 className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
@@ -211,7 +236,6 @@ export default function Journey({ params }) {
         <div className="flex justify-end mt-6 text-sm">
           <Link href={`/journeys/${journeyID}/edit`}>
         <button
-                onClick={() => alert("Button clicked!")}
                 className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150 "
               >
                 <p className="flex justify-between"><span>Edit</span><span>

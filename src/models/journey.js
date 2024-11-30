@@ -1,6 +1,16 @@
 // models/Journey.js
 import {Schema, models, model} from 'mongoose';
 
+const driver = new Schema({
+    name: { type: String, required: true },
+    id: { type: String, required: true },
+  });
+
+const truck = new Schema({
+name: { type: String, required: true },
+plate_id: { type: String, required: true },
+});
+
 const JourneySchema = new Schema({
     from: { type: String, required: true },
     to: { type: String, required: true },
@@ -11,9 +21,9 @@ const JourneySchema = new Schema({
     delivered: { type: String, required: false },
     distance: { type: Number, required: true },
     status: { type: String, required: true },
-    truck: { type: Number, required: true },
+    truck: { type: truck, required: true },
     expenses: { type: String, required: true, default:"N/A" },
-    driver: { type: Number, required: true },
+    driver: { type: driver, required: true },
     
 }, { timestamps: true });
 

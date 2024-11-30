@@ -10,6 +10,9 @@ export default function Manage() {
   const [rows, setRows] = useState([]);
   const [expenseOptions, setExpenseOptions] = useState([]);
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [attachments, setAttachments] = useState(""); // For managing attachment input
+  const [type, setType] = useState(""); // Type of expense (e.g., trip, misc)
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // Default to today's date
 
   // Currency symbol map
   const currencySymbols = {
@@ -54,14 +57,14 @@ export default function Manage() {
     }
 
     const lastRow = rows[rows.length - 1];
-    if (lastRow && (!lastRow.amount || !lastRow.expense)) {
+    if (lastRow && (!lastRow.amount || !lastRow.name)) {
       alert(
         "Please fill out the Expense and Amount fields for the previous row before adding a new one."
       );
       return;
     }
 
-    setRows([...rows, { expense: "", amount: "", currency: "USD", file: null }]);
+    setRows([...rows, { name: "", amount: "", currency: "USD", file: null }]);
   };
 
   const currencyOptions = Object.keys(currencySymbols);
@@ -69,7 +72,7 @@ export default function Manage() {
   // Handle dropdown change for expense
   const handleExpenseChange = (index, value) => {
     const updatedRows = [...rows];
-    updatedRows[index].expense = value;
+    updatedRows[index].name = value;
     setRows(updatedRows);
   };
 
@@ -85,6 +88,13 @@ export default function Manage() {
       return `${currencySymbol}${parsedAmount.toFixed(2)}`;
     }
     return "";
+  };
+
+  // Handle input changes
+  const handleInputChange = (index, key, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index][key] = value;
+    setRows(updatedRows);
   };
 
   const handleAmountChange = (index, value) => {
@@ -143,6 +153,33 @@ export default function Manage() {
     return totals;
   };
 
+    // Save the expense
+    const saveExpense = async () => {
+      try {
+        // Format data for the API
+        const totalAmount = Object.entries(calculateTotals()).map(
+          ([currency, amount]) => ({ currency, amount: amount.toString() })
+        );
+  
+        const payload = {
+          date,
+          type,
+          expenses: rows,
+          total_amount: totalAmount,
+          trip: { route: "N/A", id: "N/A" }, // Adjust if trip data is available
+          attachments,
+        };
+  
+        const response = await axios.post("/api/expense", payload);
+  
+        alert("Expense saved successfully!");
+        setRows([]); // Clear rows
+      } catch (error) {
+        console.error("Error saving expense:", error);
+        alert("Failed to save expense. Please try again.");
+      }
+    };
+
   useEffect(() => {
     fetchExpenses();
   }, []);
@@ -160,9 +197,55 @@ export default function Manage() {
               <span>Expenses Management</span>
             </Link>{" "}
             <span>&gt;</span>
+            <Link href="/expenses/manage" passHref>
+              <span> Manage Expenses</span>
+            </Link>{" "}
+            <span>&gt;</span>
             <span> Add Expenses </span>
           </p>
         </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Row 1 */}
+              <div>
+                <label
+                  htmlFor="departure"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Date
+                </label>
+                <input
+                  type="date"
+                  id="departure"
+                  name="departure"
+                  value={date} // Bind the input value to the state
+                 
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="trip-select"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Select Option
+                </label>
+         	
+                  <select
+                      id="trip-select"
+                      name="trip-select"
+                      value={type}
+                      onChange={(e) => setType(e.target.value)}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+                    >
+                      <option value="" disabled>
+                        -- Select an Option --
+                      </option>
+                      <option value="Trip">Trip</option>
+                      <option value="General">General</option>
+                    </select>
+    </div>
+              </div>
 
         {/* Table Section */}
         <div className="h-96">
@@ -181,7 +264,7 @@ export default function Manage() {
                   <tr key={index} className="hover:bg-gray-100">
                     <td>
                       <select
-                        value={row.expense}
+                        value={row.name}
                         onChange={(e) =>
                           handleExpenseChange(index, e.target.value)
                         }
@@ -271,7 +354,7 @@ export default function Manage() {
             ${
               rows.length >= 30 ||
               (rows.length > 0 &&
-                (!rows[rows.length - 1]?.expense ||
+                (!rows[rows.length - 1]?.name ||
                   !rows[rows.length - 1]?.amount))
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-[#AC0000] text-white hover:bg-[#8A0000]"
@@ -299,6 +382,17 @@ export default function Manage() {
               <span className="font-black text-3xl">{total.toFixed(2)}</span>
             </p>
           ))}
+        </div>
+
+        
+        {/* Add Row and Save Buttons */}
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={saveExpense}
+            className="bg-green-600 text-white px-4 py-2 rounded"
+          >
+            Save Expense
+          </button>
         </div>
       </Layout>
     </div>

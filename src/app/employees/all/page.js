@@ -117,7 +117,7 @@ export default function ViewEmployees() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16 font-bold md:p-2">
             {employees.map((employee, index) => (
               <div id="emp" key={index}>
-                <Link href= {getLink(employee.nationalID)} passHref>
+                <Link href= {getLink(employee._id)} passHref>
                 <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-40 rounded bg-white shadow-2xl">
                   <div className="col-span-1 flex items-center justify-center font-bold">
                     <Image

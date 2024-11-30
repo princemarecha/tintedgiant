@@ -5,12 +5,16 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+
 
 export default function Manage() {
   const [searchQuery, setSearchQuery] = useState(""); // State for search input
   const [expenseType, setExpenseType] = useState(""); // State for journey type dropdown
   const [journeys, setJourneys] = useState([]); // State for fetched journeys
   const [loading, setLoading] = useState(true); // State to track loading
+
+  const router = useRouter();
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,6 +72,16 @@ export default function Manage() {
     const date = new Date(dateTimeString);
     return date.toLocaleString("en-US", options).replace(",", "");
   }
+
+  function goTo(type, id, e) {
+    e.preventDefault(); // Prevent default behavior
+    if (type === "truck") {
+      router.push(`/trucks/${id}`);
+    } else {
+      router.push(`/employees/${id}`);
+    }
+  }
+  
 
   return (
     <div className="bg-white h-screen relative">
@@ -173,12 +187,12 @@ export default function Manage() {
                         </div>
                         <div  className="col-span-2">
                             <p className="2xl:text-lg font-bold">Truck</p>
-                            <p className="border border-white text-center text-white p-1 m-1 rounded w-3/4">Toyota Streamliner</p>
+                            <p onClick={(e) => goTo("truck", journey.truck ? journey.truck.plate_id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded w-3/4">{journey.truck?journey.truck.name:""}</p>
                         </div>
 
                         <div className="col-span-2">
                             <p className="2xl:text-lg font-bold">Driver</p>
-                            <p className="bg-white border border-white text-center text-[#AC0000] p-1 m-1 rounded w-3/4">Prince Marecha</p>
+                            <p onClick={(e) => goTo("driver", journey.driver ? journey.driver.id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded w-3/4">{journey.driver?journey.driver.name:""}</p>
                         </div>
                   </div>
                 </div>

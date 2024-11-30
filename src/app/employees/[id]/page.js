@@ -4,55 +4,43 @@ import Layout from "@/components/Layout";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useParams,useRouter } from "next/navigation";
 import Link from "next/link";
 
-async function getNationalID(params) {
-  // Simulate fetching or processing to get the national ID
-  const national_id = (await params).national_id
-  return national_id
-}
 
-
-
-async function fetchEmployeeData(nationalID) {
+async function fetchEmployeeData(empID) {
   // Fetch employee data from the endpoint
 
-  const response = await fetch(`/api/employee/${nationalID}`);
+  const response = await fetch(`/api/employee/${empID}`);
   if (!response.ok) {
-    throw new Error("Failed to fetch employee data"+nationalID);
+    throw new Error("Failed to fetch employee data"+empID);
   }
   return response.json();
 }
 
 export default function MyComponent({ params }) {
   const router = useRouter();
-  const [nationalID, setNationalID] = useState(null);
+  const [empID, setEmpID] = useState(null);
   const [employeeData, setEmployeeData] = useState(null);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const { id } = useParams();
+
+
 
   useEffect(() => {
     // Fetch the national ID and set the state
-    async function fetchNationalID() {
-      try {
-        const id = await getNationalID(params);
-        setNationalID(id);
-      } catch (err) {
-        setError("Failed to fetch national ID");
-      }
-    }
-
-    fetchNationalID();
+ 
+        setEmpID(id);
   }, [params]); // Dependency array ensures it runs when `params` change
 
   useEffect(() => {
-    // Fetch employee data when nationalID is available
-    if (nationalID) {
+    // Fetch employee data when empID is available
+    if (empID) {
       async function fetchEmployee() {
         try {
-          const data = await fetchEmployeeData(nationalID);
+          const data = await fetchEmployeeData(empID);
           setEmployeeData(data);
         } catch (err) {
           setError("Failed to fetch employee data");
@@ -61,18 +49,18 @@ export default function MyComponent({ params }) {
 
       fetchEmployee();
     }
-  }, [nationalID]);
+  }, [empID]);
 
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   const deleteEmployee = async () => {
-    console.log("National Id is this "+ nationalID)
-    if (!nationalID) return;
+    console.log("National Id is this "+ empID)
+    if (!empID) return;
   
     try {
-      const response = await axios.delete(`/api/employee/${nationalID}`);
+      const response = await axios.delete(`/api/employee/${empID}`);
       if (response.status === 200) {
         // Navigate to the employees list on successful deletion
         router.push("/employees/all");
@@ -91,7 +79,7 @@ export default function MyComponent({ params }) {
       <Layout>
       <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Employees</p>
 
-<p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Employee Management</span> <span>&gt;</span><span>Employees </span><span>&gt;</span><span>{nationalID}</span></p>
+<p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Employee Management</span> <span>&gt;</span><span> Employees </span><span>&gt;</span><span> {empID} </span></p>
         <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
         <div className="col-span-3  md:col-span-2 lg:col-span-4 xl:col-span-4 flex justify-center items-center bg-gray-100">
           <Image
@@ -111,7 +99,7 @@ export default function MyComponent({ params }) {
                 <div className="font-bold" >Phone</div> <div className="col-span-2">{employeeData.phoneNumber || "Not provided"}</div> 
                 <div className="font-bold" >Gender </div> <div className="col-span-2">{employeeData.gender || "Not provided"}</div> 
                 <div className="font-bold" >Nationality</div> <div className="col-span-2">{employeeData.nationality || "Not provided"}</div> 
-                <div className="font-bold" >National ID </div> <div className="col-span-2">{employeeData.nationalID || "Not provided"}</div> 
+                <div className="font-bold" >National ID </div> <div className="col-span-2">{employeeData.empID || "Not provided"}</div> 
                 <div className="font-bold" >Passport Number</div> <div className="col-span-2">{employeeData.passportNumber || "Not provided"}</div> 
                 <div className="font-bold" >Occupation</div> <div className="col-span-2">{employeeData.occupation || "Not provided"}</div> 
                 <div className="font-bold" >Km Travelled</div> <div className="col-span-2">{employeeData.kmtravelled || "Not provided"} km</div> 
@@ -122,7 +110,7 @@ export default function MyComponent({ params }) {
                 <div className="font-bold" >Avg Op Cost</div> <div className="col-span-2">${employeeData.avg_op_costs || "Not provided"}</div> 
               </div>
             ) : (
-              nationalID && <div>Loading employee data...</div>
+              empID && <div>Loading employee data...</div>
             )}
             {employeeData ? (
               <div className="col-span-3 md:col-span-2 lg:col-span-5 xl:col-span-3  py-4  text-black shadow-xl rounded bg-[#AC0000] ">
@@ -145,7 +133,7 @@ export default function MyComponent({ params }) {
 
               </div>
             ) : (
-              nationalID && <div>Loading employee data...</div>
+              empID && <div>Loading employee data...</div>
             )}
         </div>
         <div className="my-4 flex justify-between text-sm 2xl:text-lg ">
@@ -166,7 +154,7 @@ export default function MyComponent({ params }) {
           </button>
 
           <button
-                onClick={() => alert("Button clicked!")}
+                onClick={() => router.push(`/employees/${empID}/edit`)}
                 className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150 "
               >
                 <p className="flex justify-between"><span>Edit</span><span>

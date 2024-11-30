@@ -1,20 +1,15 @@
 "use client";
 
 import Layout from "@/components/Layout";
-import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 
-export default function Manage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [journeyType, setJourneyType] = useState("");
-  const [cargoEnabled, setCargoEnabled] = useState(false);
-  const [trucks, setTrucks] = useState();
-  const [drivers, setDrivers] = useState();
 
-  // Form state
-  const [formData, setFormData] = useState({
+
+export default function Driver({params}) {
+
+  const defaultForm = {
     departure: "",
     arrival: "",
     driver: "",
@@ -24,10 +19,45 @@ export default function Manage() {
     distance: "",
     status: "",
     cargo: "",
-  });
+  }
 
-  const handleSearch = (e) => setSearchQuery(e.target.value);
-  const handleTypeChange = (e) => setJourneyType(e.target.value);
+  const [drivers, setDrivers] = useState([]); // Holds driver data
+  const [trucks, setTrucks] = useState([]); // Holds driver data
+  const [journeyID, setID] = useState(null);
+  const [cargoEnabled, setCargoEnabled] = useState(null);
+  const [formData, setFormData] = useState(defaultForm);
+
+
+   // Unwrap params using React.use()
+   useEffect(() => {
+    async function fetchParams() {
+      // Unwrap params promise and set the plateId
+      const resolvedParams = await params;
+      console.log(resolvedParams.id)
+      setID(resolvedParams.id); // assuming the plate_id is in the params
+    }
+
+    fetchParams();
+  }, [params]);
+  
+
+
+  useEffect(() => {
+    const fetchTruckDrivers = async () => {
+      try {
+        const response = await axios.get("/api/employee/drivers");
+        console.log("Fetched drivers:", response.data.employees);
+        const responseTrucks = await axios.get("/api/trucks/list");
+        console.log("Fetched trucks:", responseTrucks.data.trucks);
+        setDrivers(response.data.employees || []);
+        setTrucks(responseTrucks.data.trucks || []);
+      } catch (error) {
+        console.error("Error fetching drivers and trucks", error);
+      }
+    };
+
+    fetchTruckDrivers(); // Fetch only on initial render
+  }, []); // Empty dependency array ensures it runs once
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,32 +67,57 @@ export default function Manage() {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-    try {
-      const response = await axios.post("/api/journey", formData);
-      console.log("Journey saved:", response.data);
+  const handleDriverChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: JSON.parse(value),
+    }));
+  };
 
-      // Clear form fields
-      setFormData({
-        departure: "",
-        arrival: "",
-        driver: "",
-        truck: "",
-        from: "",
-        to: "",
-        distance: "",
-        status: "",
-        cargo: "",
-      });
-      setCargoEnabled(false); // Reset cargo checkbox
-      alert("Journey saved successfully!");
+  const handleTruckChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: JSON.parse(value),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    // Filter formData to only include non-empty fields and valid values
+    const filteredData = Object.fromEntries(
+      Object.entries(formData).filter(([key, value]) => {
+        // Exclude empty strings, null, undefined, empty arrays, or objects with no keys
+        if (value === null || value === undefined) return false;
+        if (typeof value === "string" && value.trim() === "") return false;
+        if (Array.isArray(value) && value.length === 0) return false;
+        if (typeof value === "object" && Object.keys(value).length === 0) return false;
+
+        return true; // Include the field if none of the above conditions are met
+      })
+    );
+
+  
+    try {
+      const response = await axios.patch(`/api/journey/${journeyID}`, filteredData);
+      console.log("Journey updated:", response.data);
+  
+      // Reset form
+      setFormData(defaultForm);
+  
+      alert("Journey updated successfully!");
     } catch (error) {
-      console.error("Error saving journey:", error);
-      alert("Failed to save journey. Please try again.");
+      console.error("Error updating journey:", error);
+      alert("Failed to update journey. Please try again.");
     }
   };
 
+  function getURL(){
+    return `/journeys/${journeyID}`
+  }
+  
   return (
     <div className="bg-white h-screen relative">
       <Layout>
@@ -76,6 +131,14 @@ export default function Manage() {
               <span>Journeys and Tracking</span>
             </Link>{" "}
             <span>&gt;</span>
+            <Link href="/journeys/manage" passHref>
+              <span>Manage Journeys</span>
+            </Link>{" "}
+            <span>&gt;</span>
+            <Link href={getURL()} passHref>
+              <span>Journey Details</span>
+            </Link>{" "}
+            <span>&gt;</span>
             <span> Edit Journey </span>
           </p>
         </div>
@@ -83,8 +146,9 @@ export default function Manage() {
         <p className="text-2xl font-bold text-[#AC0000]">Edit Journey</p>
         <hr className="border border-[#AC0000] my-2" />
 
-        {/* Journey Input Form */}
-        <div className="mx-auto mt-4 text-black">
+   
+
+          <div className="mx-auto mt-4 text-black">
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Row 1 */}
@@ -123,31 +187,37 @@ export default function Manage() {
                 <select
                   id="driver"
                   name="driver"
-                  value={formData.driver}
-                  onChange={handleChange}
+                  value={formData.name}
+                  onChange={handleDriverChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 >
                   <option value="">Select Driver</option>
-                  <option value={1}>Driver 1</option>
-                  <option value={2}>Driver 2</option>
-                  <option value={3}>Driver 3</option>
+                  {drivers.map((driver, index) => (
+                    <option key={driver.id || index} value={JSON.stringify({ name: driver.name, id: driver._id })}>
+                      {driver.name}
+                    </option>
+                  ))}
                 </select>
+
               </div>
+
               <div>
-                <label htmlFor="truck" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
                   Truck
                 </label>
                 <select
                   id="truck"
                   name="truck"
-                  value={formData.truck}
-                  onChange={handleChange}
+                  value={formData.plate_id}
+                  onChange={handleTruckChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 >
                   <option value="">Select Truck</option>
-                  <option value={1}>Truck 1</option>
-                  <option value={2}>Truck 2</option>
-                  <option value={3}>Truck 3</option>
+                  {trucks.map((truck, index) => (
+                    <option key={truck.id || index} value={JSON.stringify({ name: truck.name, plate_id: truck.plate_id })}>
+                      {truck.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -218,20 +288,13 @@ export default function Manage() {
               {/* Row 5 */}
               <div className="col-span-2">
                 <div className="flex items-center space-x-4">
-                  <input
-                    type="checkbox"
-                    id="cargo"
-                    name="enableCargo"
-                    onChange={() => setCargoEnabled(!cargoEnabled)}
-                    checked={cargoEnabled}
-                    className="h-4 w-4 text-[#AC0000] focus:ring-[#AC0000] border-gray-300 rounded"
-                  />
+  
                   <label htmlFor="cargo" className="text-sm font-medium text-gray-700">
                     Cargo
                   </label>
                 </div>
 
-                {cargoEnabled && (
+
                   <div className="mt-4 w-2/5">
                     <input
                       type="text"
@@ -243,7 +306,6 @@ export default function Manage() {
                       className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                     />
                   </div>
-                )}
               </div>
             </div>
 
@@ -251,10 +313,11 @@ export default function Manage() {
               type="submit"
               className="mt-6 px-4 py-2 bg-[#AC0000] text-white font-bold rounded shadow hover:bg-[#8A0000] focus:outline-none"
             >
-              Save Journey
+              Save Update
             </button>
           </form>
         </div>
+       
       </Layout>
     </div>
   );

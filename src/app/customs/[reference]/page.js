@@ -5,6 +5,7 @@ import React, { useState, useEffect, use } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Clearance({ params }) {
   const resolvedParams = use(params); // Unwrapping the promise
@@ -12,6 +13,8 @@ export default function Clearance({ params }) {
 
   const [clearance, setClearance] = useState(null); // Clearance data
   const [error, setError] = useState(null); // Error message
+
+  const router  = useRouter();
 
   // Fetch clearance details
   const fetchClearance = async (reference) => {
@@ -46,6 +49,22 @@ export default function Clearance({ params }) {
     const date = new Date(dateTimeString);
     return date.toLocaleString("en-US", options).replace(",", "");
   };
+
+  const handleDeleteCustom = async () => {
+    try {
+      const confirmDelete = window.confirm("Are you sure you want to delete this clearance?");
+      if (!confirmDelete) return;
+  
+      await axios.delete(`/api/customs/${reference}`);
+      alert("clearance deleted successfully!");
+      // Optionally, redirect to another page or refresh the list
+      router.push("/customs/manage");
+    } catch (error) {
+      console.error("Error deleting clearance:", error);
+      alert("Failed to delete clearance. Please try again.");
+    }
+  };
+  
 
   return (
     <div className="bg-white h-screen relative">
@@ -112,7 +131,13 @@ export default function Clearance({ params }) {
 
         {/* Footer Actions */}
         <div className="flex justify-between mt-6 text-sm">
-          <p className="font-bold text-[#AC0000] text-sm mr-10">Delete Clearance</p>
+        <p
+            className="font-bold text-[#AC0000] text-sm mr-10 cursor-pointer hover:underline"
+            onClick={handleDeleteCustom}
+          >
+            Delete Clearance
+          </p>
+
           <button
             onClick={() => alert("Button clicked!")}
             className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0 transition duration-150"

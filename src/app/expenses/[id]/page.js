@@ -3,12 +3,13 @@
 import Layout from "@/components/Layout";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "next/navigation";
+import { useParams,useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Expense() {
   const { id } = useParams();
+  const router = useRouter();
   const [expense, setExpense] = useState(null);
   const [journeyDetails, setJourneyDetails] = useState(null);
   const [journeys, setJourneys] = useState([]);
@@ -129,6 +130,22 @@ export default function Expense() {
     return date.toLocaleString("en-US", options).replace(",", "");
   };
 
+  const handleDeleteExpense = async () => {
+    try {
+      const confirmDelete = window.confirm("Are you sure you want to delete this expense?");
+      if (!confirmDelete) return;
+  
+      await axios.delete(`/api/expense/${id}`);
+      alert("Expense deleted successfully!");
+      // Optionally, redirect to another page or refresh the list
+      router.push("/expenses/manage");
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      alert("Failed to delete expense. Please try again.");
+    }
+  };
+  
+
   return (
     <div className="bg-white h-screen relative">
       <Layout>
@@ -170,10 +187,10 @@ export default function Expense() {
                 {formatDateTime(journeyDetails.arrival)}
               </div>
               <div className="grid grid-cols-1">
-                <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 w-1/2 text-white rounded text-center">{journeyDetails.driver}</span>
+                <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 w-1/2 text-white rounded text-center">{journeyDetails.driver?.name}</span>
               </div>
               <div className="grid grid-cols-1">
-                <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 w-1/2 text-white rounded text-center">{journeyDetails.truck}</span>
+                <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 w-1/2 text-white rounded text-center">{journeyDetails.truck?.name}</span>
               </div>
               <div className="grid grid-cols-1">
                 <span className="font-bold">Status</span> {journeyDetails.status}
@@ -193,7 +210,7 @@ export default function Expense() {
             id="journeyDropdown"
             className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
             onChange={handleJourneyChange}
-            value={selectedJourney}
+            value={selectedJourney.from}
           >
             <option className="text-xs" value="">
               Select a Journey
@@ -256,7 +273,13 @@ export default function Expense() {
         </div>
         <hr className="border border-black my-2"/>
         <div className="flex justify-between mt-6 text-sm">
-        <p className="font-bold text-[#AC0000] text-sm mr-10">Delete Expense</p>
+        <p
+            className="font-bold text-[#AC0000] text-sm mr-10 cursor-pointer hover:underline"
+            onClick={handleDeleteExpense}
+          >
+            Delete Expense
+          </p>
+
         <button
                 onClick={() => alert("Button clicked!")}
                 className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
