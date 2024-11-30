@@ -65,7 +65,8 @@ export async function GET(request) {
     // Fetch paginated trucks based on the search and make filters
     const trucks = await Truck.find(query)
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort({ createdAt: -1 });  // Sort by most recent
 
     // Calculate total pages
     const totalPages = Math.ceil(totaltrucks / limit);

@@ -114,7 +114,8 @@ export async function GET(request) {
     // Fetch paginated employees based on the search and role filters
     const employees = await Employee.find(query)
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .sort({ createdAt: -1 });  // Sort by most recent
 
     // Calculate total pages
     const totalPages = Math.ceil(totalEmployees / limit);

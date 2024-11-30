@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function MyComponent({ params }) {
   const router = useRouter();
@@ -84,7 +85,7 @@ export default function MyComponent({ params }) {
       const response = await axios.patch(`/api/trucks/${plateId}`, updatedFields);
       if (response.status === 200) {
         alert("Truck information updated successfully!");
-        setFormData(initialFormData);  // Reset form to initial state
+        router.push("/trucks/all")
       }
     } catch (error) {
       console.error("Error submitting truck information:", error);
@@ -99,8 +100,8 @@ export default function MyComponent({ params }) {
 
         <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8">
           <Link href="/" passHref><span>Home </span></Link> <span>&gt;</span>
-          <Link href="/trucks" passHref><span>Truck Management</span></Link> <span>&gt;</span>
-          <Link href="/trucks/all" passHref><span>Trucks </span></Link>
+          <Link href="/trucks" passHref className="hover:underline"><span>Truck Management</span></Link> <span>&gt;</span>
+          <Link href="/trucks/all" passHref className="hover:underline"><span>Trucks </span></Link>
           <span>&gt;</span>
           <span>Edit Truck</span>
         </p>
@@ -165,9 +166,16 @@ export default function MyComponent({ params }) {
         <div className="mt-6">
           <button
             onClick={handleSubmit}
-            className="px-6 py-3 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none transition duration-150"
+            className="px-6 py-3 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none transition duration-150 flex"
           >
-            Submit
+            <span>Save</span>
+            <Image
+            src="/images/icons/save.png" // Replace with your image path
+            alt="save Icon"  // Alternative text for the image
+            width={20} // Set the width of the image
+            height={20} // Set the height of the image
+            className="transition duration-75 group-hover:opacity-80 w-6 h-6 ml-2" 
+          />
           </button>
         </div>
       </Layout>

@@ -3,7 +3,7 @@ import {Schema, models, model} from 'mongoose';
 
 const TruckSchema = new Schema({
     name: { type: String, required: true },
-    status: { type: String, required: false },
+    status: { type: String, required: false, default:"Active" },
     location: { type: String, required: true },
     make: { type: String, required: true },
     travelling: { type: String, required: false },
