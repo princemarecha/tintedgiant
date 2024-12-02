@@ -2,10 +2,11 @@
 
 import Layout from "@/components/Layout";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { CldImage } from "next-cloudinary";
 
 async function getplateID(params) {
   // Simulate fetching or processing to get the plate ID
@@ -31,7 +32,13 @@ export default function MyComponent({ params }) {
   const [truckData, setTruckData] = useState(null);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [mainImageSrc, setMainImageSrc] = useState("/images/truck.png");
+  const [photos, setPhotos] = useState([])
+  const [mainImageSrc, setMainImageSrc] = useState(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const fileInputRef = useRef(null); // Reference to the hidden file input
+  const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
 
 
   useEffect(() => {
@@ -55,6 +62,11 @@ export default function MyComponent({ params }) {
         try {
           const data = await fetchTruckData(plateID);
           setTruckData(data);
+          if (data.photos)
+            {
+              setMainImageSrc(data.photos[0])
+              setPhotos(data.photos)
+              }
         } catch (err) {
           setError("Failed to fetch truck data");
         }
@@ -63,6 +75,74 @@ export default function MyComponent({ params }) {
       fetchTruck();
     }
   }, [plateID]);
+
+  useEffect(() => {
+    const uploadImage = async () => {
+      if (!image) return; // Prevent upload if no image is selected
+  
+      console.log("Uploading file:", image);
+      setUploading(true);
+  
+      const reader = new FileReader();
+  
+      reader.onloadend = async () => {
+        try {
+          const response = await fetch("/api/trucks/upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ file: reader.result, imageName:image.name, folder: plateID }),
+          });
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+            setUploadedImageUrl(data.url);
+            setMainImageSrc(data.url);
+          
+          } else {
+            console.error("Upload failed:", data.error);
+            alert("Failed to upload image.");
+          }
+        } catch (error) {
+          console.error("Error during upload:", error);
+          alert("An error occurred while uploading the image.");
+        } finally {
+          setUploading(false);
+        }
+      };
+  
+      reader.onerror = (err) => {
+        console.error("FileReader error:", err);
+        alert("Failed to read the file.");
+      };
+  
+      reader.readAsDataURL(image); // Convert file to base64
+    };
+  
+    uploadImage();
+  }, [image]); // Dependency array to watch for image state changes
+
+    // Make a PATCH request when uploadedImageUrl changes
+    useEffect(() => {
+      if (uploadedImageUrl) {
+        const updateEmployeeImage = async () => {
+          try {
+              const response = await axios.patch(`/api/trucks/${plateID}`, {
+              photos: [uploadedImageUrl, ...photos],
+            });
+            setPhotos([uploadedImageUrl, ...photos])
+            console.log("Image updated successfully:", response.data);
+          } catch (error) {
+            console.error("Error updating image:", error);
+          }
+        };
+  
+        updateEmployeeImage();
+      }
+    }, [uploadedImageUrl, plateID]);
+
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -91,6 +171,79 @@ export default function MyComponent({ params }) {
     setMainImageSrc(newSrc);
   };
 
+  const handleFileChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+
+  function cleanCloudinaryUrl(url) {
+    try {
+      // Use URL constructor to parse the URL
+      const urlObj = new URL(url);
+  
+      // Extract the pathname, remove the leading `/` and split by `/`
+      const pathParts = urlObj.pathname.split("/");
+  
+      // Start from the part after "trucks" and join the rest
+      const truckIndex = pathParts.indexOf("trucks");
+      if (truckIndex === -1) {
+        throw new Error("URL does not contain 'trucks'");
+      }
+  
+      // Join the path parts after "trucks"
+      const cleanedPath = pathParts.slice(truckIndex).join("/");
+  
+      // Remove file extension from the cleaned path
+      const pathWithoutExtension = cleanedPath.replace(/\.[^/.]+$/, ''); // Removes file extension
+  
+      return pathWithoutExtension;
+    } catch (error) {
+      console.error("Invalid URL or missing 'trucks' segment:", error);
+      return null;
+    }
+  }
+  
+  async function updatePhotos(pics) {
+        try {
+          const response = await axios.patch(`/api/trucks/${plateID}`, {
+          photos: pics,
+        });
+        console.log("Image updated successfully:", response.data);
+        truckData?.photos?setMainImageSrc(truckData.photos[0]): setMainImageSrc(null)
+      } catch (error) {
+        console.error("Error updating image:", error);
+      }
+  }
+  
+
+  const deleteImage = (e, publicID)=>{
+
+    e.preventDefault();
+
+    axios
+          .delete("/api/trucks/upload", {
+            data: {
+              publicId: cleanCloudinaryUrl(publicID), // Replace with your actual public ID
+            },
+          })
+          .then((response) => {
+            console.log("Response:", response.data);
+            const newPhotos = photos.filter((url) => !url.includes(publicID))
+            console.log(newPhotos)
+            setPhotos(newPhotos)
+            try{
+              setMainImageSrc(photos[0])
+              updatePhotos(newPhotos)
+            }
+            catch{}
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+  }
+
+
+
   return (
     <div className="bg-white h-screen relative">
       <Layout>
@@ -99,14 +252,17 @@ export default function MyComponent({ params }) {
         <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Truck Management</span> <span>&gt;</span><span>Trucks </span><span>&gt;</span><span>{plateID}</span></p>
         <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
         <div className="relative col-span-3 md:col-span-2 lg:col-span-4 xl:col-span-5 bg-gray-100 ">
-            <Image
-                src={mainImageSrc}
-                id="mainImage"
-                alt="Truck Image"
-                fill
-                className="object-cover rounded-xl"
-            />
-        </div>
+          {truckData?<Image
+              src= {mainImageSrc?mainImageSrc:"https://res.cloudinary.com/dix6sop3b/image/upload/v1733117711/u0y0mh6rtjgwqvtgoelr.png"}
+              alt="Search Icon"
+              fill
+              unoptimized
+              className={`transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl object-contain mx-auto ${
+                uploading ? 'animate-pulse' : ''
+              }`}
+              //onError={(e) => (e.target.src = "u0y0mh6rtjgwqvtgoelr")}
+            />:""}
+          </div>
 
 
 
@@ -188,17 +344,19 @@ export default function MyComponent({ params }) {
 
 
             <div className="col-span-full grid grid-cols-5 gap-2">
-            {["/images/trucks/1.png", "/images/trucks/2.png", "/images/trucks/3.png", "/images/trucks/4.png", "/images/trucks/5.png"].map((src, index) => (
+            {photos.map((src, index) => (
                 <div key={index} className="relative h-60 cursor-pointer group">
                     <Image
                     src={src}
                     alt={`Truck Thumbnail ${index + 1}`}
                     fill
+                    unoptimized
                     className="object-cover rounded-xl"
+                    onClick={()=>{setMainImageSrc(src)}}
                     />
                     <div
                     className="absolute bottom-2 right-2 bg-[#AC0000] p-2 rounded-full shadow-md cursor-pointer hover:bg-gray-200"
-                    onClick={() => console.log(`Delete image: ${src}`)}
+                    onClick={(e) => deleteImage(e,src)}
                     >
                     <Image
                         src="/images/icons/delete.png" // Replace with the path to your delete icon
@@ -218,7 +376,7 @@ export default function MyComponent({ params }) {
 
         <div className="my-4 flex justify-between text-sm 2xl:text-lg ">
           <button
-                onClick={() => alert("Button clicked!")}
+                  onClick={(e) => fileInputRef.current.click()}
                 className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
               >
                 <p className="flex justify-between"><span>Upload Image</span><span>
@@ -269,6 +427,16 @@ export default function MyComponent({ params }) {
             </p>
           </button>
         </div>
+
+          {/* Hidden file input */}
+          <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*" // Restrict to image files
+          onChange={handleFileChange}
+          style={{ display: "none" }} // Hide the input
+        />
+
 
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
