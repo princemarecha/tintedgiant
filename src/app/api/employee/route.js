@@ -12,6 +12,7 @@ export async function POST(request) {
     const {
       name,
       age,
+      current_journey,
       phoneNumber,
       gender,
       nationality,
@@ -29,6 +30,7 @@ export async function POST(request) {
     console.log('Inserting Employee:', {
       name,
       age,
+      current_journey,
       phoneNumber,
       gender,
       nationality,
@@ -47,6 +49,7 @@ export async function POST(request) {
     const newEmployee = new Employee({
       name,
       age,
+      current_journey,
       phoneNumber,
       gender,
       nationality,

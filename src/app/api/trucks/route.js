@@ -10,12 +10,12 @@ export async function POST(request) {
     await connectToDatabase();
 
     // Parse the JSON body
-    const { name,make, status, location, travelling, trailer, trailerPlate, colour, plate_id, mileage, fuel, journeys, avg_km, opCosts, avg_opCosts, photos } = await request.json();
+    const { name,make,  current_journey, status, location, travelling, trailer, trailerPlate, colour, plate_id, mileage, fuel, journeys, avg_km, opCosts, avg_opCosts, photos } = await request.json();
 
-    console.log('Inserting Truck:', name,make, status, location, travelling, trailer, trailerPlate, colour, plate_id, mileage, fuel, journeys, avg_km, opCosts, avg_opCosts, photos);
+    console.log('Inserting Truck:', name,make,  current_journey, status, location, travelling, trailer, trailerPlate, colour, plate_id, mileage, fuel, journeys, avg_km, opCosts, avg_opCosts, photos);
 
     // Create a new Truck instance
-    const newTruck = new Truck({ name,make, status, location, travelling, trailer, trailerPlate, colour, plate_id, mileage, fuel, journeys, avg_km, opCosts, avg_opCosts, photos });
+    const newTruck = new Truck({ name,make,  current_journey, status, location, travelling, trailer, trailerPlate, colour, plate_id, mileage, fuel, journeys, avg_km, opCosts, avg_opCosts, photos });
 
     // Save to the database
     await newTruck.save();

@@ -12,10 +12,11 @@ const EmployeeSchema = new Schema({
     occupation: { type: String, required: true },
     kmtravelled: { type: Number, required: false },
     avg_km: { type: Number, required: false },
-    journeys: { type: String, required: false },
+    journeys: { type: Number, required: false },
     opCosts: { type: Number, required: false },
     avg_op_costs: { type: Number, required: false },
-    photo: { type: String, required: false }
+    photo: { type: String, required: false },
+    current_journey: { type: String, required: false },
 }, { timestamps: true });
 
 

@@ -26,10 +26,20 @@ async function fetchTruckData(plateID) {
   return response.json();
 }
 
+async function fetchJourneyData(journeyID) {
+  // Fetch truck data from the endpoint
+  const response = await fetch(`/api/journey/${journeyID}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch truck data"+journeyID);
+  }
+  return response.json();
+}
+
 export default function MyComponent({ params }) {
   const router = useRouter();
   const [plateID, setplateID] = useState(null);
   const [truckData, setTruckData] = useState(null);
+  const [journeyData, setJourneyData] = useState(null);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [photos, setPhotos] = useState([])
@@ -62,6 +72,8 @@ export default function MyComponent({ params }) {
         try {
           const data = await fetchTruckData(plateID);
           setTruckData(data);
+          if (data.current_journey)
+          {const journey = await fetchJourneyData(data.current_journey); setJourneyData(journey)}
           if (data.photos)
             {
               setMainImageSrc(data.photos[0])
@@ -308,33 +320,33 @@ export default function MyComponent({ params }) {
         <div className="">{truckData.avg_km || "Not provided"} km</div> 
       
         <div className="font-bold">Operational Costs</div> 
-        <div className="">${truckData.opCosts || "Not provided"}</div> 
+        <div className="">{`$ ${truckData.opCosts}` || "N/A"}</div> 
       
         <div className="font-bold">Avg Op Cost</div> 
-        <div className="">${truckData.avg_opCosts || "Not provided"}</div> 
+        <div className="">{`$ ${truckData.avg_opCosts}` || "N/A"}</div> 
       
       </div>
       
             ) : (
               plateID && <div>Loading truck data...</div>
             )}
-            {truckData ? (
+            {journeyData ? (
               <div className="col-span-3 md:col-span-2 lg:col-span-5 xl:col-span-3  py-4  text-black shadow-xl rounded bg-[#AC0000] ">
                 <p className="xl:text-lg mx-6 font-black text-white 2xl:text-2xl">Current Journey</p> 
                 <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">From</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Harare, Zimbabwe</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">{journeyData.from}</p> 
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">To</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Pretoria, South Africa</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">{journeyData.to}</p> 
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">Driver</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-1">Prince Marecha</p> 
+                <Link href={`/employees/${journeyData.driver?.id}`}><p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-1">{journeyData.driver?.name}</p> </Link>
 
                 <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
                 <div className="text-sm 2xl:text-lg grid grid-cols-4 mx-6 text-white gap-y-2">
-                <div className="font-bold col-span-2" >Departure</div> <div className="col-span-2">21/11/24</div> 
-                <div className="font-bold col-span-2" >Arrival(Est) </div> <div className="col-span-2">23/11/24</div> 
-                <div className="font-bold col-span-2" >Distance</div> <div className="col-span-2">243 km</div> 
-                <div className="font-bold col-span-2" >Estimate Cost </div> <div className="col-span-2">$670.20</div> 
+                <div className="font-bold col-span-2" >Departure</div> <div className="col-span-2">{journeyData.departure}</div> 
+                <div className="font-bold col-span-2" >Arrival(Est) </div> <div className="col-span-2">{journeyData.arrival}</div> 
+                <div className="font-bold col-span-2" >Distance</div> <div className="col-span-2">{journeyData.distance} km</div> 
+                <div className="font-bold col-span-2" >Estimate Cost </div> <div className="col-span-2">{journeyData.expenses?.total_cost || "N/A"}</div> 
                 </div>
 
               </div>

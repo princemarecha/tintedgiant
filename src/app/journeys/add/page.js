@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+import Journeys from "../page";
 
 
 
@@ -24,6 +25,8 @@ export default function Driver({params}) {
   const [drivers, setDrivers] = useState([]); // Holds driver data
   const [trucks, setTrucks] = useState([]); // Holds driver data
   const [journeyID, setID] = useState(null);
+  const [truckID, setTruckID] = useState(null);
+  const [driverID, setDriverID] = useState(null);
   const [cargoEnabled, setCargoEnabled] = useState(null);
   const [formData, setFormData] = useState(defaultForm);
 
@@ -51,6 +54,16 @@ export default function Driver({params}) {
         console.log("Fetched trucks:", responseTrucks.data.trucks);
         setDrivers(response.data.employees || []);
         setTrucks(responseTrucks.data.trucks || []);
+        // Initialize IDs safely
+        setDriverID(response.data?.employees?.length ? response.data.employees[0]._id : null);
+        setTruckID(responseTrucks.data?.trucks?.length ? responseTrucks.data.trucks[0].plate_id : null);
+
+
+        setFormData(prev => ({
+          ...prev,
+          driver: response.data?.employees?.length > 0 ? {"name":response.data.employees[0].name, "id":response.data.employees[0]._id} : "",
+          truck: responseTrucks.data?.trucks?.length > 0 ? responseTrucks.data.trucks[0] : "",
+        }));
       } catch (error) {
         console.error("Error fetching drivers and trucks", error);
       }
@@ -69,18 +82,22 @@ export default function Driver({params}) {
 
   const handleDriverChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: JSON.parse(value),
-    }));
+    if (value!="")
+      {setFormData((prev) => ({
+        ...prev,
+        [name]: JSON.parse(value),
+      }));}
+  else{return}
   };
 
   const handleTruckChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: JSON.parse(value),
-    }));
+    if (value!="")
+      {setFormData((prev) => ({
+        ...prev,
+        [name]: JSON.parse(value),
+      }));}
+  else{return}
   };
 
   const handleSubmit = async (e) => {
@@ -89,31 +106,66 @@ export default function Driver({params}) {
     // Filter formData to only include non-empty fields and valid values
     const filteredData = Object.fromEntries(
       Object.entries(formData).filter(([key, value]) => {
-        // Exclude empty strings, null, undefined, empty arrays, or objects with no keys
         if (value === null || value === undefined) return false;
         if (typeof value === "string" && value.trim() === "") return false;
         if (Array.isArray(value) && value.length === 0) return false;
         if (typeof value === "object" && Object.keys(value).length === 0) return false;
-
+  
         return true; // Include the field if none of the above conditions are met
       })
     );
+  
+    // Safeguards for truckID and journeyID
+    if (!truckID) {
+      console.error("Truck ID is missing!");
+      alert("Please select a valid truck before submitting.");
+      return;
+    }
+
+  
 
   
     try {
+      // Log data being sent
+      console.log("Filtered data:", filteredData);
+  
       const response = await axios.post(`/api/journey`, filteredData);
+
+      const payload = {
+        current_journey: (response.data?.newJourney?._id),
+      };
+
+      const responseTruck = await axios.patch(`/api/trucks/${truckID}`, payload);
+      const responseDriver = await axios.patch(`/api/employee/${driverID}`, payload);
+  
       console.log("Journey added:", response.data);
+      console.log("Truck updated:", responseTruck.data);
+      console.log("Truck updated:", responseDriver.data);
   
       // Reset form
       setFormData(defaultForm);
   
-      alert("Journey adding successfully!");
+      alert("Journey added successfully!");
     } catch (error) {
       console.error("Error adding journey:", error);
-      alert("Failed to addd journey. Please try again.");
+      alert("Failed to add journey. Please try again.");
     }
   };
   
+
+  function getTruck(thisTruck) {
+    let truck  = JSON.parse(thisTruck)
+    setTruckID(truck.plate_id); // Update state with the selected truck ID
+    console.log("Selected truck ID:", truck.plate_id);
+  }
+  
+  function getDriver(thisDriver) {
+    let driver  = JSON.parse(thisDriver)
+    setDriverID(driver.id); // Update state with the selected driver ID
+    console.log("Selected driver ID:", driver.id);
+  }
+  
+
   return (
     <div className="bg-white h-screen relative">
       <Layout>
@@ -180,10 +232,14 @@ export default function Driver({params}) {
                   id="driver"
                   name="driver"
                   value={formData.name}
-                  onChange={handleDriverChange}
+                  onChange={(e) => {
+                    const selectedTruckID = e.target.value; // Get the selected truck ID
+                    getDriver(selectedTruckID); // Call getTruck with the selected ID
+                    handleDriverChange(e); // Maintain your existing functionality
+                  }}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 >
-                  <option value="">Select Driver</option>
+                  {/* <option value="" disabled>Select Driver</option> */}
                   {drivers.map((driver, index) => (
                     <option key={driver.id || index} value={JSON.stringify({ name: driver.name, id: driver._id })}>
                       {driver.name}
@@ -201,13 +257,18 @@ export default function Driver({params}) {
                   id="truck"
                   name="truck"
                   value={formData.plate_id}
-                  onChange={handleTruckChange}
+                  onChange={(e) => {
+                    const selectedTruckID = e.target.value; // Get the selected truck ID
+                    getTruck(selectedTruckID); // Call getTruck with the selected ID
+                    handleTruckChange(e); // Maintain your existing functionality
+                  }}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 >
-                  <option value="">Select Truck</option>
+                  {/* <option value="" disabled>Select Truck</option> */}
                   {trucks.map((truck, index) => (
-                    <option key={truck.id || index} value={JSON.stringify({ name: truck.name, plate_id: truck.plate_id })}>
+                    <option onClick={(e)=>getTruck(e, truck.id)} key={truck.id || index} value={JSON.stringify({ name: truck.name, plate_id: truck.plate_id })}>
                       {truck.name}
+                    
                     </option>
                   ))}
                 </select>
