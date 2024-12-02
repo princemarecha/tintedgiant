@@ -5,6 +5,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { CldImage } from "next-cloudinary";
 
 export default function ViewEmployees() {
   const [employees, setEmployees] = useState([]);
@@ -13,6 +14,7 @@ export default function ViewEmployees() {
   const [searchTerm, setSearchTerm] = useState("");
   const [role, setRole] = useState(""); // State for selected role
   const itemsPerPage = 9; // Items to show per page
+  const [validPhotoUrls, setValidPhotoUrls] = useState([]);
 
   // Fetch employee data
   const fetchEmployees = async (page = 1, search = "", role = "") => {
@@ -35,6 +37,30 @@ export default function ViewEmployees() {
   useEffect(() => {
     fetchEmployees(currentPage, searchTerm, role);
   }, [currentPage, searchTerm, role]); // Fetch data when search or role changes
+  
+  useEffect(() => {
+    const checkPhotos = async () => {
+      const updatedUrls = await Promise.all(
+        employees.map(async (employee) => {
+          const isValid = await isValidUrl(employee.photo);
+          return isValid ? employee.photo : "irxdkhgi7ehjhtbeh1zk";
+        })
+      );
+      setValidPhotoUrls(updatedUrls);
+    };
+
+    checkPhotos();
+  }, [employees]);
+
+  const isValidUrl = async (url) => {
+    try {
+      const response = await axios.head(url);
+      response.status ==200? console.log("got image"): console.log("failed to get image")
+      return response.status === 200;
+    } catch {
+      return false;
+    }
+  };
 
   // Handle Search
   const handleSearch = (e) => {
@@ -120,12 +146,12 @@ export default function ViewEmployees() {
                 <Link href= {getLink(employee._id)} passHref>
                 <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-40 rounded bg-white shadow-2xl">
                   <div className="col-span-1 flex items-center justify-center font-bold">
-                    <Image
-                      src="/images/employee.jpg" // Use employee image or default
-                      alt={`${employee.name} Profile`}
-                      width={100}
-                      height={100}
-                      className="mb-2 transition duration-75 group-hover:opacity-80 sm:w-16 sm:h-16 xl:w-20 xl:h-20 2xl:w-28 2xl:h-28 rounded-full ml-1"
+                  <CldImage
+                      src={validPhotoUrls[index] || "irxdkhgi7ehjhtbeh1zk"}
+                      alt={employee.name || "Employee Photo"}
+                      width={200}
+                      height={200}
+                      className="rounded-full object-cover"
                     />
                   </div>
                   <div className="col-span-3 text-[#5F5F5F]">

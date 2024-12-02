@@ -2,10 +2,11 @@
 
 import Layout from "@/components/Layout";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useParams,useRouter } from "next/navigation";
 import Link from "next/link";
+import { CldImage } from "next-cloudinary";
 
 
 async function fetchEmployeeData(empID) {
@@ -24,6 +25,10 @@ export default function MyComponent({ params }) {
   const [employeeData, setEmployeeData] = useState(null);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
+  const fileInputRef = useRef(null); // Reference to the hidden file input
 
   const { id } = useParams();
 
@@ -51,9 +56,129 @@ export default function MyComponent({ params }) {
     }
   }, [empID]);
 
+  useEffect(() => {
+    const uploadImage = async () => {
+      if (!image) return; // Prevent upload if no image is selected
+  
+      console.log("Uploading file:", image);
+      setUploading(true);
+  
+      const reader = new FileReader();
+  
+      reader.onloadend = async () => {
+        try {
+          const response = await fetch("/api/employee/upload", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ file: reader.result, imageName: empID }),
+          });
+  
+          const data = await response.json();
+  
+          if (response.ok) {
+            setUploadedImageUrl(data.url);
+          
+          } else {
+            console.error("Upload failed:", data.error);
+            alert("Failed to upload image.");
+          }
+        } catch (error) {
+          console.error("Error during upload:", error);
+          alert("An error occurred while uploading the image.");
+        } finally {
+          setUploading(false);
+        }
+      };
+  
+      reader.onerror = (err) => {
+        console.error("FileReader error:", err);
+        alert("Failed to read the file.");
+      };
+  
+      reader.readAsDataURL(image); // Convert file to base64
+    };
+  
+    uploadImage();
+  }, [image]); // Dependency array to watch for image state changes
+
+  // useEffect(() => {
+  //   const uploadImage = async () => {
+  //     if (!image) return; // Prevent upload if no image is selected
+  
+  //     console.log("Uploading file:", image);
+  //     setUploading(true);
+  
+  //     const reader = new FileReader();
+  
+  //     reader.onloadend = async () => {
+  //       try {
+  //         const response = await fetch("/api/employee/upload", {
+  //           method: "POST",
+  //           headers: {
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify({ file: reader.result, imageName: empID }),
+  //         });
+  
+  //         const data = await response.json();
+  
+  //         if (response.ok) {
+  //           setUploadedImageUrl(data.url);
+  //           alert("Image uploaded successfully!");
+  //         } else {
+  //           console.error("Upload failed:", data.error);
+  //           alert("Failed to upload image.");
+  //         }
+  //       } catch (error) {
+  //         console.error("Error during upload:", error);
+  //         alert("An error occurred while uploading the image.");
+  //       } finally {
+  //         setUploading(false);
+  //       }
+  //     };
+  
+  //     reader.onerror = (err) => {
+  //       console.error("FileReader error:", err);
+  //       alert("Failed to read the file.");
+  //     };
+  
+  //     reader.readAsDataURL(image); // Convert file to base64
+  //   };
+  
+  //   uploadImage();
+  // }, [image]); // Dependency array to watch for image state changes
+  
+
   if (error) {
     return <div>Error: {error}</div>;
   }
+
+    // Make a PATCH request when uploadedImageUrl changes
+    useEffect(() => {
+      if (uploadedImageUrl) {
+        const updateEmployeeImage = async () => {
+          try {
+            const response = await axios.patch(`/api/employee/${empID}`, {
+              photo: uploadedImageUrl,
+            });
+            console.log("Image updated successfully:", response.data);
+          } catch (error) {
+            console.error("Error updating image:", error);
+          }
+        };
+  
+        updateEmployeeImage();
+      }
+    }, [uploadedImageUrl, empID]);
+
+
+  useEffect(() => {
+    if (employeeData?.photo) {
+      setUploadedImageUrl(employeeData.photo);
+    }
+  }, [employeeData]);
 
   const deleteEmployee = async () => {
     console.log("National Id is this "+ empID)
@@ -74,20 +199,30 @@ export default function MyComponent({ params }) {
     }
   };
 
+
+  const handleFileChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+
+
   return (
     <div className="bg-white h-screen relative">
       <Layout>
       <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Employees</p>
 
-<p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Employee Management</span> <span>&gt;</span><span> Employees </span><span>&gt;</span><span> {empID} </span></p>
+<p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <Link href={"/employees"}><span className="hover:underline">Employee Management</span></Link> <span>&gt;</span><Link href={"/employees/all"}><span className="hover:underline"> Employees </span></Link><span>&gt;</span><span> {empID} </span></p>
         <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
         <div className="col-span-3  md:col-span-2 lg:col-span-4 xl:col-span-4 flex justify-center items-center bg-gray-100">
-          <Image
-            src="/images/employee.jpg"
+          <CldImage
+            src= {uploadedImageUrl?uploadedImageUrl:"irxdkhgi7ehjhtbeh1zk"}
             alt="Search Icon"
             width={400}
             height={400}
-            className="transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl object-contain"
+            className={`transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl object-contain ${
+              uploading ? 'animate-pulse' : ''
+            }`}
+            onError={(e) => (e.target.src = "irxdkhgi7ehjhtbeh1zk")}
           />
         </div>
 
@@ -138,7 +273,7 @@ export default function MyComponent({ params }) {
         </div>
         <div className="my-4 flex justify-between text-sm 2xl:text-lg ">
           <button
-                onClick={() => alert("Button clicked!")}
+                onClick={(e) => fileInputRef.current.click()}
                 className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
               >
                 <p className="flex justify-between"><span>Upload Image</span><span>
@@ -189,6 +324,16 @@ export default function MyComponent({ params }) {
             </p>
           </button>
         </div>
+
+              {/* Hidden file input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*" // Restrict to image files
+          onChange={handleFileChange}
+          style={{ display: "none" }} // Hide the input
+        />
+
 
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
