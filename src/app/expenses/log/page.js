@@ -13,6 +13,10 @@ export default function Manage() {
   const [attachments, setAttachments] = useState(""); // For managing attachment input
   const [type, setType] = useState(""); // Type of expense (e.g., trip, misc)
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // Default to today's date
+  const [images, setImages] = useState([]); // Stores images with names
+  const [uploadedImages, setUploadedImages] = useState({}); // State to store uploaded image names by index
+  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false) ;
 
   // Currency symbol map
   const currencySymbols = {
@@ -82,9 +86,31 @@ export default function Manage() {
   
 
   const deleteRow = (index) => {
+
+    console.log("start "+ JSON.stringify(uploadedImages))
+    // Update rows by filtering out the row at the given index
     const updatedRows = rows.filter((_, rowIndex) => rowIndex !== index);
     setRows(updatedRows);
+  
+    // Remove images associated with the deleted row
+    setImages((prevImages) =>
+      prevImages.filter((image) => image.rowID !== index)
+    );
+  
+    setUploadedImages((prevUploadedImages) => {
+      // Create an array of entries and filter out the one at the given index
+      const updatedEntries = Object.entries(prevUploadedImages)
+        .filter(([key]) => parseInt(key) !== index)
+        .map(([key, value], i) => [i.toString(), value]); // Reassign keys starting from 0
+    
+      // Convert the array back to an object
+      return Object.fromEntries(updatedEntries);
+    });
+    
+
+    console.log("end"+ JSON.stringify(uploadedImages))
   };
+  
 
   const formatCurrency = (amount, currency) => {
     const parsedAmount = parseFloat(amount);
@@ -127,26 +153,12 @@ export default function Manage() {
     setRows(updatedRows);
   };
 
-  const handleFileChange = (index, file) => {
-    const updatedRows = [...rows];
-    updatedRows[index].file = file;
-    setRows(updatedRows);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    axios
-      .post("/api/upload", formData)
-      .then(() => alert("File uploaded successfully"))
-      .catch((error) => console.error("Error uploading file:", error));
-  };
-
   const calculateTotals = () => {
     const totals = {};
     rows.forEach((row) => {
       const currency = row.currency;
       const amount = parseFloat(row.amount);
-      console.log("Row:", row); // Debugging
+      //console.log("Row:", row); // Debugging
       if (!isNaN(amount)) {
         if (!totals[currency]) {
           totals[currency] = 0;
@@ -154,41 +166,109 @@ export default function Manage() {
         totals[currency] += amount;
       }
     });
-    console.log("Totals:", totals); // Debugging
+   // console.log("Totals:", totals); // Debugging
     return totals;
   };
 
-    // Save the expense
-    const saveExpense = async () => {
-      try {
-        // Format data for the API
-        const totalAmount = Object.entries(calculateTotals()).map(
-          ([currency, amount]) => ({ currency, amount: amount.toString() })
-        );
+  const saveExpense = async () => {
+    try {
+      // Upload images and get their URLs
+      const uploadedImageUrls = await uploadImages();
   
-        const payload = {
-          date,
-          type,
-          expenses: rows,
-          total_amount: totalAmount,
-          trip: { route: "N/A", id: "N/A" }, // Adjust if trip data is available
-          attachments,
-        };
+      // Format data for the API
+      const totalAmount = Object.entries(calculateTotals()).map(
+        ([currency, amount]) => ({ currency, amount: amount.toString() })
+      );
   
-        const response = await axios.post("/api/expense", payload);
+      // Combine uploaded images with their corresponding rows
+      const formattedRows = rows.map((row, index) => ({
+        ...row,
+        attachment: uploadedImageUrls[index] || null, // Assign image URL if exists
+      }));
   
-        alert("Expense saved successfully!");
-        setRows([]); // Clear rows
-      } catch (error) {
-        console.error("Error saving expense:", error);
-        alert("Failed to save expense. Please try again.");
-      }
-    };
-
+      // Construct payload
+      const payload = {
+        date,
+        type,
+        expenses: formattedRows,
+        total_amount: totalAmount,
+        trip: { route: "N/A", id: "N/A" }, // Adjust if trip data is available
+        attachments: uploadedImageUrls, // Attach uploaded image URLs
+      };
+  
+      // Send the payload to the API
+      const response = await axios.post("/api/expense", payload);
+  
+      alert("Expense saved successfully!");
+      setRows([]); // Clear rows after saving
+    } catch (error) {
+      console.error("Error saving expense:", error);
+      alert("Failed to save expense. Please try again.");
+    }
+  };
+  
   useEffect(() => {
     fetchExpenses();
   }, []);
 
+
+  const handleFileChange = (e, index) => {
+    const files = Array.from(e.target.files);
+  
+    Promise.all(
+      files.map((file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve({ name: file.name, data: reader.result });
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        })
+      )
+    ).then((base64Files) => {
+      // Store images with their associated rowID (index)
+      setImages((prevImages) => [
+        ...prevImages,
+        ...base64Files.map((file) => ({
+          rowID: index,
+          image: file.data,
+          name: file.name,
+        })),
+      ]);
+  
+      setUploadedImages((prev) => ({
+        ...prev,
+        [index]: base64Files[0]?.name, // Store the first file name by index
+      }));
+    });
+  
+    console.log(images);
+  };
+  
+  const uploadImages = async () => {
+    if (!images.length) {
+      
+      return [];
+    }
+  
+    setUploading(true);
+    try {
+      const response = await axios.post("/api/customs/upload", {
+        files: images.map((img) => img.image), // Send base64 strings
+        folder: "expenses", // Specify folder name
+      });
+  
+      console.log("Uploaded Images:", response.data.images);
+      return response.data.images; // Return the uploaded images
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      alert("Failed to upload images. Please try again.");
+      throw error; // Re-throw error to handle it in `handleSubmit`
+    } finally {
+      setUploading(false);
+    }
+  };
+  
+    
   return (
     <div className="bg-white h-screen relative">
       <Layout>
@@ -225,7 +305,7 @@ export default function Manage() {
                   name="departure"
                   value={date} // Bind the input value to the state
                  onChange={handleDateChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-black"
                 />
               </div>
               <div>
@@ -241,7 +321,7 @@ export default function Manage() {
                       name="trip-select"
                       value={type}
                       onChange={(e) => setType(e.target.value)}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-black"
                     >
                       <option value="" disabled>
                         -- Select an Option --
@@ -320,16 +400,21 @@ export default function Manage() {
                         <input
                           type="file"
                           id={`file-upload-${index}`}
+                          name={row.name}
                           className="hidden"
                           onChange={(e) =>
-                            handleFileChange(index, e.target.files[0])
+                            handleFileChange(e,index)
                           }
                         />
                         <label
                           htmlFor={`file-upload-${index}`}
-                          className="text-green-500 font-bold underline cursor-pointer"
+                          className={`font-bold underline cursor-pointer ${
+                            uploadedImages[index] ? "text-blue-500" : "text-green-500"
+                          }`}
                         >
-                          Attach Image
+                            {uploadedImages[index] 
+                              ? `${uploadedImages[index].slice(0, 20)}${uploadedImages[index].length > 20 ? '...' : ''}` 
+                              : "Attach Image"}
                         </label>
                       </div>
                       <button
@@ -399,6 +484,21 @@ export default function Manage() {
             Save Expense
           </button>
         </div>
+
+        {/* Attach Image */}
+        <div className="flex items-center gap-2 mt-2">
+        <input
+            id="images"
+            type="file"
+            name="images"
+            multiple
+            accept="image/*"
+            onChange={(e) => {
+              handleFileChange(e)
+            }}
+            className="hidden" // Hide the file input
+          />
+          </div>
       </Layout>
     </div>
   );

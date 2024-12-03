@@ -19,13 +19,18 @@ const trip = new Schema({
   id: { type: String, required: false, default: '0' },     // Default value for amount
 });
 
+const attachment = new Schema({
+  publicId: { type: String, required: false},
+  url: { type: String, required: false },     
+});
+
 const ExpenseSchema = new Schema({
   date: { type: String, required: true },
   expenses: [expenses],
   trip: { type: trip, default: {route: "N/A", id: "N/A" } }, // Set default value as empty object for trip
   type: { type: String, required: true },
   total_amount: [total],
-  attachments: { type: String, required: false },
+  attachments: [attachment],
 }, { timestamps: true });
 
 const Expense = models.Expense || model('Expense', ExpenseSchema);

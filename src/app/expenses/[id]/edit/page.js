@@ -11,9 +11,12 @@ export default function Manage() {
   const [rows, setRows] = useState([]);
   const [expenseOptions, setExpenseOptions] = useState([]);
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
-  const [attachments, setAttachments] = useState(""); // For managing attachment input
+  const [attachments, setAttachments] = useState([]);// For managing attachment input
   const [type, setType] = useState(""); // Type of expense (e.g., trip, misc)
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // Default to today's date
+  const [newAttachments, setNewAttachments] = useState([]); // Default to today's date
+  const [uploading, setUploading] = useState([]);
+
 
   const router  = useRouter()
 
@@ -91,7 +94,7 @@ export default function Manage() {
       setDate(expenseData.date);
       setType(expenseData.type);
       setRows(expenseData.expenses);
-      setAttachments(expenseData.attachments || "");
+      setAttachments(expenseData.attachments);
     } catch (error) {
       console.error("Error fetching expense by ID:", error);
       alert("Failed to fetch expense data. Please try again.");
@@ -144,18 +147,43 @@ export default function Manage() {
     setRows(updatedRows);
   };
 
-  const handleFileChange = (index, file) => {
-    const updatedRows = [...rows];
-    updatedRows[index].file = file;
-    setRows(updatedRows);
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
 
-    const formData = new FormData();
-    formData.append("file", file);
+    Promise.all(
+      files.map((file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve({ name: file.name, data: reader.result });
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        })
+      )
+    ).then((base64Files) => setNewAttachments(base64Files));
+  };
 
-    axios
-      .axios("/api/upload", formData)
-      .then(() => alert("File uploaded successfully"))
-      .catch((error) => console.error("Error uploading file:", error));
+  const uploadImages = async () => {
+    if (!newAttachments.length) {
+      
+      return [];
+    }
+  
+    setUploading(true);
+    try {
+      const response = await axios.post("/api/customs/upload", {
+        files: newAttachments.map((img) => img.data), // Send base64 strings
+        folder: "customs", // Specify folder name
+      });
+  
+      //console.log("Uploaded Images:", response.data.images);
+      return response.data.images; // Return the uploaded images
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      alert("Failed to upload images. Please try again.");
+      throw error; // Re-throw error to handle it in `handleSubmit`
+    } finally {
+      setUploading(false);
+    }
   };
 
   const calculateTotals = () => {
@@ -163,7 +191,7 @@ export default function Manage() {
     rows.forEach((row) => {
       const currency = row.currency;
       const amount = parseFloat(row.amount);
-      console.log("Row:", row); // Debugging
+      //console.log("Row:", row); // Debugging
       if (!isNaN(amount)) {
         if (!totals[currency]) {
           totals[currency] = 0;
@@ -171,7 +199,7 @@ export default function Manage() {
         totals[currency] += amount;
       }
     });
-    console.log("Totals:", totals); // Debugging
+    //console.log("Totals:", totals); // Debugging
     return totals;
   };
 
@@ -191,9 +219,17 @@ export default function Manage() {
          
           attachments,
         };
+
+        const uploadedImages = await uploadImages(); // Wait for images to upload
+        //console.log(`these are uploaded images ${uploadedImages}`)
+      if (uploadedImages) {
+        payload.attachments = [...uploadedImages, ...attachments]; // Update payload with uploaded images
+      }
+
+      setAttachments([...uploadedImages, ...attachments])
   
         const response = await axios.patch(`/api/expense/${id}`, payload);
-  
+
         alert("Expense updated successfully!");
         router.push(`/expenses/${id}`)
       } catch (error) {
@@ -201,6 +237,43 @@ export default function Manage() {
         alert("Failed to update expense. Please try again.");
       }
     };
+
+    const deleteImage = (e, publicID)=>{
+
+      e.preventDefault();
+  
+      axios
+            .delete("/api/customs/upload", {
+              data: {
+                publicId: publicID, // Replace with your actual public ID
+              },
+            })
+            .then((response) => {
+              console.log("Response:", response.data);
+              const newPhotos = attachments?.filter((pic) => !pic?.url?.includes(publicID))
+              console.log(newPhotos)
+              try{
+                updatePhotos(newPhotos)
+              }
+              catch{}
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+    }
+
+    async function updatePhotos(pics) {
+      try {
+        const response = await axios.patch(`/api/expense/${id}`, {
+        attachments: pics,
+      });
+      console.log("Image updated successfully:", response.data);
+      setAttachments(pics)
+      
+    } catch (error) {
+      console.error("Error updating image:", error);
+    }
+  }
 
   useEffect(() => {
     fetchExpenses();
@@ -347,6 +420,7 @@ export default function Manage() {
                       <div>
                         <input
                           type="file"
+                          disabled
                           id={`file-upload-${index}`}
                           className="hidden"
                           onChange={(e) =>
@@ -355,7 +429,7 @@ export default function Manage() {
                         />
                         <label
                           htmlFor={`file-upload-${index}`}
-                          className="text-green-500 font-bold underline cursor-pointer"
+                          className="text-gray-300 font-bold underline cursor-pointer"
                         >
                           Attach Image
                         </label>
@@ -416,6 +490,100 @@ export default function Manage() {
             </p>
           ))}
         </div>
+
+
+        <p className="font-black text-[#AC0000] text-md mr-10 mt-10">Attached Media</p>
+        <div className="grid grid-cols-5 mt-4">
+        
+        {attachments?.map((src, index) => (
+                <div key={index} className="relative h-60 cursor-pointer group">
+                    <Image
+                    src={src.url}
+                    alt={`Truck Thumbnail ${index + 1}`}
+                    fill
+                    unoptimized
+                    className="object-cover rounded-xl"
+                    />
+                    <div
+                    className="absolute bottom-2 right-2 bg-[#AC0000] p-2 rounded-full shadow-md cursor-pointer hover:bg-gray-200"
+                    onClick={(e) => deleteImage(e,src.publicId)}
+                    >
+                    <Image
+                        src="/images/icons/delete.png" // Replace with the path to your delete icon
+                        alt="Delete Icon"
+                        width={20}
+                        height={20}
+                        className="object-contain"
+                    />
+                    </div>
+                </div>
+                ))}
+
+            
+     
+        </div>
+
+        <div className="col-span-4 mb-4 mt-4">
+          <div className="">
+            {/* Attach Media Button */}
+            <button
+              type="button"
+              onClick={() => document.getElementById("images").click()} // Trigger the file input click
+              className="px-2 py-3 rounded text-sm text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none transition duration-150"
+            >
+              <span className="flex">
+                <span className="mr-2">Attach Relevant Media</span>
+                <Image
+                  src="/images/icons/attachment.png" // Replace with your image path
+                  alt="attachment Icon" // Alternative text for the image
+                  width={20} // Set the width of the image
+                  height={20} // Set the height of the image
+                  className="transition duration-75 group-hover:opacity-80 w-5 h-5 mr-2"
+                />
+              </span>
+            </button>
+
+              {/* Clear Attachments Button */}
+              {newAttachments?newAttachments.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setNewAttachments({ ...newAttachments, images: [] })} // Clear the images
+                  className="px-4 py-2 ml-4 text-sm rounded text-white bg-gray-400 hover:bg-gray-500 focus:outline-none transition duration-150"
+                >
+                  Clear Attachments
+                </button>
+              ):""}
+            </div>
+
+              <input
+                id="images"
+                type="file"
+                name="images"
+                multiple
+                accept="image/*"
+                onChange={(e) => {
+           
+                  handleFileChange(e)
+                }}
+                className="hidden" // Hide the file input
+              />
+
+            {/* Show attached file names */}
+              <div className="mt-3 text-sm text-[#AC0000]">
+                {newAttachments.length > 0 ? (
+                  <p>
+                    <span className="font-bold">Attached Files:</span>{" "}
+                    {newAttachments.map((file, index) => (
+                      <span key={index} className="mr-2">
+                        {file.name}
+                      </span>
+                    ))}
+                  </p>
+                ) : (
+                  <p>No files attached</p>
+                )}
+              </div>
+          </div>
 
         
         {/* Add Row and Save Buttons */}

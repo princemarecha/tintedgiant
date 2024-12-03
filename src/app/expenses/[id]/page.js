@@ -326,17 +326,24 @@ export default function Expense() {
         <div>
         <p className="font-black text-[#AC0000] text-md mr-10 mt-10">Attached Media</p>
         <div className="grid grid-cols-5 mt-4">
-          <div>
-          <Image
-            src="/images/trucks/1.png"
-            alt="Search Icon"
-            width={200}
-            height={200}
-            className="transition duration-75 group-hover:opacity-80 rounded mx-auto object-contain"
-          />
+        
+          {expense?.attachments.map((src, index) => (
+                <div key={index} className="relative h-60 cursor-pointer group">
+                  <Link href= {`${src.url}`} target="_blank" rel="noopener noreferrer">
+                    <Image
+                    src={src.url}
+                    alt={`Truck Thumbnail ${index + 1}`}
+                    fill
+                    unoptimized
+                    className="object-cover rounded-xl"
+                    />
+                    </Link>
+                    
+                </div>
+                ))}
 
-            <p className="font-regular text-[#AC0000] text-center text-sm ">1.png</p>
-          </div>
+            
+     
         </div>
         </div>
     
