@@ -150,7 +150,7 @@ export default function Manage() {
                   <td>{row.importer || ""}</td>
                   <td>{row.cargo || ""}</td>
                   <td className="flex justify-center">
-                    {row.date?row.cleared ? (
+                    {row.date?row.status =="Cleared" ? (
                       <span className="bg-[#126928] p-1 w-3/5 text-center text-white rounded">
                         Cleared
                       </span>

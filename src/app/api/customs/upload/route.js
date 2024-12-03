@@ -58,3 +58,51 @@ export async function POST(req, res) {
     );
   }
 }
+
+
+// Add DELETE handler for deleting an image
+export async function DELETE(req, res) {
+  try {
+    const { publicId } = await req.json(); // Expecting the publicId of the image to delete
+    console.log(publicId)
+
+    if (!publicId) {
+      return new Response(
+        JSON.stringify({ error: "No publicId provided" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const deleteResponse = await cloudinary.uploader.destroy(publicId);
+
+    if (deleteResponse.result === "ok") {
+      return new Response(
+        JSON.stringify({ message: "Image deleted successfully" }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    } else {
+      return new Response(
+        JSON.stringify({ error: "Failed to delete image" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+  } catch (error) {
+    console.error("Cloudinary delete error:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to delete image" }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+}

@@ -103,7 +103,7 @@ export default function Clearance({ params }) {
             { label: "Invoice", value: clearance?.invoice || "N/A" },
             { label: "Duty", value: clearance?.duty || "N/A" },
             { label: "Cargo", value: clearance?.cargo || "N/A" },
-            { label: "Cleared", value: clearance?.cleared ? "Yes" : "No" },
+            { label: "Cleared", value: clearance?.status == "Cleared" ? "Yes" : "No" },
           ].map((item, index) => (
             <div key={index} className="grid grid-cols-1">
               <span className="font-bold text-[#AC0000]">{item.label}</span>
@@ -116,17 +116,24 @@ export default function Clearance({ params }) {
         {/* Attached Media */}
         <div>
   <p className="font-bold text-[#AC0000] text-sm mr-10">Attached Media</p>
-  <div>
-    <Link href="/images/employee.jpg" target="_blank" rel="noopener noreferrer">
-      <Image
-        src="/images/employee.jpg" // Replace with your image path
-        alt="Dashboard Icon" // Alternative text for the image
-        width={200} // Set the width of the image
-        height={200} // Set the height of the image
-        className="transition duration-75 group-hover:opacity-80 rounded" // Apply hover effect, for example, reduce opacity
-      />
-    </Link>
-  </div>
+  <div className="col-span-full grid grid-cols-5 gap-2">
+            {clearance?.attachments.map((src, index) => (
+                <div key={index} className="relative h-60 cursor-pointer group">
+                  <Link href= {`${src.url}`} target="_blank" rel="noopener noreferrer">
+                    <Image
+                    src={src.url}
+                    alt={`Truck Thumbnail ${index + 1}`}
+                    fill
+                    unoptimized
+                    className="object-cover rounded-xl"
+                    />
+                    </Link>
+                    
+                </div>
+                ))}
+        
+    
+            </div>
 </div>
 
         {/* Footer Actions */}
@@ -154,6 +161,28 @@ export default function Clearance({ params }) {
                 />
               </span>
             </p>
+          </button>
+        </div>
+        <div className="flex justify-end mt-6 text-sm">
+
+          <button
+            
+            className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0 transition duration-150"
+          >
+            <Link href={`/customs/${reference}/edit`}>
+            <p className="flex justify-between">
+              <span>Edit Clearance</span>
+              <span>
+                <Image
+                  src="/images/icons/edit.png"
+                  alt="Print Icon"
+                  width={20}
+                  height={20}
+                  className="transition duration-75 group-hover:opacity-80 ml-2 sm:w-6 sm:h-6"
+                />
+              </span>
+            </p>
+            </Link>
           </button>
         </div>
       </Layout>
