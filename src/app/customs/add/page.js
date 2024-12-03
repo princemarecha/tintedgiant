@@ -25,6 +25,8 @@ export default function MyComponent() {
 
   // Form state
   const [formData, setFormData] = useState(initialFormData);
+  const [images, setImages] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   // Handle input change
   const handleChange = (e) => {
@@ -52,9 +54,14 @@ export default function MyComponent() {
   
     // Remove unnecessary fields
     delete payload.cargoVisible; // Remove visibility toggle flag
-    payload.images = payload.images.map((image) => image.name); // Keep only the image names
   
     try {
+      // Upload images and update attachments in payload
+      const uploadedImages = await uploadImages(); // Wait for images to upload
+      if (uploadedImages) {
+        payload.attachments = uploadedImages; // Update payload with uploaded images
+      }
+  
       // Send the payload to the API endpoint
       const response = await axios.post("/api/customs", payload);
   
@@ -67,6 +74,47 @@ export default function MyComponent() {
       alert("Failed to add customs entry.");
     }
   };
+  
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    Promise.all(
+      files.map((file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve({ name: file.name, data: reader.result });
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        })
+      )
+    ).then((base64Files) => setImages(base64Files));
+  };
+
+  const uploadImages = async () => {
+    if (!images.length) {
+      alert("No images to upload!");
+      return [];
+    }
+  
+    setUploading(true);
+    try {
+      const response = await axios.post("/api/customs/upload", {
+        files: images.map((img) => img.data), // Send base64 strings
+        folder: "customs", // Specify folder name
+      });
+  
+      console.log("Uploaded Images:", response.data.images);
+      return response.data.images; // Return the uploaded images
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      alert("Failed to upload images. Please try again.");
+      throw error; // Re-throw error to handle it in `handleSubmit`
+    } finally {
+      setUploading(false);
+    }
+  };
+  
   
 
   return (
@@ -308,7 +356,9 @@ export default function MyComponent() {
       setFormData((prevData) => ({
         ...prevData,
         images: fileNames, // Update images field with file names
+        
       }));
+      handleFileChange(e)
     }}
     className="hidden" // Hide the file input
   />

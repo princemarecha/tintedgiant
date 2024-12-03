@@ -440,7 +440,7 @@ export default function MyComponent({ params }) {
           </button>
         </div>
 
-          {/* Hidden file input */}
+          {/* Hidden file input */} 
           <input
           type="file"
           ref={fileInputRef}
