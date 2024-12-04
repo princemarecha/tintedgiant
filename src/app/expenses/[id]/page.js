@@ -130,6 +130,24 @@ export default function Expense() {
     return date.toLocaleString("en-US", options).replace(",", "");
   };
 
+  const deleteImage = (publicID)=>{
+
+
+    axios
+          .delete("/api/customs/upload", {
+            data: {
+              publicId: publicID, // Replace with your actual public ID
+            },
+          })
+          .then((response) => {
+            console.log("Response:", response.data);
+      
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+  }
+
   const handleDeleteExpense = async () => {
     try {
       const confirmDelete = window.confirm("Are you sure you want to delete this expense?");
@@ -140,7 +158,20 @@ export default function Expense() {
       }
   
       await axios.delete(`/api/expense/${id}`);
-      await axios.patch(`/api/journey/${journeyDetails._id}`, payload)
+      journeyDetails?await axios.patch(`/api/journey/${journeyDetails._id}`, payload):""
+
+      if (expense.attachments && expense.attachments.length > 0) {
+        expense.attachments.forEach((attachment) => {
+          try {
+            deleteImage(attachment.publicId);
+          } catch (error) {
+            console.error(`Failed to delete image with publicId ${attachment.publicId}`, error);
+          }
+        });
+      }
+      
+
+
       alert("Expense deleted successfully!");
       // Optionally, redirect to another page or refresh the list
       router.push("/expenses/manage");

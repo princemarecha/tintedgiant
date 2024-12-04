@@ -32,7 +32,7 @@ export async function GET(req, { params }) {
 // DELETE method: Delete a single expense by _id
 export async function DELETE(req, { params }) {
   const { db } = await connectToDatabase();
-  const { expense_id } = params; // Extract `expense_id` from `params`
+  const { expense_id } = await params; // Extract `expense_id` from `params`
 
   try {
     if (!expense_id) {
