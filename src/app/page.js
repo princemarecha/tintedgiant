@@ -10,8 +10,34 @@ import BarChart from "@/components/Bar";
 
 export default function Dashboard() {
 
-
+const [journeys, setJourneys] = useState([]);
  
+useEffect(() => {
+  const fetchJourneys = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/home/journeys");
+      if (!response.ok) {
+        throw new Error("Failed to fetch journeys");
+      }
+      const data = await response.json();
+      setJourneys(data.journeys);
+    } catch (error) {
+      console.error("Error fetching journeys:", error);
+    }
+  };
+
+  fetchJourneys();
+}, []);
+
+
+function truncateString(str, maxLength = 10) {
+  if (!str) return ""; // Handle null or undefined by returning an empty string
+  if (str.length > maxLength) {
+    return str.substring(0, maxLength); // Truncate if string exceeds maxLength
+  }
+  return str; // Return original string if it's within maxLength
+}
+
 
   return (
     <div className="bg-white h-screen relative">
@@ -41,32 +67,40 @@ export default function Dashboard() {
               {/* Active Journeys */}
 
               <div className="grid grid-cols-1 overflow-y-scroll h-72 scrollbar scrollbar-thumb-white scrollbar-track-[#5A4F05]">
-                <div className="bg-white h-20 mx-6 mt-2 grid grid-cols-3">
-                <div className="mx-2 mt-2">
-                    <p className="text-[#AC0000]  text-xs font-black">From</p>
-                    <p className="text-[#AC0000]  text-xs ">Harare</p>
-                  </div>
-                  <div className="mx-2 mt-2">
-                    <p className="text-[#AC0000]  text-xs font-black">To</p>
-                    <p className="text-[#AC0000]  text-xs ">Lusaka</p>
-                  </div>
-                  <div className="mx-2 mt-2">
-                    <p className="text-[#AC0000]  text-xs font-bold">Driver</p>
-                    <p className="text-white rounded-sm  text-xs bg-[#4D4D4D] text-center">P. Marecha</p>
-                  </div>
-                  <div className="mx-2 mt-2 col-span-2">
-                    <p className="text-[#AC0000]  text-xs font-black">Departure</p>
-                    <p className="rounded-sm  text-xs text-[#AC0000] ">30 October 2024</p>
-                  </div>
-                  <div className="mx-2 mt-2 col-span-1">
-                    <p className="text-[#126928]  text-xl text-end font-black">$720</p>
-                  </div>
+              {journeys.map((journey, index) => (
+                 <Link key={index} href={`/journeys/${journey._id}`}>
+                <div  className="bg-white h-24 mx-6 mt-2 grid grid-cols-3">
+                  
+                    <div className="mx-2 mt-2">
+                        <p className="text-[#AC0000] text-xs font-black">From</p>
+                        <p className="text-[#AC0000] text-xs 2xl:hidden">{truncateString(journey.from) || "Loading"}</p>
+                        <p className="text-[#AC0000] text-xs hidden 2xl:inline">{journey.from}</p>
+                      </div>
+                      <div className="mx-2 mt-2">
+                        <p className="text-[#AC0000] text-xs font-black">To</p>
+                        <p className="text-[#AC0000] text-xs 2xl:hidden">{truncateString(journey.to) || "Loading"}</p>
+                        <p className="text-[#AC0000] text-xs hidden 2xl:inline">{journey.to}</p>
+                      </div>
+                      <div className="mx-2 mt-2">
+                        <p className="text-[#AC0000] text-xs font-bold">Driver</p>
+                        <p className="text-white rounded-sm text-xs bg-[#4D4D4D] text-center 2xl:hidden">{truncateString(journey.driver?.name) || "Loading..."}</p>
+                        <p className="text-white rounded-sm text-xs bg-[#4D4D4D] text-center hidden 2xl:inline">{journey.driver?.name || "Loading..."}</p>
+                      </div>
+                      <div className="mx-2 mt-2 col-span-2">
+                        <p className="text-[#AC0000] text-xs font-black">Departure</p>
+                        <p className="rounded-sm text-xs text-[#AC0000] 2xl:hidden">{truncateString(journey.departure) || "Loading"}</p>
+                        <p className="rounded-sm text-xs text-[#AC0000] hidden 2xl:inline">{journey.departure || "Loading"}</p>
+                      </div>
+                      <div className="mx-2 mt-2 col-span-1">
+                        <p className="text-[#126928] text-md text-end font-black">
+                          {journey.distance || "-"} km
+                        </p>
+                      </div>
 
                 </div>
-                <div className="bg-white h-20 mx-6 mt-2"></div>
-                <div className="bg-white h-20 mx-6 mt-2"></div>
-                <div className="bg-white h-20 mx-6 mt-2"></div>
-                <div className="bg-white h-20 mx-6 mt-2"></div>
+                </Link>
+              ))}
+            
               </div>
 
 

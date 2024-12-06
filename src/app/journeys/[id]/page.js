@@ -221,7 +221,7 @@ export default function Journey({ params }) {
           className="font-bold text-[#AC0000] text-sm mr-10 cursor-pointer hover:underline"
           onClick={handleDeleteJourney}
         >
-          Delete Expense
+          Delete Journey
         </p>
 
         <button
