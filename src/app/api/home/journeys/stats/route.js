@@ -1,4 +1,3 @@
-// pages/api/insertJourney.js
 import connectToDatabase from '@/utils/mongo/mongoose';
 import Journey from '@/models/journey'; // Assumes Journey model is correctly defined in '@/models/journey'
 import { NextResponse } from 'next/server';
@@ -51,8 +50,16 @@ export async function GET(req) {
       journeys[month] = item.count;
     });
 
-    // Return the result
-    return NextResponse.json({ journeys });
+    // Reverse the journey order
+    const reversedJourneys = Object.entries(journeys)
+      .reverse()
+      .reduce((acc, [key, value]) => {
+        acc[key] = value;
+        return acc;
+      }, {});
+
+    // Return the reversed result
+    return NextResponse.json({ journeys: reversedJourneys });
   } catch (error) {
     console.error("Error fetching journeys per month:", error);
     return NextResponse.json(

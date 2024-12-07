@@ -11,6 +11,12 @@ import BarChart from "@/components/Bar";
 export default function Dashboard() {
 
 const [journeys, setJourneys] = useState([]);
+const [chartData, setChartData] = useState(null);
+const [isLoading, setIsLoading] = useState(true);
+const [expenses, setExpenses] = useState([]);
+const maxExpenses = 9; // Total number of divs to display (including placeholders)
+const [summary, setSummary] = useState(null); // State to store summary data
+const [error, setError] = useState(null); // State to handle errors
  
 useEffect(() => {
   const fetchJourneys = async () => {
@@ -30,6 +36,90 @@ useEffect(() => {
 }, []);
 
 
+useEffect(() => {
+  // Fetch data from the API endpoint
+  const fetchChartData = async () => {
+    try {
+      const response = await fetch('http://localhost:3000/api/home/journeys/stats');
+      const result = await response.json();
+
+      if (result.journeys) {
+        // Extract the months and journey counts from the response
+        const months = Object.keys(result.journeys); // Get the months (keys)
+        const journeyCounts = Object.values(result.journeys); // Get the journey counts (values)
+
+        setChartData({
+          data: {
+            labels: months,
+            datasets: [
+              {
+                label: 'Journeys',
+                data: journeyCounts,
+                backgroundColor: '#AC0000',
+                borderColor: '#AC0000',
+                borderWidth: 1,
+                borderRadius: 10,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: { beginAtZero: true },
+            },
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchChartData();
+}, []);
+
+
+useEffect(() => {
+  const fetchExpenses = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/home/expenses");
+      const data = await response.json();
+      const expensesArray = Object.entries(data.expenses || {}).map(
+        ([name, amount]) => ({ name, amount })
+      ); // Convert object to an array of { name, amount } objects
+      setExpenses(expensesArray);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      setExpenses([]); // Fallback to an empty array on error
+    }
+  };
+
+  fetchExpenses();
+}, []);
+
+useEffect(() => {
+  const fetchSummary = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/home/summary");
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      setSummary(data); // Set the summary data to state
+    } catch (err) {
+      console.error("Error fetching summary data:", err);
+      setError(err.message); // Set error message to state
+    }
+  };
+
+  fetchSummary();
+}, []);
+
 function truncateString(str, maxLength = 10) {
   if (!str) return ""; // Handle null or undefined by returning an empty string
   if (str.length > maxLength) {
@@ -38,6 +128,12 @@ function truncateString(str, maxLength = 10) {
   return str; // Return original string if it's within maxLength
 }
 
+
+// Prepare combined data (expenses + placeholders)
+const displayData = [
+  ...expenses,
+  ...Array(Math.max(0, maxExpenses - expenses.length)).fill(null),
+].slice(0, maxExpenses);
 
   return (
     <div className="bg-white h-screen relative">
@@ -112,9 +208,10 @@ function truncateString(str, maxLength = 10) {
               </div>
           
             <hr className=""/>
-            <div className="flex justify-center xl:h-76">
-              <BarChart />
+            <div>
+              {chartData ? <BarChart data={chartData.data} options={chartData.options} /> : <p>Loading chart...</p>}
             </div>
+
                 
             </div>
             <div className="col-span-8 bg-[#5A4F05]   grid grid-cols-8 rounded-lg">
@@ -146,181 +243,95 @@ function truncateString(str, maxLength = 10) {
                 </div>
               </div>
               <div className="col-span-6 grid grid-cols-3 gap-3 m-6 ">
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Fuel</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Gate Pass</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#AC0000] text-xs font-bold">EMA</p>
-                        <div>
-                            <Image
-                            src="/images/icons/up.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#AC0000] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Fuel</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Fuel</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Fuel</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Fuel</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Fuel</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
-                  <div className="bg-white h-20 rounded flex-col justify-between">
-                    <div className="flex justify-between m-2">
-                        <p className="text-[#126928] text-xs font-bold">Fuel</p>
-                        <div>
-                            <Image
-                            src="/images/icons/down.png" // Replace with your image path
-                            alt="Truck Icon"  // Alternative text for the image
-                            width={20} // Set the width of the image
-                            height={20} // Set the height of the image
-                            className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
-                          />
-                        </div>
-                    </div>
-                    <p className="text-[#126928] mx-2 text-xl font-black">$5664.00</p>
-                  </div>
+              {displayData.map((expense, index) => (
+        <div
+          key={index}
+          className={`bg-white h-20 rounded flex-col justify-between ${
+            expense ? "" : "opacity-50" // Apply reduced opacity for placeholders
+          }`}
+        >
+          {expense ? (
+            <>
+              <div className="flex justify-between m-2">
+                <p className="text-[#126928] text-xs font-bold">
+                  {expense.name || "Unknown"}
+                </p>
+                <div>
+                  <Image
+                    src="/images/icons/down.png"
+                    alt="Expense Icon"
+                    width={20}
+                    height={20}
+                    className="transition duration-75 group-hover:opacity-80 ml-2"
+                  />
+                </div>
+              </div>
+              <p className="text-[#126928] mx-2 text-xl font-black">
+                {expense.amount || "$0.00"}
+              </p>
+            </>
+          ) : (
+            <>
+              <div className="flex justify-between m-2">
+                <p className="text-gray-400 text-xs font-bold">Expense</p>
+              </div>
+              <p className="text-gray-400 mx-2 text-xl font-black">$0.00</p>
+            </>
+          )}
+        </div>
+      ))}
+              
               </div>
 
             </div>
             <div className="col-span-4 bg-[#AC0000] flex-col justify-between flex rounded-lg">
-                <div>
-                  <p className="text-white mx-6 mt-4 text-xl font-black">Summary</p>
-                </div>
-                <div className="appendDown">
-                  <div>
-                    <p className="text-white mx-6 mt-4 text-xl font-semibold">Top Cargo</p>
-                    <p className="text-white mx-6 text-xs font-semibold">Petroleum</p>
-                  </div>
+      <div>
+        <p className="text-white mx-6 mt-4 text-xl font-black">Summary</p>
+      </div>
+      <div className="appendDown">
+        {/* Top Cargo */}
+        <div>
+          <p className="text-white mx-6 mt-4 text-xl font-semibold">Top Cargo</p>
+          <div className="flex">
+             <p className="text-white mx-6 text-xs font-semibold">{summary?.topCargo?.name}</p>
+          <p className="text-white mx-6 text-xs font-semibold">Trips: {summary?.topCargo?.trips}</p>
+          </div>
+         
+        </div>
 
-                  <div>
-                    <p className="text-white mx-6 mt-4 text-xl font-semibold">Top Destination</p>
-                    <p className="text-white mx-6 text-xs font-semibold mb-2">Kampala, Uganda</p>
-                  </div>
-                </div>
+        {/* Top Destination */}
+        <div>
+          <p className="text-white mx-6 mt-4 text-xl font-semibold">Top Destination</p>
+          <div className="flex">
+            <p className="text-white mx-6 text-xs font-semibold mb-2">{summary?.topDestination?.name}</p>
+          <p className="text-white mx-6 text-xs font-semibold">Trips: {summary?.topDestination?.trips}</p>
+          </div>
+          
+        </div>
+      </div>
 
-                <div className="appendDown mb-6">
-                  <div>
-                    <p className="text-white mx-6 mt-4 text-lg font-semibold">Top Driver</p>
-                 <div className="flex justify-between">
-                  <p className="text-white mx-6 text-xs ">Prince Marecha</p>
-                    <p className="text-white mx-6 text-xs ">57 Trips</p>
-                    <p className="text-white mx-6 text-xs ">450 km travelled</p>
-                 </div>
-                    
-                  </div>
+      <div className="appendDown mb-6">
+        {/* Top Driver */}
+        <div>
+          <p className="text-white mx-6 mt-4 text-lg font-semibold">Top Driver</p>
+          <div className="grid grid-cols-3">
+            <p className="text-white mx-6 text-xs">{summary?.topDriver?.name?.name}</p>
+            <p className="text-white mx-6 text-xs">{summary?.topDriver?.trips} Trips</p>
+            <p className="text-white mx-6 text-xs">{summary?.topDriver?.kmTravelled} km travelled</p>
+          </div>
+        </div>
 
-                  <div>
-                    <p className="text-white mx-6 mt-4 text-lg font-semibold">Top Truck</p>
-                  <div className="flex justify-between">
-                  <p className="text-white mx-6 text-xs ">Nissan Humper</p>
-                    <p className="text-white mx-6 text-xs ">57 Trips</p>
-                    <p className="text-white mx-6 text-xs ">450 km travelled</p>
-                 </div>
-                  </div>
-                </div>
-            </div>
+        {/* Top Truck */}
+        <div>
+          <p className="text-white mx-6 mt-4 text-lg font-semibold">Top Truck</p>
+          <div className="grid grid-cols-3">
+            <p className="text-white mx-6 text-xs">{summary?.topTruck?.name?.name}</p>
+            <p className="text-white mx-6 text-xs">{summary?.trips} Trips</p>
+            <p className="text-white mx-6 text-xs">{summary?.topTruck?.kmTravelled} km travelled</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
           </div>
 
