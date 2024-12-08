@@ -29,6 +29,8 @@ export default function MyComponent({ params }) {
   const [uploading, setUploading] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const fileInputRef = useRef(null); // Reference to the hidden file input
+  const [data, setData] = useState(null); // To store API response
+  const [loading, setLoading] = useState(true); // To handle loading state
 
   const { id } = useParams();
 
@@ -102,58 +104,36 @@ export default function MyComponent({ params }) {
   
     uploadImage();
   }, [image]); // Dependency array to watch for image state changes
+  
+  useEffect(() => {
+    // Fetch data when component mounts or empID changes
+    const fetchOperationalCosts = async () => {
+      try {
+        setLoading(true); // Start loading
+        setError(null); // Reset error
 
-  // useEffect(() => {
-  //   const uploadImage = async () => {
-  //     if (!image) return; // Prevent upload if no image is selected
-  
-  //     console.log("Uploading file:", image);
-  //     setUploading(true);
-  
-  //     const reader = new FileReader();
-  
-  //     reader.onloadend = async () => {
-  //       try {
-  //         const response = await fetch("/api/employee/upload", {
-  //           method: "POST",
-  //           headers: {
-  //             "Content-Type": "application/json",
-  //           },
-  //           body: JSON.stringify({ file: reader.result, imageName: empID }),
-  //         });
-  
-  //         const data = await response.json();
-  
-  //         if (response.ok) {
-  //           setUploadedImageUrl(data.url);
-  //           alert("Image uploaded successfully!");
-  //         } else {
-  //           console.error("Upload failed:", data.error);
-  //           alert("Failed to upload image.");
-  //         }
-  //       } catch (error) {
-  //         console.error("Error during upload:", error);
-  //         alert("An error occurred while uploading the image.");
-  //       } finally {
-  //         setUploading(false);
-  //       }
-  //     };
-  
-  //     reader.onerror = (err) => {
-  //       console.error("FileReader error:", err);
-  //       alert("Failed to read the file.");
-  //     };
-  
-  //     reader.readAsDataURL(image); // Convert file to base64
-  //   };
-  
-  //   uploadImage();
-  // }, [image]); // Dependency array to watch for image state changes
-  
+        // API call to fetch data
+        const response = await fetch(
+          `http://localhost:3000/api/employee/opCosts?userId=${empID}`
+        );
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        setData(result); // Save response data
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false); // Stop loading
+      }
+    };
+
+    if (empID) fetchOperationalCosts();
+  }, [empID]);
+
+
 
     // Make a PATCH request when uploadedImageUrl changes
     useEffect(() => {
@@ -225,15 +205,15 @@ export default function MyComponent({ params }) {
 
 <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <Link href={"/employees"}><span className="hover:underline">Employee Management</span></Link> <span>&gt;</span><Link href={"/employees/all"}><span className="hover:underline"> Employees </span></Link><span>&gt;</span><span> {empID} </span></p>
         <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
-        <div className="col-span-3  md:col-span-2 lg:col-span-4 xl:col-span-4 flex justify-center items-center bg-gray-100">
+        <div className="col-span-3  md:col-span-2 lg:col-span-4 xl:col-span-4 flex justify-center items-center bg-gray-100 ">
           <CldImage
             src= {uploadedImageUrl?uploadedImageUrl:"irxdkhgi7ehjhtbeh1zk"}
             alt="Search Icon"
             width={400}
             height={400}
-            className={`transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl object-contain ${
+            className={`transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl object-contain  ${
               uploading ? 'animate-pulse' : ''
-            }`}
+            }max-h-96`}
             onError={(e) => (e.target.src = "irxdkhgi7ehjhtbeh1zk")}
           />
         </div>
@@ -249,12 +229,13 @@ export default function MyComponent({ params }) {
                 <div className="font-bold" >National ID </div> <div className="col-span-2">{employeeData.nationalID || "Not provided"}</div> 
                 <div className="font-bold" >Passport Number</div> <div className="col-span-2">{employeeData.passportNumber || "Not provided"}</div> 
                 <div className="font-bold" >Occupation</div> <div className="col-span-2">{employeeData.occupation || "Not provided"}</div> 
-                <div className="font-bold" >Km Travelled</div> <div className="col-span-2">{employeeData.kmtravelled || "Not provided"} km</div> 
-                <div className="font-bold" >Avg Km </div> <div className="col-span-2">{employeeData.avg_km || "Not provided"} km</div> 
-                <div className="font-bold" >Journeys</div> <div className="col-span-2">{employeeData.journeys || "Not provided"} </div> 
-                <div className="font-bold" >Occupation</div> <div className="col-span-2">{employeeData.occupation || "Not provided"}</div> 
-                <div className="font-bold" >Operational Costs</div> <div className="col-span-2">${employeeData.opCosts || "Not provided"}</div> 
-                <div className="font-bold" >Avg Op Cost</div> <div className="col-span-2">${employeeData.avg_op_costs || "Not provided"}</div> 
+
+                {employeeData?.occupation == "Driver"?<div className="grid grid-cols-3 col-span-full">
+                                <div className="font-bold" >Km Travelled</div> <div className="col-span-2">{data?.totalKmTravelled || "0"} km</div> 
+                                <div className="font-bold" >Avg Km </div> <div className="col-span-2">{data?.avgKmTravelled || "0"} km</div> 
+                                <div className="font-bold" >Journeys</div> <div className="col-span-2">{data?.totalJourneys || "0"} </div> 
+                </div>:""}
+
               </div>
             ) : (
               empID && <div>Loading employee data...</div>
@@ -283,6 +264,34 @@ export default function MyComponent({ params }) {
               empID && <div>Loading employee data...</div>
             )}
         </div>
+        {data?.totalExpenses?.length?<div className="col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded">
+            <div className="col-span-full">
+              <p className="text-lg font-bold mb-2">Operational Costs</p>
+            </div>
+            {data?.totalExpenses && data?.totalExpenses.map((expense, index) => (
+              <div key={index} className="col-span-1">
+                <p className="text-sm font-bold">
+                  {expense.currency} <span className="text-3xl">{expense.operation_costs}</span>
+                </p>
+              </div>
+            ))}
+
+        </div>:""}
+
+        {data?.totalExpenses?.length?<div className="col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded">
+            <div className="col-span-full">
+              <p className="text-lg font-bold mb-2">Average Operational Costs</p>
+            </div>
+            {data?.averageOperationalCosts && data?.averageOperationalCosts.map((expense, index) => (
+              <div key={index} className="col-span-1">
+                <p className="text-sm font-bold">
+                  {expense.currency} <span className="text-3xl">{expense.avg_operational_costs}</span>
+                </p>
+              </div>
+            ))}
+
+        </div>:""}
+
         <div className="my-4 flex justify-between text-sm 2xl:text-lg ">
           <button
                 onClick={(e) => fileInputRef.current.click()}

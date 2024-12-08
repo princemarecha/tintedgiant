@@ -20,11 +20,11 @@ export async function GET(request) {
 
     console.log("Received userId:", userId);
 
+    // Fetch journeys where expenses.totals exists and driver.id matches
     const journeys = await Journey.find({
       "expenses.totals": { $exists: true, $ne: [] },
       "driver.id": userId,
     });
-    
 
     console.log("Fetched journeys:", journeys);
 
@@ -32,11 +32,16 @@ export async function GET(request) {
     const totalExpensesByCurrency = {};
     const avgOperationalCostsByCurrency = {};
 
+    let totalJourneys = 0;
+    let totalKmTravelled = 0;
+
     // Process the fetched journeys
     journeys.forEach((journey) => {
+      totalJourneys += 1; // Increment the journey count
+      totalKmTravelled += journey.distance || 0; // Add journey distance safely
+
       // Safely access the expenses.totals array
       if (journey.expenses && Array.isArray(journey.expenses.totals)) {
-
         journey.expenses.totals.forEach(({ currency, amount }) => {
           if (!currency || isNaN(amount)) return; // Skip invalid entries
 
@@ -72,10 +77,16 @@ export async function GET(request) {
       })
     );
 
+    // Calculate average kilometers traveled
+    const avgKmTravelled = totalJourneys > 0 ? totalKmTravelled / totalJourneys : 0;
+
     // Return the response
     return NextResponse.json({
       totalExpenses,
       averageOperationalCosts,
+      totalJourneys,
+      totalKmTravelled,
+      avgKmTravelled,
     });
   } catch (error) {
     console.error("Error analyzing expenses:", error);
