@@ -12,10 +12,10 @@ async function getBase64ImageFromUrl(url) {
 // This function handles the PDF generation for a specific employee
 export async function GET(req, context) {
   const { params } = context;
-  const { national_id } = params;
+  const { id } = params;
 
   // Fetch data from the main employee endpoint
-  const employeeResponse = await fetch(`http://localhost:3000/api/employee/${national_id}`);
+  const employeeResponse = await fetch(`http://localhost:3000/api/employee/${id}`);
   if (!employeeResponse.ok) {
     return new Response("Employee not found", { status: 404 });
   }
@@ -115,7 +115,7 @@ export async function GET(req, context) {
   return new NextResponse(Buffer.from(pdfData), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename=employee_${national_id}_details.pdf`,
+      "Content-Disposition": `attachment; filename=employee_${id}_details.pdf`,
     },
   });
 }

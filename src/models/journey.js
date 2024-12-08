@@ -22,7 +22,16 @@ const JourneySchema = new Schema({
     distance: { type: Number, required: true },
     status: { type: String, required: true },
     truck: { type: truck, required: true },
-    expenses: { type: String, required: true, default:"N/A" },
+    expenses: {
+      id: { type: String, required: false },
+      totals: [
+        {
+          currency: { type: String, required: true },
+          amount: { type: Number, required: true },
+          _id: { type: Schema.Types.ObjectId, required: false },
+        },
+      ],
+    },
     driver: { type: driver, required: true },
     
 }, { timestamps: true });

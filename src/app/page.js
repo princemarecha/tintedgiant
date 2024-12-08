@@ -219,6 +219,7 @@ const displayData = [
                 <div className="flex justify-between">
                   <p className="text-white mx-6 mt-4 text-md font-black">Expenses</p>
                   <div className="mt-6">
+                    <Link href={`/expenses/manage`}>
                       <Image
                         src="/images/icons/share.png" // Replace with your image path
                         alt="Truck Icon"  // Alternative text for the image
@@ -226,6 +227,7 @@ const displayData = [
                         height={20} // Set the height of the image
                         className="transition duration-75 group-hover:opacity-80 ml-2" // Apply hover effect, for example, reduce opacity
                       />
+                      </Link>
                   </div>
                 
                 </div>

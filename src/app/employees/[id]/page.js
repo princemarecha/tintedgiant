@@ -204,6 +204,18 @@ export default function MyComponent({ params }) {
     setImage(e.target.files[0]);
   };
 
+  function printCard(e){
+    e.preventDefault();
+    
+    try{
+
+      axios.get(`/api/employee/${empID}/print`)
+    }
+    catch{
+      console.log(`Could not print employee Card`)
+    }
+    
+  }
 
 
   return (
@@ -234,7 +246,7 @@ export default function MyComponent({ params }) {
                 <div className="font-bold" >Phone</div> <div className="col-span-2">{employeeData.phoneNumber || "Not provided"}</div> 
                 <div className="font-bold" >Gender </div> <div className="col-span-2">{employeeData.gender || "Not provided"}</div> 
                 <div className="font-bold" >Nationality</div> <div className="col-span-2">{employeeData.nationality || "Not provided"}</div> 
-                <div className="font-bold" >National ID </div> <div className="col-span-2">{employeeData.empID || "Not provided"}</div> 
+                <div className="font-bold" >National ID </div> <div className="col-span-2">{employeeData.nationalID || "Not provided"}</div> 
                 <div className="font-bold" >Passport Number</div> <div className="col-span-2">{employeeData.passportNumber || "Not provided"}</div> 
                 <div className="font-bold" >Occupation</div> <div className="col-span-2">{employeeData.occupation || "Not provided"}</div> 
                 <div className="font-bold" >Km Travelled</div> <div className="col-span-2">{employeeData.kmtravelled || "Not provided"} km</div> 
@@ -305,7 +317,22 @@ export default function MyComponent({ params }) {
           </button>
 
         </div>
-        <div className="my-4 flex justify-end text-sm 2xl:text-lg">
+        <div className="my-4 flex justify-between text-sm 2xl:text-lg">
+        <button
+               onClick={(e) => printCard(e)}
+                className="px-4 py-2 rounded text-white bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150 "
+              >
+                <p className="flex justify-between"><span>Print</span><span>
+                <Image
+                src="/images/icons/print.png"
+                alt="Search Icon"
+                width={20}
+                height={20}
+                className="transition duration-75 group-hover:opacity-80 ml-2 sm:w-6 sm:h-6"
+              />
+                  </span>
+                  </p>
+          </button>
         <button
             onClick={deleteEmployee}
             className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"

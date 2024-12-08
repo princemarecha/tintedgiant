@@ -75,7 +75,7 @@ export default function Journey({ params }) {
   // Fetch expense data when journey data is loaded
   useEffect(() => {
     if (journey?.expenses) {
-      fetchExpense(journey.expenses);
+      fetchExpense(journey.expenses?.id);
     }
   }, [journey]);
   

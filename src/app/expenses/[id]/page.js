@@ -53,7 +53,7 @@ export default function Expense() {
       };
 
       const payloadJourney = {
-        expenses: id,
+        expenses: {"id":id,"totals": expense?.total_amount}
       };
 
       const response = await axios.patch(`/api/expense/${id}`, payload);
