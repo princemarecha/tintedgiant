@@ -48,6 +48,8 @@ export default function MyComponent({ params }) {
   const fileInputRef = useRef(null); // Reference to the hidden file input
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(false);
 
 
 
@@ -154,6 +156,35 @@ export default function MyComponent({ params }) {
         updateEmployeeImage();
       }
     }, [uploadedImageUrl, plateID]);
+
+    useEffect(() => {
+      // Fetch data when component mounts or plateID changes
+      const fetchOperationalCosts = async () => {
+        try {
+          setLoading(true); // Start loading
+          setError(null); // Reset error
+    
+          // API call to fetch data
+          const response = await fetch(
+            `http://localhost:3000/api/trucks/opCosts?plateId=${plateID}`
+          );
+    
+          if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+          }
+    
+          const result = await response.json();
+          setData(result); // Save response data
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false); // Stop loading
+        }
+      };
+    
+      if (plateID) fetchOperationalCosts();
+    }, [plateID]);
+    
 
 
   if (error) {
@@ -314,16 +345,14 @@ export default function MyComponent({ params }) {
         <div className="">{truckData.fuel || "Not provided"}</div> 
       
         <div className="font-bold">Journeys</div> 
-        <div className="">{truckData.journeys || "Not provided"}</div> 
+        <div className="">{data?.totalJourneys || "0"}</div> 
       
+        <div className="font-bold">Km Travelled</div> 
+        <div className="">{data?.totalKmTravelled || "0"} km</div> 
+
         <div className="font-bold">Avg Km</div> 
-        <div className="">{truckData.avg_km || "Not provided"} km</div> 
+        <div className="">{data?.avgKmTravelled || "0"} km</div> 
       
-        <div className="font-bold">Operational Costs</div> 
-        <div className="">{`$ ${truckData.opCosts}` || "N/A"}</div> 
-      
-        <div className="font-bold">Avg Op Cost</div> 
-        <div className="">{`$ ${truckData.avg_opCosts}` || "N/A"}</div> 
       
       </div>
       
@@ -354,6 +383,33 @@ export default function MyComponent({ params }) {
               plateID && <div>Loading truck data...</div>
             )}
 
+{data?.totalExpenses?.length?<div className="col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded">
+            <div className="col-span-full">
+              <p className="text-lg font-bold mb-2">Operational Costs</p>
+            </div>
+            {data?.totalExpenses && data?.totalExpenses.map((expense, index) => (
+              <div key={index} className="col-span-1">
+                <p className="text-sm font-bold">
+                  {expense.currency} <span className="text-3xl">{expense.operation_costs}</span>
+                </p>
+              </div>
+            ))}
+
+        </div>:""}
+
+        {data?.totalExpenses?.length?<div className="col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded">
+            <div className="col-span-full">
+              <p className="text-lg font-bold mb-2">Average Operational Costs</p>
+            </div>
+            {data?.averageOperationalCosts && data?.averageOperationalCosts.map((expense, index) => (
+              <div key={index} className="col-span-1">
+                <p className="text-sm font-bold">
+                  {expense.currency} <span className="text-3xl">{expense.avg_operational_costs}</span>
+                </p>
+              </div>
+            ))}
+
+        </div>:""}
 
             <div className="col-span-full grid grid-cols-5 gap-2">
             {photos.map((src, index) => (
