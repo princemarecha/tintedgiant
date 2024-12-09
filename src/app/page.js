@@ -17,6 +17,9 @@ const [expenses, setExpenses] = useState([]);
 const maxExpenses = 9; // Total number of divs to display (including placeholders)
 const [summary, setSummary] = useState(null); // State to store summary data
 const [error, setError] = useState(null); // State to handle errors
+const [active, setActive] = useState(0)
+const [expenseData, setExpenseData] = useState([])
+const [selectedCurrency, setSelectedCurrency] = useState("USD")
  
 useEffect(() => {
   const fetchJourneys = async () => {
@@ -27,6 +30,7 @@ useEffect(() => {
       }
       const data = await response.json();
       setJourneys(data.journeys);
+      setActive(data.totalJourneys);
     } catch (error) {
       console.error("Error fetching journeys:", error);
     }
@@ -93,6 +97,7 @@ useEffect(() => {
         ([name, amount]) => ({ name, amount })
       ); // Convert object to an array of { name, amount } objects
       setExpenses(expensesArray);
+      setExpenseData(data);
     } catch (error) {
       console.error("Error fetching expenses:", error);
       setExpenses([]); // Fallback to an empty array on error
@@ -128,6 +133,23 @@ function truncateString(str, maxLength = 10) {
   return str; // Return original string if it's within maxLength
 }
 
+const fetchExpenses = async (e, currency) => {
+  e.preventDefault();
+  
+  try {
+    const response = await fetch(`http://localhost:3000/api/home/expenses?currency=${currency}`);
+    const data = await response.json();
+    const expensesArray = Object.entries(data.expenses || {}).map(
+      ([name, amount]) => ({ name, amount })
+    ); // Convert object to an array of { name, amount } objects
+    setExpenses(expensesArray);
+    setExpenseData(data);
+    setSelectedCurrency(currency)
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+    setExpenses([]); // Fallback to an empty array on error
+  }
+};
 
 // Prepare combined data (expenses + placeholders)
 const displayData = [
@@ -144,10 +166,10 @@ const displayData = [
           <p className="text-sm text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Dashboard</span> </p>
 
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-4 bg-[#5A4F05] h-96 rounded-lg">
+            <div className="col-span-4 bg-[#5A4F05] h-full rounded-lg">
               <p className="text-white text-end mx-6 mt-6 text-xl font-bold">Now Traveling</p>
               <div className="justify-end flex mx-6 mt-2">
-              <p className="text-white text-end  text-xl font-bold">5<span className="text-sm"> Journeys</span></p>
+              <p className="text-white text-end  text-xl font-bold">{active}<span className="text-sm"> Journeys</span></p>
               <div>
                 <Image
                   src="/images/icons/share.png" // Replace with your image path
@@ -162,7 +184,7 @@ const displayData = [
 
               {/* Active Journeys */}
 
-              <div className="grid grid-cols-1 overflow-y-scroll h-72 scrollbar scrollbar-thumb-white scrollbar-track-[#5A4F05]">
+              <div className="grid grid-cols-1 overflow-y-scroll h-96 scrollbar scrollbar-thumb-white scrollbar-track-[#5A4F05]">
               {journeys.map((journey, index) => (
                  <Link key={index} href={`/journeys/${journey._id}`}>
                 <div  className="bg-white h-24 mx-6 mt-2 grid grid-cols-3">
@@ -232,6 +254,22 @@ const displayData = [
                 
                 </div>
 
+                <div className="mx-6 grid grid-cols-2 gap-2">
+                {expenseData?.availableCurrencies?.map((currency) => (
+                    <button
+                      key={currency}
+                      onClick={(e) => fetchExpenses(e,currency)}
+                      className={`text-xs border rounded py-1 px-2 text-center ${
+                        selectedCurrency === currency
+                          ? "bg-white text-black"
+                          : "border-white  text-white"
+                      }`}
+                    >
+                      {currency}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="appendDown">
                   <div>
                     <p className="text-white mx-6 mt-4 text-xs font-semibold">Year</p>
@@ -240,7 +278,7 @@ const displayData = [
 
                   <div>
                     <p className="text-white mx-6 mt-4 text-xs font-semibold">Total Amount</p>
-                    <p className="text-white mx-6 text-2xl font-black mb-2">$245<span className="text-xs">.00</span></p>
+                    <p className="text-white mx-6 text-2xl font-black mb-2">{`${expenseData?.total}`}</p>
                   </div>
                 </div>
               </div>

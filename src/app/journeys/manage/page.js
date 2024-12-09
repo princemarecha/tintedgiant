@@ -173,7 +173,7 @@ export default function Manage() {
                     </div> 
 
                     <div className="grid grid-cols-1">
-                        <div className="font-bold" >Delivered</div> <div > {formatDateTime(journey.delivered)}</div>
+                        <div className="font-bold" >Delivered</div> <div > {journey?.status == "Arrived"? "Yes": "No"}</div>
                     </div>
                     
         

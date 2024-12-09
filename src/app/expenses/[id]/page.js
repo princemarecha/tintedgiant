@@ -300,8 +300,8 @@ export default function Expense() {
          <div className="mt-6 mb-4 text-[#4F4F4F] flex mb-10">
           <p className="font-bold text-sm mr-10">totals</p>
           
-          {expense?.total_amount?.map((total) => (
-          <p key={total._id} className="mr-4">
+          {expense?.total_amount?.map((total, index) => (
+          <p key={index} className="mr-4">
           <span className="text-xs">{total.currency}</span>
           <span className="font-black text-3xl"> {total.amount}</span>
             </p>

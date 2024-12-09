@@ -1,7 +1,6 @@
 // pages/api/insertJourney.js
 import connectToDatabase from '@/utils/mongo/mongoose';
 import Expense from '@/models/expense';
-import Journey from '@/models/journey'; // Assumes Journey model is correctly defined in '@/models/journey'
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
@@ -9,16 +8,19 @@ export async function GET(req) {
     // Establish connection
     await connectToDatabase();
 
-    // Get the current date and calculate the first day of the current month
+    // Parse query parameters to get the 'currency', default to 'USD'
+    const { searchParams } = new URL(req.url);
+    const currency = searchParams.get('currency') || 'USD';
+
+    // Get the current date and calculate the first and last day of the month
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
-    // Aggregate data for the current month
-    const result = await Expense.aggregate([
+    // Step 1: Aggregate top 9 expenses for the specified currency
+    const expensesResult = await Expense.aggregate([
       {
         $match: {
-          // Match documents with `date` within the current month
           date: { $gte: startOfMonth.toISOString(), $lt: endOfMonth.toISOString() },
         },
       },
@@ -26,36 +28,83 @@ export async function GET(req) {
         $unwind: "$expenses", // Deconstruct the expenses array
       },
       {
+        $match: {
+          "expenses.currency": currency, // Filter by the specified currency
+        },
+      },
+      {
         $group: {
-          // Group by expense name and calculate total amounts in USD
-          _id: "$expenses.name",
-          totalAmountUSD: {
-            $sum: {
-              $cond: [
-                { $eq: ["$expenses.currency", "USD"] },
-                { $toDouble: "$expenses.amount" },
-                0,
-              ],
-            },
+          _id: "$expenses.name", // Group by expense name
+          totalAmount: {
+            $sum: { $toDouble: "$expenses.amount" }, // Sum the amounts
           },
         },
       },
       {
-        $sort: { totalAmountUSD: -1 }, // Sort by total amount in descending order
+        $sort: { totalAmount: -1 }, // Sort by total amount descending
       },
       {
-        $limit: 9, // Limit the results to the top 9 expenses
+        $limit: 9, // Limit to top 9 results
       },
     ]);
 
-    // Format the results as an object with expense names as keys
+    // Format the result as an object with expense names as keys
     const expenses = {};
-    result.forEach((item) => {
-      expenses[item._id] = `$${item.totalAmountUSD.toFixed(2)}`;
+    expensesResult.forEach((item) => {
+      expenses[item._id] = `$${item.totalAmount.toFixed(2)}`;
     });
 
-    // Return the formatted response
-    return NextResponse.json({ expenses });
+    // Step 2: Calculate the total for the specified currency
+    const totalResult = await Expense.aggregate([
+      {
+        $match: {
+          date: { $gte: startOfMonth.toISOString(), $lt: endOfMonth.toISOString() },
+        },
+      },
+      {
+        $unwind: "$expenses", // Deconstruct the expenses array
+      },
+      {
+        $match: {
+          "expenses.currency": currency, // Filter by the specified currency
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: { $toDouble: "$expenses.amount" } }, // Sum the amounts
+        },
+      },
+    ]);
+
+    const currencyTotal =
+      totalResult.length > 0
+        ? `${totalResult[0].totalAmount.toFixed(2)}`
+        : `0.00`;
+
+    // Step 3: Get all unique currencies
+    const currenciesResult = await Expense.aggregate([
+      {
+        $unwind: "$expenses", // Deconstruct the expenses array
+      },
+      {
+        $group: {
+          _id: null,
+          currencies: { $addToSet: "$expenses.currency" }, // Collect unique currencies
+        },
+      },
+    ]);
+
+    const availableCurrencies =
+      currenciesResult.length > 0 ? currenciesResult[0].currencies : [];
+
+    // Return the response
+    return NextResponse.json({
+      currency: currency,
+      expenses,
+      total: currencyTotal,
+      availableCurrencies,
+    });
   } catch (error) {
     console.error("Error fetching monthly expenses:", error);
     return NextResponse.json(
