@@ -19,6 +19,7 @@ export default function MyComponent() {
     duty: "",
     invoice: "",
     cargo: "",
+    status: "Not Cleared",
     cargoVisible: false, // Toggle for the cargo field
     attachments: [], // Array to hold multiple images
   };

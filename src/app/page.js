@@ -166,8 +166,8 @@ const displayData = [
           <p className="text-sm text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Dashboard</span> </p>
 
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-4 bg-[#5A4F05] h-full rounded-lg">
-              <p className="text-white text-end mx-6 mt-6 text-xl font-bold">Now Traveling</p>
+            <div className=" col-span-12 lg:col-span-4 bg-[#5A4F05] lg:h-full rounded-sm xl:rounded-lg">
+              <p className="text-white text-end mx-6 mt-6 text-xl font-bold">Now Travelling</p>
               <div className="justify-end flex mx-6 mt-2">
               <p className="text-white text-end  text-xl font-bold">{active}<span className="text-sm"> Journeys</span></p>
               <div>
@@ -223,23 +223,23 @@ const displayData = [
 
 
             </div>
-            <div className="col-span-8 shadow-lg p-4 rounded-lg">
+            <div className="col-span-4 col-span-full lg:col-span-8 shadow-lg p-4 rounded-lg">
               <div className="flex justify-between mx-4">
                   <p className="text-[#AC0000] mx-6 mt-4 text-xl font-black">Journeys</p>
                   <p className="text-[#AC0000] mx-6 mt-4 text-lg font-black">2024</p>
               </div>
           
             <hr className=""/>
-            <div>
+            <div className="h-52  lg:h-96">
               {chartData ? <BarChart data={chartData.data} options={chartData.options} /> : <p>Loading chart...</p>}
             </div>
 
                 
             </div>
-            <div className="col-span-8 bg-[#5A4F05]   grid grid-cols-8 rounded-lg">
-            <div className="col-span-2 flex flex-col justify-between h-full">
+            <div className="col-span-12 xl:col-span-8 bg-[#5A4F05]   grid grid-cols-8 rounded-lg">
+            <div className="col-span-3 flex flex-col justify-between h-full">
                 <div className="flex justify-between">
-                  <p className="text-white mx-6 mt-4 text-md font-black">Expenses</p>
+                  <p className="text-white mx-3 xl:mx-6 mt-4 text-sm xl:text-md font-black">Expenses</p>
                   <div className="mt-6">
                     <Link href={`/expenses/manage`}>
                       <Image
@@ -254,7 +254,7 @@ const displayData = [
                 
                 </div>
 
-                <div className="mx-6 grid grid-cols-2 gap-2">
+                <div className="xl:mx-6 mx-2 grid grid-cols-2 lg:grid-cols-3 gap-2">
                 {expenseData?.availableCurrencies?.map((currency) => (
                     <button
                       key={currency}
@@ -272,17 +272,17 @@ const displayData = [
 
                 <div className="appendDown">
                   <div>
-                    <p className="text-white mx-6 mt-4 text-xs font-semibold">Year</p>
-                    <p className="text-white mx-6 text-md font-black">2024</p>
+                    <p className="text-white mx-2 xl:mx-6 mt-4 text-xs font-semibold">Year</p>
+                    <p className="text-white mx-2 xl:mx-6 text-md font-black">2024</p>
                   </div>
 
                   <div>
-                    <p className="text-white mx-6 mt-4 text-xs font-semibold">Total Amount</p>
-                    <p className="text-white mx-6 text-2xl font-black mb-2">{`${expenseData?.total}`}</p>
+                    <p className="text-white mx-2 xl:mx-6 mt-4 text-xs font-semibold">Total Amount</p>
+                    <p className="text-white mx-2 xl:mx-6 xl:text-2xl text-xl font-black mb-2">{`${expenseData?.total}`}</p>
                   </div>
                 </div>
               </div>
-              <div className="col-span-6 grid grid-cols-3 gap-3 m-6 ">
+              <div className="col-span-5 grid grid-cols-2 lg:grid-cols-3 gap-3 m-2 xl:m-6 ">
               {displayData.map((expense, index) => (
         <div
           key={index}
@@ -306,7 +306,7 @@ const displayData = [
                   />
                 </div>
               </div>
-              <p className="text-[#126928] mx-2 text-xl font-black">
+              <p className="text-[#126928] mx-2 text-md xl:text-xl font-black">
                 {expense.amount || "$0.00"}
               </p>
             </>
@@ -324,7 +324,7 @@ const displayData = [
               </div>
 
             </div>
-            <div className="col-span-4 bg-[#AC0000] flex-col justify-between flex rounded-lg">
+            <div className="col-span-full xl:col-span-4 bg-[#AC0000] flex-col justify-between flex rounded-lg">
       <div>
         <p className="text-white mx-6 mt-4 text-xl font-black">Summary</p>
       </div>

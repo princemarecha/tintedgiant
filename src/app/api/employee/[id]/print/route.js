@@ -21,6 +21,13 @@ export async function GET(req, context) {
   }
   const employeeData = await employeeResponse.json();
 
+  // Fetch operational costs and average costs
+  const operationalResponse = await fetch(`http://localhost:3000/api/employee/opCosts?userId=${id}`);
+  if (!operationalResponse.ok) {
+    return new Response("Operational costs not found", { status: 404 });
+  }
+  const operationalData = await operationalResponse.json();
+
   // Create a new jsPDF instance
   const doc = new jsPDF("p", "in", "a4");
 
@@ -29,7 +36,7 @@ export async function GET(req, context) {
   
   const logoBase64 = await getBase64ImageFromUrl("http://localhost:3000/images/logo.png");
   const watermarkBase64 = await getBase64ImageFromUrl("http://localhost:3000/images/watermark.png");
-  const employeeImageBase64 = await getBase64ImageFromUrl(employeeData.imageUrl || "http://localhost:3000/images/employee.jpg");
+  const employeeImageBase64 = await getBase64ImageFromUrl(employeeData.photo || "http://localhost:3000/images/placeholder.webp");
 
   const logoWidth = 5; // Width of the watermark (in inches)
   const logoHeight = 4; // Height of the watermark (in inches)
@@ -63,6 +70,10 @@ export async function GET(req, context) {
   doc.line(left, bottom, right, bottom);  // Bottom horizontal line
 
   doc.line(left, 3, right, 3);  // Top horizontal line
+  doc.line(left, 8, right, 8);
+  doc.line(left, 8.1, right, 8.1);
+  doc.line(left, 10, right, 10);
+  doc.line(left, 10.1, right, 10.1);
   
 
   // Add logo to the PDF at the top-left corner, 100x100 pixels (converted to inches: 100px = 1.0417in, 100px = 1.0417in)
@@ -91,11 +102,34 @@ export async function GET(req, context) {
   doc.text(`Gender: ${employeeData.gender}`, 0.3937, 5.2980); // (160mm = 6.2980in)
   doc.text(`Nationality: ${employeeData.nationality}`, 0.3937, 5.6906); // (170mm = 6.6906in)
   doc.text(`Passport No: ${employeeData.passportNumber}`, 0.3937, 6.0831); // (180mm = 7.0831in)
-  doc.text(`KM Travelled: ${employeeData.kmtravelled}`, 0.3937, 6.4756); // (190mm = 7.4756in)
-  doc.text(`Avg. KM: ${employeeData.avg_km}`, 0.3937, 6.8681); // (200mm = 7.8681in)
-  doc.text(`Journeys: ${employeeData.journeys}`, 0.3937, 7.2606); // (210mm = 8.2606in)
-  doc.text(`Operational Costs: ${employeeData.opCosts}`, 0.3937, 7.6531); // (220mm = 8.6531in)
-  doc.text(`Avg. Operational Costs: ${employeeData.avg_op_costs}`, 0.3937, 8.0456); // (230mm = 9.0456in)
+  doc.text(`Km Travelled: ${operationalData.totalKmTravelled}`, 0.3937, 6.4756); // (190mm = 7.4756in)
+  doc.text(`Average Km Travelled: ${operationalData.avgKmTravelled}`, 0.3937, 6.8681); // (200mm = 7.8681in)
+  doc.text(`Journeys: ${operationalData.totalJourneys}`, 0.3937, 7.2606); // (210mm = 8.2606in)
+
+  // Display Operational Costs
+  let y = 8.5; // Start at y = 3 inches
+  doc.setFontSize(12);
+  doc.text("Operational Costs:", 0.3937, y);
+  operationalData?.totalExpenses?.forEach((expense, index) => {
+    doc.text(
+      `${expense.currency}: ${expense.operation_costs}`,
+      1.5,
+      y + 0.3 + index * 0.2
+    );
+  });
+
+  y += 1; // Move to next section
+
+  // Average Operational Costs
+  doc.text("Average Operational Costs:", 0.3937, y);
+  operationalData?.averageOperationalCosts?.forEach((expense, index) => {
+    doc.text(
+      `${expense.currency}: ${expense.avg_operational_costs}`,
+      1.5,
+      y + 0.3 + index * 0.2
+    );
+  });
+
 
 
   const currentDate = new Date();

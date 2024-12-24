@@ -11,6 +11,7 @@ export async function POST(request) {
     // Parse the JSON body
     const {
       date,
+      status,
       reference,
       transporter,
       exporter,
@@ -27,6 +28,7 @@ export async function POST(request) {
 
     console.log('Inserting Customs Entry:', {
       date,
+      status,
       reference,
       transporter,
       exporter,
@@ -44,6 +46,7 @@ export async function POST(request) {
     // Create a new Customs entry
     const newCustoms = new Customs({
       date,
+      status,
       reference,
       transporter,
       exporter,
@@ -101,9 +104,9 @@ export async function GET(req) {
       ];
     }
 
-    // Add filter condition
+    // Add filter condition for "status" instead of "cleared"
     if (filter) {
-      query.cleared = filter === 'Cleared';
+      query.status = filter; // Matches the exact value of 'status' field
     }
 
     // Fetch filtered, paginated, and sorted results
@@ -131,3 +134,4 @@ export async function GET(req) {
     );
   }
 }
+

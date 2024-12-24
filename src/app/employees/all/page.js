@@ -145,13 +145,13 @@ export default function ViewEmployees() {
               <div id="emp" key={index}>
                 <Link href= {getLink(employee._id)} passHref>
                 <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-40 rounded bg-white shadow-2xl">
-                  <div className="col-span-1 flex items-center justify-center font-bold">
+                  <div className="col-span-1 flex items-center  justify-center font-bold">
                   <CldImage
                       src={validPhotoUrls[index] || "irxdkhgi7ehjhtbeh1zk"}
                       alt={employee.name || "Employee Photo"}
                       width={200}
                       height={200}
-                      className="rounded-full object-cover"
+                      className="rounded-full object-cover w-24 h-24"
                     />
                   </div>
                   <div className="col-span-3 text-[#5F5F5F]">

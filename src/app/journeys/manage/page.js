@@ -165,7 +165,7 @@ export default function Manage() {
                         <div className="font-bold" >Arrival Date</div> <div > {formatDateTime(journey.arrival)}</div>
                     </div>
                     <div className="grid grid-cols-1">
-                        <div className="font-bold" >Cargo</div> <div > {journey.cargo?"Wheat":"No Cargo"}</div>
+                        <div className="font-bold" >Cargo</div> <div > {journey.cargo?journey.cargo:"No Cargo"}</div>
                     </div>
                     
                     <div className="grid grid-cols-1 text-[#AC0000] font-bold">

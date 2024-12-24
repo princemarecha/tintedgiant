@@ -12,6 +12,7 @@ const CustomsSchema = new Schema(
     transporter: { type: String, required: true },
     exporter: { type: String, required: true },
     importer: { type: String, required: true },
+    status: { type: String, required: false },
     trailerPlate: { type: String, required: false },
     cargo: { type: String, required: true, default: false },
     BOE: { type: Number, required: true },
