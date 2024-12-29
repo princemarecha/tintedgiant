@@ -73,6 +73,7 @@ export default function MyComponent({params}) {
   const [customsData, setCustomsData] = useState([]) ;
   const [photos, setPhotos] = useState([]) ;
   const [loading, setLoading] = useState(false) ;
+  const [isLoading, setIsLoading] = useState(true);
 
   // Handle input change
   const handleChange = (e) => {
@@ -122,6 +123,7 @@ export default function MyComponent({params}) {
 
       setPhotos(customsData.attachments);
     }
+    setIsLoading(false)
   }, [customsData]);
   
 
@@ -135,6 +137,8 @@ export default function MyComponent({params}) {
 
   // Submit the form
   const handleSubmit = async () => {
+
+    setIsLoading(true)
     // Prepare the payload
     const payload = { ...formData };
   
@@ -152,12 +156,14 @@ export default function MyComponent({params}) {
       const response = await axios.patch(`/api/customs/${reference}`, payload);
   
       if (response.status === 200) {
+        setIsLoading(false)
         alert("Customs entry updated successfully!");
         //setFormData(initialFormData); // Reset form to initial state
         router.refresh()
       }
     } catch (error) {
       console.error("Error adding customs entry:", error);
+      setIsLoading(false)
       alert("Failed to add customs entry.");
     }
   };
@@ -206,6 +212,14 @@ export default function MyComponent({params}) {
 
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
         <div>
           <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">

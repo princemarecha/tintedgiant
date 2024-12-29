@@ -13,6 +13,7 @@ export default function Manage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const rowsPerPage = 10;
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch customs data with filters, pagination, and sorting
   const fetchCustoms = async () => {
@@ -54,6 +55,7 @@ export default function Manage() {
   // Fetch data when filters or pagination changes
   useEffect(() => {
     fetchCustoms();
+    setIsLoading(false)
   }, [searchQuery, clearanceType, currentPage]);
 
   // Add empty rows if necessary to fill up to rowsPerPage
@@ -72,6 +74,14 @@ export default function Manage() {
 
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
         <div>
           <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">

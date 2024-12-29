@@ -11,6 +11,7 @@ export default function Manage() {
   const [otherCosts, setOtherCosts] = useState([]);
   const [newCost, setNewCost] = useState("");
   const [isInputVisible, setIsInputVisible] = useState({ regular: false, other: false });
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch expenses data
   const fetchExpenses = async () => {
@@ -70,6 +71,7 @@ export default function Manage() {
   // Delete a cost from the respective list
   const deleteCost = async (type, cost) => {
     try {
+      setIsLoading(true)
       const updatedCosts =
         type === "regular" ? regularCosts.filter((item) => item !== cost) : otherCosts.filter((item) => item !== cost);
 
@@ -86,19 +88,30 @@ export default function Manage() {
           setOtherCosts(updatedCosts);
         }
       }
+      setIsLoading(false)
     } catch (error) {
       console.error("Error deleting cost:", error);
       alert("Failed to delete cost.");
+      setIsLoading(false)
     }
   };
 
   // Fetch data on mount
   useEffect(() => {
     fetchExpenses();
+    setIsLoading(false)
   }, []);
 
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
         <div>
           <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Expenses Management</p>

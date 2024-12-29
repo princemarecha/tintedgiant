@@ -17,6 +17,7 @@ export default function Manage() {
   const [uploadedImages, setUploadedImages] = useState({}); // State to store uploaded image names by index
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false) ;
+  const [isLoading, setIsLoading] = useState(true);
 
   // Currency symbol map
   const currencySymbols = {
@@ -171,6 +172,7 @@ export default function Manage() {
   };
 
   const saveExpense = async () => {
+    setIsLoading(true)
     try {
       // Upload images and get their URLs
       const uploadedImageUrls = await uploadImages();
@@ -198,10 +200,11 @@ export default function Manage() {
   
       // Send the payload to the API
       const response = await axios.post("/api/expense", payload);
-  
+      setIsLoading(false)
       alert("Expense saved successfully!");
       setRows([]); // Clear rows after saving
     } catch (error) {
+      setIsLoading(false)
       console.error("Error saving expense:", error);
       alert("Failed to save expense. Please try again.");
     }
@@ -209,6 +212,7 @@ export default function Manage() {
   
   useEffect(() => {
     fetchExpenses();
+    setIsLoading(false);
   }, []);
 
 
@@ -271,6 +275,14 @@ export default function Manage() {
     
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
         <div>
           <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">

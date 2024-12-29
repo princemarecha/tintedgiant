@@ -13,6 +13,7 @@ export default function Manage() {
   const [expenseType, setExpenseType] = useState(""); // State for journey type dropdown
   const [journeys, setJourneys] = useState([]); // State for fetched journeys
   const [loading, setLoading] = useState(true); // State to track loading
+  const [isLoading, setIsLoading] = useState(true);
 
   const router = useRouter();
 
@@ -39,6 +40,7 @@ export default function Manage() {
     };
 
     fetchJourneys();
+    setIsLoading(false);
   }, [currentPage]); // Re-fetch data when the current page changes
 
   // Handle search input change
@@ -85,6 +87,14 @@ export default function Manage() {
 
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
         {/* Page Header */}
         <div>

@@ -29,6 +29,7 @@ export default function MyComponent({ params }) {
 
   // Form state
   const [formData, setFormData] = useState(initialFormData);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Handle input change
   const handleChange = (e) => {
@@ -53,19 +54,23 @@ export default function MyComponent({ params }) {
   // Submit the form
   const handleSubmit = async () => {
     try {
+      setIsLoading(true)
       const updatedFields = getChangedFields();  // Get only the changed fields
       if (Object.keys(updatedFields).length === 0) {
+        setIsLoading(false)
         alert("No changes detected!");
         return;
       }
 
       const response = await axios.post("/api/trucks", updatedFields);
       if (response.status === 200) {
+        setIsLoading(false)
         alert("Truck information updated successfully!");
         setFormData(initialFormData);  // Reset form to initial state
       }
     } catch (error) {
       console.error("Error submitting truck information:", error);
+      setIsLoading(false)
       alert("Failed to submit truck information.");
     }
   };

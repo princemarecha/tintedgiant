@@ -31,6 +31,7 @@ export default function MyComponent({ params }) {
   const fileInputRef = useRef(null); // Reference to the hidden file input
   const [data, setData] = useState(null); // To store API response
   const [loading, setLoading] = useState(true); // To handle loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   const { id } = useParams();
 
@@ -133,8 +134,6 @@ export default function MyComponent({ params }) {
     if (empID) fetchOperationalCosts();
   }, [empID]);
 
-
-
     // Make a PATCH request when uploadedImageUrl changes
     useEffect(() => {
       if (uploadedImageUrl) {
@@ -153,11 +152,11 @@ export default function MyComponent({ params }) {
       }
     }, [uploadedImageUrl, empID]);
 
-
   useEffect(() => {
     if (employeeData?.photo) {
       setUploadedImageUrl(employeeData.photo);
     }
+    setIsLoading(false)
   }, [employeeData]);
 
   const deleteEmployee = async () => {
@@ -200,10 +199,18 @@ export default function MyComponent({ params }) {
 
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
       <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Employees</p>
 
-<p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <Link href={"/employees"}><span className="hover:underline">Employee Management</span></Link> <span>&gt;</span><Link href={"/employees/all"}><span className="hover:underline"> Employees </span></Link><span>&gt;</span><span> {empID} </span></p>
+      <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <Link href={"/employees"}><span className="hover:underline">Employee Management</span></Link> <span>&gt;</span><Link href={"/employees/all"}><span className="hover:underline"> Employees </span></Link><span>&gt;</span><span> {empID} </span></p>
         <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
         <div className="col-span-3  md:col-span-2 lg:col-span-4 xl:col-span-4 flex justify-center items-center bg-gray-100 ">
           <CldImage

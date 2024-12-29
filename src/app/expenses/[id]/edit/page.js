@@ -16,6 +16,7 @@ export default function Manage() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // Default to today's date
   const [newAttachments, setNewAttachments] = useState([]); // Default to today's date
   const [uploading, setUploading] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
 
   const router  = useRouter()
@@ -205,6 +206,7 @@ export default function Manage() {
 
     // Save the expense
     const saveExpense = async () => {
+      setIsLoading(true)
       try {
         // Format data for the API
         const totalAmount = Object.entries(calculateTotals()).map(
@@ -229,11 +231,12 @@ export default function Manage() {
       setAttachments([...uploadedImages, ...attachments])
   
         const response = await axios.patch(`/api/expense/${id}`, payload);
-
+        setIsLoading(false)
         alert("Expense updated successfully!");
         router.push(`/expenses/${id}`)
       } catch (error) {
         console.error("Error updating expense:", error);
+        setIsLoading(false)
         alert("Failed to update expense. Please try again.");
       }
     };
@@ -283,10 +286,19 @@ export default function Manage() {
     if (id) {
       fetchExpenseById(); // Fetch the expense when the component mounts and ID is available
     }
+    setIsLoading(false)
   }, [id]);
 
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
         <div>
           <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">

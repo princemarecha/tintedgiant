@@ -1,7 +1,7 @@
 "use client";
 
 import Layout from "@/components/Layout";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
@@ -28,6 +28,7 @@ export default function MyComponent() {
   const [formData, setFormData] = useState(initialFormData);
   const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Handle input change
   const handleChange = (e) => {
@@ -50,6 +51,8 @@ export default function MyComponent() {
 
   // Submit the form
   const handleSubmit = async () => {
+
+    setIsLoading(true)
     // Prepare the payload
     const payload = { ...formData };
   
@@ -67,10 +70,12 @@ export default function MyComponent() {
       const response = await axios.post("/api/customs", payload);
   
       if (response.status === 200) {
+        setIsLoading(false)
         alert("Customs entry added successfully!");
         setFormData(initialFormData); // Reset form to initial state
       }
     } catch (error) {
+      setIsLoading(false)
       console.error("Error adding customs entry:", error);
       alert("Failed to add customs entry.");
     }
@@ -115,11 +120,25 @@ export default function MyComponent() {
       setUploading(false);
     }
   };
+
+  useEffect(() => {
+ 
+      setIsLoading(false);
+    
+  }, []);
   
   
 
   return (
     <div className="bg-white h-screen relative">
+                {isLoading && (
+      <div className="absolute inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+        <div className="relative flex justify-center items-center">
+          <div className="absolute animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-yellow-300"></div>
+          <img src="/images/logo.png" alt="Loading Logo" className="rounded-full h-22 w-28" />
+        </div>
+      </div>
+    )}
       <Layout>
         <div>
           <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">
