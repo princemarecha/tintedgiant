@@ -94,7 +94,7 @@ export default function Manage() {
               placeholder="Search Expenses..."
               className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
               value={searchQuery}
-              onChange={handleSearch}
+              onChange={handleSearch} 
             />
           </div>
           <div className="col-span-2 md:col-span-1 flex items-center justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-r">

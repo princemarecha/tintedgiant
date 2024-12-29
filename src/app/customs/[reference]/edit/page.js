@@ -226,9 +226,9 @@ export default function MyComponent({params}) {
         </div>
 
         {/* Form */}
-        <div className="grid grid-cols-6 gap-4 ">
+        <div className="md:grid md:grid-cols-6 gap-4 ">
           {/* Date Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="date" className="block text-md font-bold text-gray-700 mb-2">
               Date
             </label>
@@ -243,7 +243,7 @@ export default function MyComponent({params}) {
           </div>
 
           {/* Reference Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="reference" className="block text-md font-bold text-gray-700 mb-2">
               Reference
             </label>
@@ -259,7 +259,7 @@ export default function MyComponent({params}) {
           </div>
 
           {/* Transporter Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="transporter" className="block text-md font-bold text-gray-700 mb-2">
               Transporter
             </label>
@@ -275,7 +275,7 @@ export default function MyComponent({params}) {
           </div>
 
           {/* Exporter Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="exporter" className="block text-md font-bold text-gray-700 mb-2">
               Exporter
             </label>
@@ -291,7 +291,7 @@ export default function MyComponent({params}) {
           </div>
 
           {/* Importer Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="importer" className="block text-md font-bold text-gray-700 mb-2">
               Importer
             </label>
@@ -307,7 +307,7 @@ export default function MyComponent({params}) {
           </div>
 
           {/* Horse Plate Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="horse_plate" className="block text-md font-bold text-gray-700 mb-2">
               Horse Plate
             </label>
@@ -323,7 +323,7 @@ export default function MyComponent({params}) {
           </div>
 
           {/* Trailer Plate Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="trailer_plate" className="block text-md font-bold text-gray-700 mb-2">
               Trailer Plate
             </label>
@@ -339,7 +339,7 @@ export default function MyComponent({params}) {
           </div>
 
           {/* BOE Field */}
-          <div className="col-span-2 mb-4">
+          <div className="md:col-span-3 lg:col-span-2 mb-4">
             <label htmlFor="BOE" className="block text-md font-bold text-gray-700 mb-2">
               BOE
             </label>
@@ -355,8 +355,8 @@ export default function MyComponent({params}) {
           </div>
 
           {/* Invoice and Duty Row */}
-          <div className="col-span-2 flex gap-4">
-            <div className="w-1/2">
+          <div className="md:col-span-3 lg:col-span-2 flex gap-4">
+            <div className="lg:w-1/2">
               <label htmlFor="invoice" className="block text-md font-bold text-gray-700 mb-2">
                 Invoice
               </label>
@@ -370,7 +370,7 @@ export default function MyComponent({params}) {
                 className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none"
               />
             </div>
-            <div className="w-1/2">
+            <div className="lg:w-1/2">
               <label htmlFor="duty" className="block text-md font-bold text-gray-700 mb-2">
                 Duty
               </label>
@@ -388,7 +388,7 @@ export default function MyComponent({params}) {
 
 
           {/* Cargo Field */}
-            <div className="col-span-4 mb-4">
+            <div className="col-span-3 lg:col-span-4 mb-4">
               <label htmlFor="cargo" className="block text-md font-bold text-gray-700 mb-2">
                 Cargo
               </label>
@@ -402,7 +402,7 @@ export default function MyComponent({params}) {
                 className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none"
               />
             </div>
-            <div className="col-span-2 mb-4">
+            <div className="md:col-span-3 lg:col-span-2 mb-4">
               <label htmlFor="cargo" className="block text-md font-bold text-gray-700 mb-2">
                 Status
               </label>
@@ -420,9 +420,9 @@ export default function MyComponent({params}) {
             </div>
 
     {/* Images Preview */}
-    <div className="col-span-full grid grid-cols-5 gap-2">
+    <div className="col-span-full grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 mb-2 lg:mb-0">
             {photos?.map((src, index) => (
-                <div key={index} className="relative h-60 cursor-pointer group">
+                <div key={index} className="relative h-28 md:h-32 xl:h-44 cursor-pointer group mt-1 border">
                     <Image
                     src={src.url}
                     alt={`Truck Thumbnail ${index + 1}`}

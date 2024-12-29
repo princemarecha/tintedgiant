@@ -90,7 +90,7 @@ export default function Clearance({ params }) {
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         {/* Clearance Details */}
-        <div className="p-4 text-black grid grid-cols-3 gap-y-6 mb-4 text-sm">
+        <div className="p-4 text-black grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-2 mb-4 text-sm">
           {[
             { label: "Date", value: clearance?.date ? formatDateTime(clearance.date) : "N/A" },
             { label: "Reference", value: clearance?.reference || "N/A" },
@@ -116,9 +116,9 @@ export default function Clearance({ params }) {
         {/* Attached Media */}
         <div>
   <p className="font-bold text-[#AC0000] text-sm mr-10">Attached Media</p>
-  <div className="col-span-full grid grid-cols-5 gap-2">
+  <div className="col-span-full grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
             {clearance?.attachments.map((src, index) => (
-                <div key={index} className="relative h-60 cursor-pointer group">
+                <div key={index} className="relative h-28 md:h-32 xl:h-44 cursor-pointer group mt-1 border"> 
                   <Link href= {`${src.url}`} target="_blank" rel="noopener noreferrer">
                     <Image
                     src={src.url}
