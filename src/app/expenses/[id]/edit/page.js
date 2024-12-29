@@ -325,7 +325,7 @@ export default function Manage() {
                     name="departure"
                     value={date} // Bind the input value to the state
                     onChange={(e) => setDate(e.target.value)} // Update the state
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-sm lg:text-md"
                   />
 
               </div>
@@ -342,7 +342,7 @@ export default function Manage() {
                       name="trip-select"
                       value={type}
                       onChange={(e) => setType(e.target.value)}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-sm lg:text-md"
                     >
                       <option value="" disabled>
                         -- Select an Option --
@@ -354,7 +354,7 @@ export default function Manage() {
               </div>
 
         {/* Table Section */}
-        <div className="h-96 mt-4">
+        <div className="h-96 mt-4 text-sm xl:text-lg">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead className="text-[#AC0000] font-bold border-b border-[#AC0000]">
@@ -374,7 +374,7 @@ export default function Manage() {
                         onChange={(e) =>
                           handleExpenseChange(index, e.target.value)
                         }
-                        className="w-full border-none rounded p-2"
+                        className="w-full border-none rounded p-2 text-xs xl:text-md"
                       >
                         <option value="" disabled>
                           Select Expense
@@ -395,7 +395,7 @@ export default function Manage() {
                         onChange={(e) =>
                           handleCurrencyChange(index, e.target.value)
                         }
-                        className="w-full border-none rounded p-2"
+                        className="w-full border-none rounded p-2 text-xs xl:text-md"
                       >
                         {currencyOptions.map((currency, idx) => (
                           <option key={idx} value={currency}>
@@ -412,7 +412,7 @@ export default function Manage() {
                           handleAmountChange(index, e.target.value)
                         }
                         onBlur={() => handleAmountBlur(index)}
-                        className="w-full border-none rounded p-2"
+                        className="w-full border-none rounded p-2 text-xs xl:text-md"
                         placeholder="Enter amount"
                       />
                     </td>
@@ -457,7 +457,7 @@ export default function Manage() {
         <div className="flex justify-end mt-4">
           <button
             onClick={addRow}
-            className={`flex items-center justify-center gap-2 px-4 py-2 font-bold rounded 
+            className={`flex items-center justify-center gap-2 px-4 py-2 font-bold rounded text-xs lg:text-lg
             ${
               rows.length >= 30 ||
               (rows.length > 0 &&
@@ -486,17 +486,17 @@ export default function Manage() {
           {Object.entries(calculateTotals()).map(([currency, total]) => (
             <p key={currency} className="mr-4">
               <span className="text-xs">{currency}</span> 
-              <span className="font-black text-3xl">{total.toFixed(2)}</span>
+              <span className="font-black text-xl xl:text-3xl">{total.toFixed(2)}</span>
             </p>
           ))}
         </div>
 
 
         <p className="font-black text-[#AC0000] text-md mr-10 mt-10">Attached Media</p>
-        <div className="grid grid-cols-5 mt-4">
+        <div className="grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 lg:mt-4">
         
         {attachments?.map((src, index) => (
-                <div key={index} className="relative h-60 cursor-pointer group">
+                <div key={index} className="relative h-32 xl:h-60 cursor-pointer group">
                     <Image
                     src={src.url}
                     alt={`Truck Thumbnail ${index + 1}`}
@@ -529,10 +529,10 @@ export default function Manage() {
             <button
               type="button"
               onClick={() => document.getElementById("images").click()} // Trigger the file input click
-              className="px-2 py-3 rounded text-sm text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none transition duration-150"
+              className=" px-2 py-2 xl:py-3 rounded text-sm text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none transition duration-150"
             >
               <span className="flex">
-                <span className="mr-2">Attach Relevant Media</span>
+                <span className="mr-2 text-xs lg:text-md my-auto">Attach Relevant Media</span>
                 <Image
                   src="/images/icons/attachment.png" // Replace with your image path
                   alt="attachment Icon" // Alternative text for the image
@@ -590,7 +590,7 @@ export default function Manage() {
         <div className="flex justify-end mt-4">
           <button
             onClick={saveExpense}
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="bg-green-600 text-white px-4 py-2 rounded text-sm lg:text-md"
           >
             Save Expense
           </button>

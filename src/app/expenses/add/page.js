@@ -108,12 +108,12 @@ export default function Manage() {
           </p>
 
           {/* Regular Costs */}
-          <p className="text-xl lg:text-xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">
+          <p className="text-lg lg:text-xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">
             <span>Regular Costs</span>
             <span className="text-sm"> ({regularCosts.length})</span>
           </p>
           <hr className="my-2 2xl:my-4 border-[#AC0000]" />
-          <div className="grid grid-cols-7 gap-2 text-sm font-bold">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:grid-cols-7 gap-2 text-sm font-bold">
             {regularCosts.map((cost, index) => (
               <div key={index} className="bg-[#AC0000] flex justify-between p-2 rounded">
                 <span>{cost}</span>
@@ -170,12 +170,12 @@ export default function Manage() {
           )}
 
           {/* Other Costs */}
-          <p className="text-xl lg:text-xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">
+          <p className="text-lg lg:text-xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">
             <span>Other Costs</span>
             <span className="text-sm"> ({otherCosts.length})</span>
           </p>
           <hr className="my-2 2xl:my-4 border-[#AC0000]" />
-          <div className="grid grid-cols-7 gap-2 text-sm font-bold">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4  xl:grid-cols-7 gap-2 text-sm font-bold">
             {otherCosts.map((cost, index) => (
               <div key={index} className="bg-[#AC0000] flex justify-between p-2 rounded">
                 <span>{cost}</span>

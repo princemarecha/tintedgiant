@@ -198,14 +198,14 @@ export default function Expense() {
         </p>
 
         <div className="flex justify-between">
-          <p className="text-2xl font-bold text-[#AC0000]">Journey</p>
-          <p className="text-xl font-bold text-gray-500">
+          <p className="xl:text-2xl font-bold text-[#AC0000]">Journey</p>
+          <p className="xl:text-xl font-bold text-gray-500">
             {formatDateTime(journeyDetails ? journeyDetails.departure : "")}
           </p>
         </div>
         <hr className="border border-black my-2" />
 
-        {journeyDetails?<div className="p-4   text-black text-sm grid grid-cols-2 gap-y-6 mb-4">
+        {journeyDetails?<div className="p-1 lg:p-2 xl:p-4   text-black text-xs lg:text-sm grid grid-cols-2 gap-y-6 gap-x-1 mb-4">
     
               <div className="grid grid-cols-1">
                 <span className="font-bold">From</span> {journeyDetails.from}
@@ -223,10 +223,10 @@ export default function Expense() {
                 {formatDateTime(journeyDetails.arrival)}
               </div>
               <div className="grid grid-cols-1">
-                <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 w-1/2 text-white rounded text-center">{journeyDetails.driver?.name}</span>
+                <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 lg:w-1/2 text-white rounded text-center">{journeyDetails.driver?.name}</span>
               </div>
               <div className="grid grid-cols-1">
-                <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 w-1/2 text-white rounded text-center">{journeyDetails.truck?.name}</span>
+                <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 lg:w-1/2 text-white rounded text-center">{journeyDetails.truck?.name}</span>
               </div>
               <div className="grid grid-cols-1">
                 <span className="font-bold">Status</span> {journeyDetails.status}
@@ -244,7 +244,7 @@ export default function Expense() {
         <div className="grid grid-cols-1">
           <select
             id="journeyDropdown"
-            className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
+            className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs lg:text-sm"
             onChange={handleJourneyChange}
             value={selectedJourney?.from}
 
@@ -271,7 +271,7 @@ export default function Expense() {
         <div className="mt-4">
           <button
             onClick={handlePatchRequest}
-            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-700"
+            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-700 text-xs lg:text-sm"
           >
             Attach Journey
           </button>
@@ -279,11 +279,11 @@ export default function Expense() {
 
              {/* Expenses */}
        
-        <p className="text-xl font-bold text-black  mb-4 mt-20">Expenses</p>
-        <hr className="border border-black my-2"/>
+        <p className="text-md xl:text-xl font-bold text-black  lg:mb-4 mb-2 mt-10 lg:mt-20">Expenses</p>
+        <hr className="border border-black xl:my-2"/>
 
         {expense?
-        <div className="grid grid-cols-7  text-black mb-10 p-4   text-black  gap-y-6 mb-4 text-sm">
+        <div className="grid text-xs grid-cols-3 xl:grid-cols-7  text-black mb-10 p-4   text-black  gap-y-6 mb-4 xl:text-sm">
         {expense?.expenses?.map((expenseItem) => (
         
           <div key={expenseItem._id} className="grid grid-cols-1">
@@ -303,7 +303,7 @@ export default function Expense() {
           {expense?.total_amount?.map((total, index) => (
           <p key={index} className="mr-4">
           <span className="text-xs">{total.currency}</span>
-          <span className="font-black text-3xl"> {total.amount}</span>
+          <span className="font-black text-xl xl:text-3xl"> {total.amount}</span>
             </p>
           ))}
         
@@ -355,11 +355,11 @@ export default function Expense() {
           
 
         <div>
-        <p className="font-black text-[#AC0000] text-md mr-10 mt-10">Attached Media</p>
-        <div className="grid grid-cols-5 mt-4">
+        <p className="font-black text-[#AC0000] text-sm mr-10 mt-10">Attached Media</p>
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-4">
         
           {expense?.attachments.map((src, index) => (
-                <div key={index} className="relative h-60 cursor-pointer group">
+                <div key={index} className="relative h-24 xl:h-60 cursor-pointer group">
                   <Link href= {`${src.url}`} target="_blank" rel="noopener noreferrer">
                     <Image
                     src={src.url}

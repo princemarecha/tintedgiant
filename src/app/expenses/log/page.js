@@ -305,7 +305,7 @@ export default function Manage() {
                   name="departure"
                   value={date} // Bind the input value to the state
                  onChange={handleDateChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-black"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-black text-sm lg:text-md"
                 />
               </div>
               <div>
@@ -321,7 +321,7 @@ export default function Manage() {
                       name="trip-select"
                       value={type}
                       onChange={(e) => setType(e.target.value)}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-black"
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000] text-black text-sm lg:text-md"
                     >
                       <option value="" disabled>
                         -- Select an Option --
@@ -333,8 +333,8 @@ export default function Manage() {
               </div>
 
         {/* Table Section */}
-        <div className="h-96">
-          <div className="overflow-x-auto">
+        <div className="h-96 text-sm lg:text-md mt-4 lg:mt-0">
+          <div className="overflow-x-auto ">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead className="text-[#AC0000] font-bold border-b border-[#AC0000]">
                 <tr>
@@ -353,7 +353,7 @@ export default function Manage() {
                         onChange={(e) =>
                           handleExpenseChange(index, e.target.value)
                         }
-                        className="w-full border-none rounded p-2"
+                        className="w-full border-none rounded p-2 text-sm lg:text-md"
                       >
                         <option value="" disabled>
                           Select Expense
@@ -374,7 +374,7 @@ export default function Manage() {
                         onChange={(e) =>
                           handleCurrencyChange(index, e.target.value)
                         }
-                        className="w-full border-none rounded p-2"
+                        className="w-full border-none rounded p-2 text-sm lg:text-md"
                       >
                         {currencyOptions.map((currency, idx) => (
                           <option key={idx} value={currency}>
@@ -391,7 +391,7 @@ export default function Manage() {
                           handleAmountChange(index, e.target.value)
                         }
                         onBlur={() => handleAmountBlur(index)}
-                        className="w-full border-none rounded p-2"
+                        className="w-full border-none rounded p-2 text-sm lg:text-md"
                         placeholder="Enter amount"
                       />
                     </td>
@@ -450,7 +450,7 @@ export default function Manage() {
                 : "bg-[#AC0000] text-white hover:bg-[#8A0000]"
             }`}
           >
-            <span>Add Expense</span>
+            <span className="text-sm lg:text-md">Add Expense</span>
             <Image
               src="/images/icons/white_plus.png"
               alt="Plus Icon"
@@ -464,12 +464,12 @@ export default function Manage() {
         <hr className="my-2 2xl:my-4 border-[#AC0000]" /> {/* Horizontal line */}
 
         {/* Totals Section */}
-        <div className="mt-6 text-[#4F4F4F] flex">
+        <div className="mt-6 text-[#4F4F4F] flex grid grid-cols-5 md:grid-cols-7 lg:grid-cols-9">
           <p className="font-bold text-sm mr-10">totals</p>
           {Object.entries(calculateTotals()).map(([currency, total]) => (
-            <p key={currency} className="mr-4">
+            <p key={currency} className="col-span-2">
               <span className="text-xs">{currency}</span> 
-              <span className="font-black text-3xl">{total.toFixed(2)}</span>
+              <span className="font-black text-xl xl:text-3xl">{total.toFixed(2)}</span>
             </p>
           ))}
         </div>
@@ -479,9 +479,9 @@ export default function Manage() {
         <div className="flex justify-end mt-4">
           <button
             onClick={saveExpense}
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="bg-green-600 text-white px-4 py-2 rounded text-sm lg:text-md"
           >
-            Save Expense
+           <span>Save Expense</span> 
           </button>
         </div>
 

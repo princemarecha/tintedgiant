@@ -92,7 +92,7 @@ export default function Manage() {
             <input
               type="text"
               placeholder="Search Expenses..."
-              className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0"
+              className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
               value={searchQuery}
               onChange={handleSearch}
             />
@@ -103,16 +103,16 @@ export default function Manage() {
               alt="Search Icon"
               width={30}
               height={30}
-              className="transition duration-75 group-hover:opacity-80 sm:w-8 sm:h-8"
+              className="transition duration-75 group-hover:opacity-80 w-4 lg:w-6 xl:w-8"
             />
           </div>
 
-          <div></div>
+          <div className="hidden lg:block"></div>
           {/* Expense Type Dropdown */}
-          <div className="flex flex-col col-span-8 md:col-span-3 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
+          <div className="flex flex-col col-span-12 md:col-span-4 lg:col-span-3 md:ml-2 lg:ml-0 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
             <select
               id="dropdown"
-              className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
+              className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
               onChange={handleTypeChange}
               value={expenseType}
             >
@@ -128,7 +128,7 @@ export default function Manage() {
         {/* Table Section */}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-separate border-spacing-y-4 min-w-[800px] w-full">
-            <thead className="text-[#AC0000] font-bold text-sm">
+            <thead className="bg-[#AC0000] font-bold text-sm">
               <tr>
                 <th>Date</th>
                 <th>Expenses</th>
@@ -142,7 +142,7 @@ export default function Manage() {
 
             <tbody className="text-[#AC0000] text-xs">
               {rowsToRender.map((row, index) => (
-                <tr key={index} className="hover:bg-gray-100">
+                <tr key={index} className="hover:bg-gray-100 bg-gray-200">
                   <td>{row.date || ""}</td>
                   <td>{row.expenses ? row.expenses.length : ""}</td>
                   <td>{row.type || ""}</td>
