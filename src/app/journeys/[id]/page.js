@@ -132,15 +132,15 @@ export default function Journey({ params }) {
         </p>
 
         <div className="flex justify-between">
-          <p className="text-2xl font-bold text-[#AC0000]">Journey</p>
-          <p className="text-xl font-bold text-gray-500">{formatDateTime(journey?journey.departure:"")}</p>
+          <p className="xl:text-2xl font-bold text-[#AC0000]">Journey</p>
+          <p className="xl:text-xl font-bold text-gray-500">{formatDateTime(journey?journey.departure:"")}</p>
         </div>
         <hr className="border border-black my-2"/>
 
         {!journey ? (
           <p className="text-red-500">{error}</p>
         ) : journey ? (
-          <div className="p-4   text-black text-sm grid grid-cols-2 gap-y-6 mb-4">
+          <div className="p-1 lg:p-2 xl:p-4   text-black text-xs lg:text-sm grid grid-cols-2 gap-y-6 gap-x-1 mb-4">
     
             <div className="grid grid-cols-1">
               <span className="font-bold">From</span> {journey.from}
@@ -158,10 +158,10 @@ export default function Journey({ params }) {
               {formatDateTime(journey.arrival)}
             </div>
             <div className="grid grid-cols-1">
-              <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 w-1/2 text-white rounded text-center">{journey.driver.name}</span>
+              <span className="font-bold">Driver</span> <span className="bg-[#AC0000] py-1 px-2 lg:w-1/2 text-white rounded text-center">{journey.driver.name}</span>
             </div>
             <div className="grid grid-cols-1">
-              <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 w-1/2 text-white rounded text-center">{journey.truck.name}</span>
+              <span className="font-bold">Truck</span> <span className="bg-black py-1 px-2 lg:w-1/2 text-white rounded text-center">{journey.truck.name}</span>
             </div>
             <div className="grid grid-cols-1">
               <span className="font-bold">Status</span> {journey.status}
@@ -180,12 +180,12 @@ export default function Journey({ params }) {
 
         {/* Expenses */}
         {expenseData?.expenses ? <div>
-          <p className="text-xl font-bold text-black">Expenses</p>
+          <p className="text-md xl:text-xl font-bold text-black  lg:mb-4 mb-2 mt-10 lg:mt-20">Expenses</p>
           <hr className="border border-black my-2"/>
         </div>:""}
 
         {expenseData?.expenses ? (
-            <div className="p-4 text-black grid grid-cols-6 gap-y-6 mb-4 text-sm">
+            <div className="grid text-xs grid-cols-3 xl:grid-cols-7  text-black mb-10 p-4   text-black  gap-y-6 mb-4 xl:text-sm">
               {expenseData.expenses.map((expense) => (
                 <div key={expense._id} className="grid grid-cols-1">
                   <span className="font-bold">{expense.name}</span> ${expense.amount} USD
@@ -206,7 +206,7 @@ export default function Journey({ params }) {
                 {expenseData.total_amount.map((total) => (
                   <div key={total._id} className="mr-4">
                     <span className="text-xs">{total.currency}</span>
-                    <span className="font-black text-3xl"> {total.amount}</span>
+                    <span className="font-black text-xl xl:text-3xl"> {total.amount}</span>
                   </div>
                 ))}
               </div>

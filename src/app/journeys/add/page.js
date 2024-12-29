@@ -187,16 +187,16 @@ export default function Driver({params}) {
           </p>
         </div>
 
-        <p className="text-2xl font-bold text-[#AC0000]">New Journey</p>
+        <p className="text-md lg:text-2xl font-bold text-[#AC0000]">New Journey</p>
         <hr className="border border-[#AC0000] my-2" />
 
    
 
           <div className="mx-auto mt-4 text-black">
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:grid md:grid-cols-2 gap-6">
               {/* Row 1 */}
-              <div>
+              <div className="mb-2 lg:mb-0">
                 <label htmlFor="departure" className="block text-sm font-medium text-gray-700">
                   Departure Date
                 </label>
@@ -208,7 +208,7 @@ export default function Driver({params}) {
                   onChange={handleChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 />
-              </div>
+              </div >
               <div>
                 <label htmlFor="arrival" className="block text-sm font-medium text-gray-700">
                   Arrival Date
@@ -224,7 +224,7 @@ export default function Driver({params}) {
               </div>
 
               {/* Row 2 */}
-              <div>
+              <div className="mb-2 lg:mb-0">
                 <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
                   Driver
                 </label>
@@ -249,7 +249,7 @@ export default function Driver({params}) {
 
               </div>
 
-              <div>
+              <div className="mb-2 lg:mb-0">
                 <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
                   Truck
                 </label>
@@ -275,7 +275,7 @@ export default function Driver({params}) {
               </div>
 
               {/* Row 3 */}
-              <div>
+              <div className="mb-2 lg:mb-0">
                 <label htmlFor="from" className="block text-sm font-medium text-gray-700">
                   From
                 </label>
@@ -289,7 +289,7 @@ export default function Driver({params}) {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 />
               </div>
-              <div>
+              <div className="mb-2 lg:mb-0">
                 <label htmlFor="to" className="block text-sm font-medium text-gray-700">
                   To
                 </label>
@@ -305,7 +305,7 @@ export default function Driver({params}) {
               </div>
 
               {/* Row 4 */}
-              <div>
+              <div className="mb-2 lg:mb-0">
                 <label htmlFor="distance" className="block text-sm font-medium text-gray-700">
                   Distance (km)
                 </label>
@@ -319,7 +319,7 @@ export default function Driver({params}) {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 />
               </div>
-              <div>
+              <div className="mb-2 lg:mb-0">
                 <label htmlFor="status" className="block text-sm font-medium text-gray-700">
                   Status
                 </label>
@@ -348,7 +348,7 @@ export default function Driver({params}) {
                 </div>
 
 
-                  <div className="mt-4 w-2/5">
+                  <div className="mt-4 lg:w-2/5">
                     <input
                       type="text"
                       id="cargoDetails"

@@ -108,7 +108,7 @@ export default function Manage() {
             <input
               type="text"
               placeholder="Search Journeys..."
-              className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0"
+              className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
               value={searchQuery}
               onChange={handleSearch}
             />
@@ -119,17 +119,17 @@ export default function Manage() {
               alt="Search Icon"
               width={30}
               height={30}
-              className="transition duration-75 group-hover:opacity-80 sm:w-8 sm:h-8"
+              className="transition duration-75 group-hover:opacity-80 w-4 lg:w-6 xl:w-8"
             />
           </div>
 
-          <div></div>
+          <div className="hidden lg:block"></div>
 
           {/* Journey Type Dropdown */}
-          <div className="flex flex-col col-span-8 md:col-span-3 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
+          <div className="flex flex-col col-span-12 md:col-span-4 lg:col-span-3 md:ml-2 lg:ml-0 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l ">
             <select
               id="dropdown"
-              className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
+              className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
               onChange={handleTypeChange}
               value={expenseType}
             >
@@ -149,15 +149,15 @@ export default function Manage() {
         ) : journeys.length === 0 ? (
           <p className="text-center text-gray-500">No journeys found.</p>
         ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-16  md:p-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 xl:gap-4 mb-16  md:p-2">
             {journeys.map((journey, index) => (
               <div id="emp" key={index}>
                 <Link href= {getLink(journey._id)} passHref>
-                <div className="grid grid-cols-4 flex flex-col items-center p-10 h-20 md:h-24 xl:h-32 2xl:h-96 rounded bg-white shadow-2xl">
-                <div className="col-span-full text-[#AC0000] font-bold text-xl mb-4">
+                <div className="grid grid-cols-4 flex flex-col items-center p-4 xl:p-10  2xl:h-96 rounded bg-white shadow-2xl text-xs lg:text-sm border border-gray-200">
+                <div className="col-span-full text-[#AC0000] font-bold text-sm lg:text-xl mb-4">
                 {journey.from} - {journey.to}
                 </div>
-                  <div className=" col-span-4 text-gray-600 grid grid-cols-2 gap-y-3 text-sm">
+                  <div className=" col-span-4 text-gray-600 grid grid-cols-2 gap-y-3 text-xs lg:text-sm">
                     <div className="grid grid-cols-1 ">
                         <div className="font-bold" >Departure Date</div> <div > {formatDateTime(journey.departure)}</div>
                     </div>
@@ -180,19 +180,19 @@ export default function Manage() {
 
 
                   </div>
-                  <div className="col-span-4 bg-[#AC0000] grid grid-cols-5 p-4 rounded-b mt-4 text-md">
-                        <div>
+                  <div className="col-span-4 bg-[#AC0000] grid grid-cols-10 p-4 rounded-b mt-4 text-md ">
+                        <div className="col-span-10 2xl:col-span-2">
                             <p className="2xl:text-lg font-bold">Status</p>
-                            <p className="bg-[#126928] border border-[#126928] text-center text-white p-1 m-1 w-3/4 rounded">{journey.status}</p>
+                            <p className="bg-[#126928] border border-[#126928] text-center text-white p-1 m-1 2xl:w-3/4 rounded">{journey.status}</p>
                         </div>
-                        <div  className="col-span-2">
+                        <div  className="col-span-5 2xl:col-span-4">
                             <p className="2xl:text-lg font-bold">Truck</p>
-                            <p onClick={(e) => goTo("truck", journey.truck ? journey.truck.plate_id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded w-3/4">{journey.truck?journey.truck.name:""}</p>
+                            <p onClick={(e) => goTo("truck", journey.truck ? journey.truck.plate_id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded 2xl:w-3/4">{journey.truck?journey.truck.name:""}</p>
                         </div>
 
-                        <div className="col-span-2">
+                        <div className="col-span-5 2xl:col-span-4">
                             <p className="2xl:text-lg font-bold">Driver</p>
-                            <p onClick={(e) => goTo("driver", journey.driver ? journey.driver.id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded w-3/4">{journey.driver?journey.driver.name:""}</p>
+                            <p onClick={(e) => goTo("driver", journey.driver ? journey.driver.id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded 2xl:w-3/4">{journey.driver?journey.driver.name:""}</p>
                         </div>
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export default function Manage() {
 
 
         {/* Pagination Controls */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 flex justify-center sm:justify-end">
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 flex justify-center sm:justify-end text-xs lg:text-md xl:text-lg">
           <button
             onClick={handlePrevious}
             disabled={currentPage === 1}
@@ -218,7 +218,7 @@ export default function Manage() {
           >
             Previous
           </button>
-          <span className="mx-4 text-lg font-semibold text-[#AC0000]">
+          <span className="mx-4 xl:text-lg font-semibold text-[#AC0000] text-xs my-auto">
             Page {currentPage} of {totalPages}
           </span>
           <button
