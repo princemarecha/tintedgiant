@@ -106,7 +106,7 @@ export default function MyComponent({ params }) {
           <span>Edit Truck</span>
         </p>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ">
           {[
             "Name",
             "Make",
@@ -121,7 +121,7 @@ export default function MyComponent({ params }) {
             <div key={index} className="mb-4">
               <label
                 htmlFor={fieldName.toLowerCase().replace(/\s+/g, "-")}
-                className="block text-lg font-bold text-gray-700 mb-2"
+                className="block text-sm font-bold text-gray-700 mb-2"
               >
                 {fieldName}
               </label>
@@ -131,7 +131,7 @@ export default function MyComponent({ params }) {
                   name="trailer"
                   value={formData.trailer || false}
                   onChange={handleChange}
-                  className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none"
+                  className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none text-sm"
                 >
                   <option value={false}>No</option>
                   <option value={true}>Yes</option>
@@ -156,7 +156,7 @@ export default function MyComponent({ params }) {
                       .replace("avg operational costs", "avg_opCosts")
                   ] || ""}
                   onChange={handleChange}
-                  className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none"
+                  className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none text-sm"
                 />
               )}
             </div>

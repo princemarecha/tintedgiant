@@ -294,13 +294,13 @@ export default function MyComponent({ params }) {
 
         <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Truck Management</span> <span>&gt;</span><span>Trucks </span><span>&gt;</span><span>{plateID}</span></p>
         <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
-        <div className="relative col-span-3 md:col-span-2 lg:col-span-4 xl:col-span-5 bg-gray-100 ">
+        <div id="truck image" className="relative col-span-3 md:col-span-4 lg:col-span-6 xl:col-span-5 bg-gray-100 h-96 lg:h-full">
           {truckData?<Image
               src= {mainImageSrc?mainImageSrc:"https://res.cloudinary.com/dix6sop3b/image/upload/v1733117711/u0y0mh6rtjgwqvtgoelr.png"}
-              alt="Search Icon"
+              alt="Main Image"
               fill
               unoptimized
-              className={`transition duration-75 group-hover:opacity-80 sm:w-100 sm:h-100 rounded-xl object-contain mx-auto ${
+              className={`transition duration-75 group-hover:opacity-80 w-100 h-100 rounded-xl object-contain mx-auto ${
                 uploading ? 'animate-pulse' : ''
               }`}
               //onError={(e) => (e.target.src = "u0y0mh6rtjgwqvtgoelr")}
@@ -313,7 +313,7 @@ export default function MyComponent({ params }) {
 
             
             {truckData ? (
-        <div className="col-span-3 text-xs 2xl:text-lg 2xl:gap-y-1 2xl:py-2 md:col-span-2 lg:col-span-8 xl:col-span-4 p-6 lg:p-6 xl:p-8 text-black shadow-xl rounded border border-gray-100 grid grid-cols-2">
+        <div className="col-span-3 border border-gray-300 text-xs 2xl:text-lg 2xl:gap-y-1 2xl:py-2 md:col-span-2 lg:col-span-6 xl:col-span-4 p-6 lg:p-6 xl:p-8 text-black shadow-xl rounded border border-gray-100 grid grid-cols-2">
         <div className="font-bold">Name</div> 
         <div className="">{truckData.name || "Not provided"}</div> 
       
@@ -360,7 +360,7 @@ export default function MyComponent({ params }) {
               plateID && <div>Loading truck data...</div>
             )}
             {journeyData ? (
-              <div className="col-span-3 md:col-span-2 lg:col-span-5 xl:col-span-3  py-4  text-black shadow-xl rounded bg-[#AC0000] ">
+              <div className="col-span-3 md:col-span-2 lg:col-span-6 xl:col-span-3  py-4  text-black shadow-xl rounded bg-[#AC0000] ">
                 <p className="xl:text-lg mx-6 font-black text-white 2xl:text-2xl">Current Journey</p> 
                 <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">From</p> 
@@ -383,7 +383,7 @@ export default function MyComponent({ params }) {
               plateID && <div>Loading truck data...</div>
             )}
 
-{data?.totalExpenses?.length?<div className="col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded">
+          {data?.totalExpenses?.length?<div className="col-span-3 md:col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded ">
             <div className="col-span-full">
               <p className="text-lg font-bold mb-2">Operational Costs</p>
             </div>
@@ -397,7 +397,7 @@ export default function MyComponent({ params }) {
 
         </div>:""}
 
-        {data?.totalExpenses?.length?<div className="col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded">
+        {data?.totalExpenses?.length?<div className="col-span-3 md:col-span-full grid grid-cols-6 bg-[#6B0303] p-4 mb-4 gap-y-2 rounded">
             <div className="col-span-full">
               <p className="text-lg font-bold mb-2">Average Operational Costs</p>
             </div>
@@ -411,9 +411,9 @@ export default function MyComponent({ params }) {
 
         </div>:""}
 
-            <div className="col-span-full grid grid-cols-5 gap-2">
+            <div className="col-span-full grid grid-cols-3 gap-2">
             {photos.map((src, index) => (
-                <div key={index} className="relative h-60 cursor-pointer group">
+                <div key={index} className="relative  h-32 lg:h-60 cursor-pointer group">
                     <Image
                     src={src}
                     alt={`Truck Thumbnail ${index + 1}`}

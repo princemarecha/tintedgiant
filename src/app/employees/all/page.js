@@ -104,7 +104,7 @@ export default function ViewEmployees() {
               <input
                 type="text"
                 placeholder="Search Employees....."
-                className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0"
+                className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
                 onKeyUp={handleSearch}
               />
             </div>
@@ -114,16 +114,16 @@ export default function ViewEmployees() {
                 alt="Search Icon"
                 width={30}
                 height={30}
-                className="transition duration-75 group-hover:opacity-80 sm:w-8 sm:h-8"
+                className="transition duration-75 group-hover:opacity-80 w-4 lg:w-6 xl:w-8"
               />
             </div>
-            <div className="hidden md:block"></div>
+            <div className="hidden lg:block"></div>
 
             {/* Role Dropdown */}
-            <div className="flex flex-col col-span-8 md:col-span-3 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
+            <div className="flex flex-col col-span-12 md:col-span-4 lg:col-span-3 md:ml-2 lg:ml-0 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l ">
               <select
                 id="dropdown"
-                className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
+                className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
                 onChange={handleRoleChange} // Update role on change
                 value={role}
               >
@@ -140,18 +140,18 @@ export default function ViewEmployees() {
           </div>
 
           {/* Employees Section */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-16 font-bold md:p-2">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16 font-bold md:p-2">
             {employees.map((employee, index) => (
               <div id="emp" key={index}>
                 <Link href= {getLink(employee._id)} passHref>
-                <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-40 rounded bg-white shadow-2xl">
+                <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-40 rounded bg-white border shadow-2xl">
                   <div className="col-span-1 flex items-center  justify-center font-bold">
                   <CldImage
                       src={validPhotoUrls[index] || "irxdkhgi7ehjhtbeh1zk"}
                       alt={employee.name || "Employee Photo"}
                       width={200}
                       height={200}
-                      className="rounded-full object-cover w-24 h-24"
+                      className="rounded-full object-cover md:w-12 lg:w-16 2xl:w-24 2xl:h-24"
                     />
                   </div>
                   <div className="col-span-3 text-[#5F5F5F]">
@@ -174,7 +174,7 @@ export default function ViewEmployees() {
                           alt="View Icon"
                           width={30}
                           height={30}
-                          className="mr-4 transition duration-75 group-hover:opacity-80 w-4 h-4 xl:w-8 xl:h-8"
+                          className="mr-4 hidden md:block transition duration-75 group-hover:opacity-80 w-4 h-4 xl:w-8 xl:h-8"
                         />
                       </div>
                     </div>
@@ -188,7 +188,7 @@ export default function ViewEmployees() {
       </Layout>
 
       {/* Pagination Controls */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 flex justify-center sm:justify-end">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 flex justify-center sm:justify-end text-xs md:text-md lg:text-lg">
         <button
           onClick={handlePrevious}
           disabled={currentPage === 1}
@@ -196,7 +196,7 @@ export default function ViewEmployees() {
         >
           Previous
         </button>
-        <span className="mx-4 text-lg font-semibold text-[#AC0000]">
+        <span className="mx-4 my-auto font-semibold text-[#AC0000]">
           Page {currentPage} of {totalPages}
         </span>
         <button

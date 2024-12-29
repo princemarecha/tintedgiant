@@ -70,7 +70,7 @@ const handleSubmit = async (e) => {
 
 
         <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm">
             {[
               { label: "Name", name: "name", type: "text", required: true },
               { label: "Age", name: "age", type: "number", required: true },
@@ -103,7 +103,7 @@ const handleSubmit = async (e) => {
           <button
             type="submit"
             disabled={loading}
-            className="absolute bottom-4 right-4 px-6 py-2  bg-[#AC0000] rounded hover:bg-blue-600 transition shadow-md flex "
+            className="md:absolute md:bottom-4 my-4 md:my-0 right-4 px-6 py-2  bg-[#AC0000] rounded hover:bg-blue-600 transition shadow-md flex "
           >
             {loading ? "Saving..." : "Save"}
             <Image

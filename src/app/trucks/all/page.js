@@ -80,7 +80,7 @@ export default function ViewTrucks() {
               <input
                 type="text"
                 placeholder="Search Trucks....."
-                className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0"
+                className="bg-[#AC0000] border-none placeholder-white text-white focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
                 onKeyUp={handleSearch}
               />
             </div>
@@ -90,16 +90,16 @@ export default function ViewTrucks() {
                 alt="Search Icon"
                 width={30}
                 height={30}
-                className="transition duration-75 group-hover:opacity-80 sm:w-8 sm:h-8"
+                className="transition duration-75 group-hover:opacity-80 w-4 lg:w-6 xl:w-8"
               />
             </div>
-            <div className="hidden md:block"></div>
+            <div className="hidden lg:block"></div>
 
             {/* make Dropdown */}
-            <div className="flex flex-col col-span-8 md:col-span-3 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l">
+            <div className="flex flex-col col-span-12 md:col-span-4 lg:col-span-3 md:ml-2 lg:ml-0 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l ">
               <select
                 id="dropdown"
-                className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0"
+                className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
                 onChange={handleMakeChange} // Update make on change
                 value={make}
               >
@@ -116,11 +116,11 @@ export default function ViewTrucks() {
           </div>
 
           {/* Trucks Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-16  md:p-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-16  md:p-2 text-xs lg:text-xs xl:text-md">
             {trucks.map((truck, index) => (
               <div id="emp" key={index}>
                 <Link href= {getLink(truck.plate_id)} passHref>
-                <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-96 rounded bg-white shadow-2xl">
+                <div className="grid border border-gray-300 grid-cols-4 gap-1 flex flex-col items-center  md:h-full xl:h-full 2xl:h-96 rounded bg-white shadow-2xl">
                   <div className="col-span-2 flex items-center justify-center  2xl:p-8">
                     <Image
                       src="/images/truck.png" // Use truck image or default
@@ -130,7 +130,7 @@ export default function ViewTrucks() {
                       className="mb-2 transition duration-75 group-hover:opacity-80 rounded 2xl:w-200 2xl:h-200  ml-1"
                     />
                   </div>
-                  <div className=" col-span-2 text-gray-600 grid grid-cols-2 gap-y-1">
+                  <div className=" col-span-2 text-gray-600 grid grid-cols-2 gap-y-1 pt-2">
                     <div className="col-span-2 font-black"> {truck.name}</div> 
                     <div className="font-bold" >Status</div> <div className="col-span-1"> {truck.status}</div> 
                     <div className="font-bold" >Location </div> <div className="col-span-1"> {truck.location}</div>
@@ -143,10 +143,10 @@ export default function ViewTrucks() {
 
 
                   </div>
-                  <div className="col-span-4 bg-[#AC0000] grid grid-cols-3 p-4 rounded-b">
+                  <div className="col-span-4 bg-[#AC0000] grid grid-cols-3 p-4 rounded-b gap-x-3 sm:gap-x-1">
                         <div>
                             <p className="2xl:text-lg font-bold">From</p>
-                            <p>Harare,Zimbabwe</p>
+                            <p >Harare,Zimbabwe</p>
                         </div>
                         <div>
                             <p className="2xl:text-lg font-bold">To</p>
@@ -167,7 +167,7 @@ export default function ViewTrucks() {
       </Layout>
 
       {/* Pagination Controls */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 flex justify-center sm:justify-end">
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-100 p-4 flex justify-center sm:justify-end text-xs md:text-md">
         <button
           onClick={handlePrevious}
           disabled={currentPage === 1}
@@ -175,7 +175,7 @@ export default function ViewTrucks() {
         >
           Previous
         </button>
-        <span className="mx-4 text-lg font-semibold text-[#AC0000]">
+        <span className="mx-4 text-lg font-semibold text-[#AC0000] text-xs md:text-md my-auto">
           Page {currentPage} of {totalPages}
         </span>
         <button
