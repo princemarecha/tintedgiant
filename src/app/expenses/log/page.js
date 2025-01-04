@@ -1,10 +1,11 @@
-"use client";
-
+"use client"; //control
+ 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Layout from "@/components/Layout";
 import Link from "next/link";
 import Image from "next/image";
+import Modal from "@/components/modal";
 
 export default function Manage() {
   const [rows, setRows] = useState([]);
@@ -18,6 +19,11 @@ export default function Manage() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false) ;
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("error");
+  const [modalMessage, setModalMessage] = useState("");
+
+  const toggleModal = () => setModalOpen(!isModalOpen);
 
   // Currency symbol map
   const currencySymbols = {
@@ -131,6 +137,14 @@ export default function Manage() {
 
   const handleAmountChange = (index, value) => {
     const numericValue = value.replace(/[^0-9.]/g, "");
+
+    if (numericValue > 100000) {
+      // Optional: Show error modal or message
+      setModalMessage("Maximum amount allowed is 100,000")
+      toggleModal()
+      return;
+    }
+
     if (!isNaN(numericValue) && numericValue.split(".").length <= 2) {
       const updatedRows = [...rows];
       updatedRows[index].amount = numericValue;
@@ -172,7 +186,14 @@ export default function Manage() {
   };
 
   const saveExpense = async () => {
-    setIsLoading(true)
+    if (!rows || rows.length === 0 || !type || !date) {
+      // Show error modal if no rows are present
+      setModalMessage("Please enter at least one record, date and type")
+      toggleModal()
+      return;
+    }
+
+    setIsLoading(true);
     try {
       // Upload images and get their URLs
       const uploadedImageUrls = await uploadImages();
@@ -197,18 +218,32 @@ export default function Manage() {
         trip: { route: "N/A", id: "N/A" }, // Adjust if trip data is available
         attachments: uploadedImageUrls, // Attach uploaded image URLs
       };
+
+      if (!payload.expenses || payload.expenses.length === 0 || payload.expenses.some(expense => !expense.name || !expense.amount)) {
+        // Show error modal if no rows are present or if any name or amount is empty
+        setModalMessage("Please ensure all expense names and amounts are filled in.");
+        toggleModal();
+        setIsLoading(false)
+        return;
+      }
+      
   
       // Send the payload to the API
       const response = await axios.post("/api/expense", payload);
-      setIsLoading(false)
-      alert("Expense saved successfully!");
+      setIsLoading(false);
+      setModalMessage("Expense logged successfully!")
+      toggleModal()
       setRows([]); // Clear rows after saving
     } catch (error) {
-      setIsLoading(false)
+      setIsLoading(false);
       console.error("Error saving expense:", error);
-      alert("Failed to save expense. Please try again.");
+      showModal({
+        type: "error",
+        message: "Failed to save expense. Please try again.",
+      });
     }
   };
+  
   
   useEffect(() => {
     fetchExpenses();
@@ -511,6 +546,14 @@ export default function Manage() {
             className="hidden" // Hide the file input
           />
           </div>
+          <Modal
+            isOpen={isModalOpen}
+            toggleModal={toggleModal}
+            type={modalType}
+            message={modalMessage}
+            color="gray"
+            onCancel={toggleModal}
+          />
       </Layout>
     </div>
   );

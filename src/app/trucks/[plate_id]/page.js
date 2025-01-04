@@ -7,6 +7,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
+import Modal from "@/components/modal";
 
 async function getplateID(params) {
   // Simulate fetching or processing to get the plate ID
@@ -42,6 +43,8 @@ export default function MyComponent({ params }) {
   const [journeyData, setJourneyData] = useState(null);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("delete");
+  const [modalMessage, setModalMessage] = useState("Are you sure you want to delete this truck?");
   const [photos, setPhotos] = useState([])
   const [mainImageSrc, setMainImageSrc] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
@@ -52,7 +55,7 @@ export default function MyComponent({ params }) {
   const [data, setData] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
 
   useEffect(() => {
     // Fetch the plate ID and set the state
@@ -79,9 +82,13 @@ export default function MyComponent({ params }) {
           {const journey = await fetchJourneyData(data.current_journey); setJourneyData(journey)}
           if (data.photos)
             {
-              setMainImageSrc(data.photos[0])
-              setPhotos(data.photos)
+              if (data.photos[0])
+              {
+                 setMainImageSrc(data.photos[0])
+                 setPhotos(data.photos)
               }
+              }
+             
         } catch (err) {
           setError("Failed to fetch truck data");
         }
@@ -489,7 +496,7 @@ export default function MyComponent({ params }) {
         </div>
         <div className="my-4 flex justify-end text-sm 2xl:text-lg">
         <button
-            onClick={deleteTruck}
+            onClick={() => setIsModalOpen(true)}
             className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
           >
             <p className="flex justify-between">
@@ -530,6 +537,7 @@ export default function MyComponent({ params }) {
             </div>
           </div>
         )}
+          <Modal isOpen={isModalOpen} toggleModal={toggleModal} type={modalType} message={modalMessage} color="gray" onCancel={toggleModal} onConfirm={deleteTruck} />
       </Layout>
     </div>
   );

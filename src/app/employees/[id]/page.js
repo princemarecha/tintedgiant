@@ -7,6 +7,7 @@ import axios from "axios";
 import { useParams,useRouter } from "next/navigation";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
+import Modal from "@/components/modal";
 
 
 async function fetchEmployeeData(empID) {
@@ -25,6 +26,8 @@ export default function MyComponent({ params }) {
   const [employeeData, setEmployeeData] = useState(null);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("delete");
+  const [modalMessage, setModalMessage] = useState("Are you sure you want to delete this employee?");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
@@ -35,6 +38,7 @@ export default function MyComponent({ params }) {
 
   const { id } = useParams();
 
+  const toggleModal = () => setIsModalOpen(!isModalOpen);
 
 
   useEffect(() => {
@@ -349,23 +353,24 @@ export default function MyComponent({ params }) {
                   </span>
                   </p>
           </button>
-        <button
-            onClick={deleteEmployee}
-            className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
-          >
-            <p className="flex justify-between">
-              <span>Delete Employee</span>
-              <span>
-                <Image
-                  src="/images/icons/delete.png"
-                  alt="Delete Icon"
-                  width={20}
-                  height={20}
-                  className="transition duration-75 group-hover:opacity-80 ml-2 sm:w-6 sm:h-6"
-                />
-              </span>
-            </p>
-          </button>
+      {/* Delete Button */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0 transition duration-150"
+      >
+        <p className="flex justify-between">
+          <span>Delete Employee</span>
+          <span>
+            <Image
+              src="/images/icons/delete.png"
+              alt="Delete Icon"
+              width={20}
+              height={20}
+              className="transition duration-75 group-hover:opacity-80 ml-2 sm:w-6 sm:h-6"
+            />
+          </span>
+        </p>
+      </button>
         </div>
 
               {/* Hidden file input */}
@@ -391,6 +396,8 @@ export default function MyComponent({ params }) {
             </div>
           </div>
         )}
+
+        <Modal isOpen={isModalOpen} toggleModal={toggleModal} type={modalType} message={modalMessage} color="gray" onCancel={toggleModal} onConfirm={deleteEmployee} />
       </Layout>
     </div>
   );

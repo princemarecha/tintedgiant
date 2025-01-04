@@ -6,6 +6,7 @@ import axios from "axios";
 import { useParams,useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import Modal from "@/components/modal";
 
 export default function Expense() {
   const { id } = useParams();
@@ -16,6 +17,11 @@ export default function Expense() {
   const [selectedJourney, setSelectedJourney] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("error");
+  const [modalMessage, setModalMessage] = useState("");
+
+  const toggleModal = () => setModalOpen(!isModalOpen);
 
   // Fetch expense data
   async function fetchExpenseData(expenseID) {
@@ -40,7 +46,8 @@ export default function Expense() {
   // Attach journey to expense
   const handlePatchRequest = async () => {
     if (!selectedJourney) {
-      alert("Please select a journey first.");
+      setModalMessage("Please select a journey first.");
+      toggleModal()
       return;
     }
 
@@ -63,7 +70,8 @@ export default function Expense() {
       console.log("Journey and Expense updated successfully:", response.data, journeyResponse.data);
     } catch (error) {
       console.error("Error attaching journey:", error);
-      alert("Failed to attach journey. Please try again.");
+      setModalMessage("Failed to attach journey. Please try again.");
+      toggleModal()
     }
   };
 
@@ -129,7 +137,18 @@ export default function Expense() {
     };
 
     const date = new Date(dateTimeString);
-    return date.toLocaleString("en-US", options).replace(",", "");
+
+    if (date){
+      var goodDate = date.toLocaleString("en-US", options).replace(",", "");
+
+      if (goodDate != "Invalid Date")
+          {
+             return goodDate
+          }
+      else{
+        return ""
+      }
+    }
   };
 
   const deleteImage = (publicID)=>{
@@ -152,8 +171,7 @@ export default function Expense() {
 
   const handleDeleteExpense = async () => {
     try {
-      const confirmDelete = window.confirm("Are you sure you want to delete this expense?");
-      if (!confirmDelete) return;
+      
 
       const payload = {
         expenses:"N/A"
@@ -174,12 +192,13 @@ export default function Expense() {
       
 
 
-      alert("Expense deleted successfully!");
+      setModalMessage("Expense deleted successfully!");
+      toggleModal()
       // Optionally, redirect to another page or refresh the list
       router.push("/expenses/manage");
     } catch (error) {
       console.error("Error deleting expense:", error);
-      alert("Failed to delete expense. Please try again.");
+      setModalMessage("Failed to delete expense. Please try again.");
     }
   };
   
@@ -322,13 +341,18 @@ export default function Expense() {
         <div className="flex justify-between mt-6 text-sm">
         <p
             className="font-bold text-[#AC0000] text-sm mr-10 cursor-pointer hover:underline"
-            onClick={handleDeleteExpense}
+            onClick={(e) => {
+              setModalMessage("Are you sure you want to delete this expense?");
+              setModalType("delete")
+              toggleModal()
+            }}
+            
           >
             Delete Expense
           </p>
 
         <button
-                onClick={() => alert("Button clicked!")}
+                onClick={() => setModalMessage("Button clicked!")}
                 className="px-4 py-2 rounded text-white bg-[#AC0000] hover:bg-gray-600 focus:outline-none focus:ring-0  transition duration-150"
               >
                 <p className="flex justify-between"><span>Print Expense</span><span>
@@ -387,7 +411,15 @@ export default function Expense() {
      
         </div>
         </div>
-    
+              <Modal
+                isOpen={isModalOpen}
+                toggleModal={toggleModal}
+                type={modalType}
+                message={modalMessage}
+                color="gray"
+                onCancel={toggleModal}
+                onConfirm={handleDeleteExpense}
+              />
       </Layout>
     </div>
   );

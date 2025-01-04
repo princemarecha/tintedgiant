@@ -6,6 +6,7 @@ import Layout from "@/components/Layout";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import Modal from "@/components/modal";
 
 export default function Manage() {
   const [rows, setRows] = useState([]);
@@ -17,6 +18,11 @@ export default function Manage() {
   const [newAttachments, setNewAttachments] = useState([]); // Default to today's date
   const [uploading, setUploading] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("error");
+  const [modalMessage, setModalMessage] = useState("");
+
+  const toggleModal = () => setModalOpen(!isModalOpen);
 
 
   const router  = useRouter()
@@ -61,15 +67,17 @@ export default function Manage() {
   // Add a new row
   const addRow = () => {
     if (rows.length >= 30) {
-      alert("You can only add a maximum of 30 expenses.");
+      setModalMessage("You can only add a maximum of 30 expenses.");
+      toggleModal()
       return;
     }
 
     const lastRow = rows[rows.length - 1];
     if (lastRow && (!lastRow.amount || !lastRow.name)) {
-      alert(
+      setModalMessage(
         "Please fill out the Expense and Amount fields for the previous row before adding a new one."
       );
+      toggleModal()
       return;
     }
 
@@ -98,7 +106,8 @@ export default function Manage() {
       setAttachments(expenseData.attachments);
     } catch (error) {
       console.error("Error fetching expense by ID:", error);
-      alert("Failed to fetch expense data. Please try again.");
+      setModalMessage("Failed to fetch expense data. Please try again.");
+      toggleModal()
     }
   };
 
@@ -180,7 +189,8 @@ export default function Manage() {
       return response.data.images; // Return the uploaded images
     } catch (error) {
       console.error("Error uploading images:", error);
-      alert("Failed to upload images. Please try again.");
+      setModalMessage("Failed to upload images. Please try again.");
+      toggleModal()
       throw error; // Re-throw error to handle it in `handleSubmit`
     } finally {
       setUploading(false);
@@ -206,7 +216,19 @@ export default function Manage() {
 
     // Save the expense
     const saveExpense = async () => {
-      setIsLoading(true)
+      setModalMessage("Updating please wait")
+      toggleModal()
+
+      if (!rows || rows.length === 0 || !type || !date) {
+        // Show error modal if no rows are present
+        toggleModal()
+        setModalMessage("Please enter at least one record, date and type")
+        toggleModal()
+        return;
+      }
+
+      
+
       try {
         // Format data for the API
         const totalAmount = Object.entries(calculateTotals()).map(
@@ -222,6 +244,15 @@ export default function Manage() {
           attachments,
         };
 
+        if (!payload.expenses || payload.expenses.length === 0 || payload.expenses.some(expense => !expense.name || !expense.amount)) {
+          // Show error modal if no rows are present or if any name or amount is empty
+          toggleModal()
+          setModalMessage("Please ensure all expense names and amounts are filled in.");
+          toggleModal();
+          setIsLoading(false)
+          return;
+        }
+
         const uploadedImages = await uploadImages(); // Wait for images to upload
         //console.log(`these are uploaded images ${uploadedImages}`)
       if (uploadedImages) {
@@ -231,13 +262,13 @@ export default function Manage() {
       setAttachments([...uploadedImages, ...attachments])
   
         const response = await axios.patch(`/api/expense/${id}`, payload);
-        setIsLoading(false)
-        alert("Expense updated successfully!");
+        setModalMessage("Expense updated successfully!");
+        toggleModal()
         router.push(`/expenses/${id}`)
       } catch (error) {
         console.error("Error updating expense:", error);
-        setIsLoading(false)
-        alert("Failed to update expense. Please try again.");
+        setModalMessage("Failed to update expense. Please try again.");
+        toggleModal()
       }
     };
 
@@ -607,6 +638,8 @@ export default function Manage() {
             Save Expense
           </button>
         </div>
+
+        <Modal isOpen={isModalOpen} toggleModal={toggleModal} type={modalType} message={modalMessage} color="gray" onCancel={toggleModal}  />
       </Layout>
     </div>
   );

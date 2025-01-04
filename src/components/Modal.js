@@ -18,14 +18,16 @@ export default function Modal({
     warning: "text-yellow-700 dark:text-yellow-400",
     error: "text-red-700 dark:text-red-400",
     saving: "text-gray-700 dark:text-gray-400",
+    delete: "text-gray-700 dark:text-gray-400",
   };
 
   const bgStyles = {
-    info: "bg-blue-100 ",
-    success: "bg-green-100 ",
-    warning: "bg-yellow-100 ",
+    info: "bg-[#AC0000] ",
+    success: "bg-[#AC0000] ",
+    warning: "bg-[#AC0000] ",
     error: "bg-[#AC0000] ",
     saving: "bg-[#AC0000]",
+    delete: "bg-[#AC0000]",
   };
 
   return (
@@ -71,9 +73,9 @@ export default function Modal({
             </div>
             </div>
 
-          {/* Modal footer */}
-          <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-            {type !== "saving" && type !== "error" && onConfirm && (
+                  {/* Modal footer */}
+                  <div className="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+            {type === "delete" && onConfirm && (
               <button
                 onClick={onConfirm}
                 className={`text-white bg-${color}-700 hover:bg-${color}-800 focus:ring-4 focus:outline-none focus:ring-${color}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-${color}-600 dark:hover:bg-${color}-700 dark:focus:ring-${color}-800`}
@@ -81,7 +83,7 @@ export default function Modal({
                 Confirm
               </button>
             )}
-            {type === "saving" && onCancel && (
+            {type === "delete" && onCancel && (
               <button
                 onClick={onCancel}
                 className="py-2.5 px-5 ms-3 text-sm font-medium text-[#AC0000] focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
@@ -90,6 +92,7 @@ export default function Modal({
               </button>
             )}
           </div>
+
         </div>
       </div>
     </div>
