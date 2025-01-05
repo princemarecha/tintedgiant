@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import Journeys from "../page";
+import Modal from "@/components/modal";
 
 
 
@@ -30,6 +31,11 @@ export default function Driver({params}) {
   const [cargoEnabled, setCargoEnabled] = useState(null);
   const [formData, setFormData] = useState(defaultForm);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("error");
+  const [modalMessage, setModalMessage] = useState("");
+
+  const toggleModal = () => setModalOpen(!isModalOpen);
 
 
    // Unwrap params using React.use()
@@ -106,6 +112,30 @@ export default function Driver({params}) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+  
+    // Validate "From" and "To" fields
+    const validateLocation = (location) => {
+      if (!location || location.length < 8) {
+        return false; // Must be at least 8 characters long
+      }
+      const isValidFormat = /^.+,.+$/.test(location); // At least one character before and after a single comma
+      return isValidFormat;
+    };
+  
+    if (!validateLocation(formData.from)) {
+      setModalMessage("The 'From' field must be at least 8 characters long and contain a single comma separating two parts.");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
+  
+    if (!validateLocation(formData.to)) {
+      setModalMessage("The 'To' field must be at least 8 characters long and contain a single comma separating two parts.");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
+  
     // Filter formData to only include non-empty fields and valid values
     const filteredData = Object.fromEntries(
       Object.entries(formData).filter(([key, value]) => {
@@ -121,41 +151,43 @@ export default function Driver({params}) {
     // Safeguards for truckID and journeyID
     if (!truckID) {
       console.error("Truck ID is missing!");
-      alert("Please select a valid truck before submitting.");
+      setModalMessage("Please select a valid truck before submitting.");
+      toggleModal();
+      setIsLoading(false);
       return;
     }
-
-  
-
   
     try {
       // Log data being sent
       console.log("Filtered data:", filteredData);
   
       const response = await axios.post(`/api/journey`, filteredData);
-
+  
       const payload = {
-        current_journey: (response.data?.newJourney?._id),
+        current_journey: response.data?.newJourney?._id,
       };
-
+  
       const responseTruck = await axios.patch(`/api/trucks/${truckID}`, payload);
       const responseDriver = await axios.patch(`/api/employee/${driverID}`, payload);
   
       console.log("Journey added:", response.data);
       console.log("Truck updated:", responseTruck.data);
-      console.log("Truck updated:", responseDriver.data);
+      console.log("Driver updated:", responseDriver.data);
   
       // Reset form
       setFormData(defaultForm);
-      setIsLoading(false)
+      setIsLoading(false);
   
-      alert("Journey added successfully!");
+      setModalMessage("Journey added successfully!");
+      toggleModal();
     } catch (error) {
-      setIsLoading(false)
+      setIsLoading(false);
       console.error("Error adding journey:", error);
-      alert("Failed to add journey. Please try again.");
+      setModalMessage("Failed to add journey. Please try again.");
+      toggleModal();
     }
   };
+  
   
 
   function getTruck(thisTruck) {
@@ -207,183 +239,203 @@ export default function Driver({params}) {
 
           <div className="mx-auto mt-4 text-black">
           <form onSubmit={handleSubmit}>
-            <div className="md:grid md:grid-cols-2 gap-6">
-              {/* Row 1 */}
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="departure" className="block text-sm font-medium text-gray-700">
-                  Departure Date
-                </label>
-                <input
-                  type="date"
-                  id="departure"
-                  name="departure"
-                  value={formData.departure}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                />
-              </div >
-              <div>
-                <label htmlFor="arrival" className="block text-sm font-medium text-gray-700">
-                  Arrival Date
-                </label>
-                <input
-                  type="date"
-                  id="arrival"
-                  name="arrival"
-                  value={formData.arrival}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                />
-              </div>
+  <div className="md:grid md:grid-cols-2 gap-6">
+    {/* Row 1 */}
+    <div className="mb-2 lg:mb-0">
+      <label htmlFor="departure" className="block text-sm font-medium text-gray-700">
+        Departure Date
+      </label>
+      <input
+        type="date"
+        id="departure"
+        name="departure"
+        value={formData.departure}
+        onChange={handleChange}
+        required
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      />
+    </div>
+    <div>
+      <label htmlFor="arrival" className="block text-sm font-medium text-gray-700">
+        Arrival Date
+      </label>
+      <input
+        type="date"
+        id="arrival"
+        name="arrival"
+        value={formData.arrival}
+        onChange={handleChange}
+        required
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      />
+    </div>
 
-              {/* Row 2 */}
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
-                  Driver
-                </label>
-                <select
-                  id="driver"
-                  name="driver"
-                  value={formData.name}
-                  onChange={(e) => {
-                    const selectedTruckID = e.target.value; // Get the selected truck ID
-                    getDriver(selectedTruckID); // Call getTruck with the selected ID
-                    handleDriverChange(e); // Maintain your existing functionality
-                  }}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                >
-                  {/* <option value="" disabled>Select Driver</option> */}
-                  {drivers.map((driver, index) => (
-                    <option key={driver.id || index} value={JSON.stringify({ name: driver.name, id: driver._id })}>
-                      {driver.name}
-                    </option>
-                  ))}
-                </select>
+    {/* Row 2 */}
+    <div className="mb-2 lg:mb-0">
+      <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
+        Driver
+      </label>
+      <select
+        id="driver"
+        name="driver"
+        value={formData.name}
+        onChange={(e) => {
+          const selectedTruckID = e.target.value;
+          getDriver(selectedTruckID);
+          handleDriverChange(e);
+        }}
+        required
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      >
+        <option value="" disabled>Select Driver</option>
+        {drivers.map((driver, index) => (
+          <option key={driver.id || index} value={JSON.stringify({ name: driver.name, id: driver._id })}>
+            {driver.name}
+          </option>
+        ))}
+      </select>
+    </div>
 
-              </div>
+    <div className="mb-2 lg:mb-0">
+      <label htmlFor="truck" className="block text-sm font-medium text-gray-700">
+        Truck
+      </label>
+      <select
+        id="truck"
+        name="truck"
+        value={formData.plate_id}
+        onChange={(e) => {
+          const selectedTruckID = e.target.value;
+          getTruck(selectedTruckID);
+          handleTruckChange(e);
+        }}
+        required
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      >
+        <option value="" disabled>Select Truck</option>
+        {trucks.map((truck, index) => (
+          <option key={truck.id || index} value={JSON.stringify({ name: truck.name, plate_id: truck.plate_id })}>
+            {truck.name}
+          </option>
+        ))}
+      </select>
+    </div>
 
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
-                  Truck
-                </label>
-                <select
-                  id="truck"
-                  name="truck"
-                  value={formData.plate_id}
-                  onChange={(e) => {
-                    const selectedTruckID = e.target.value; // Get the selected truck ID
-                    getTruck(selectedTruckID); // Call getTruck with the selected ID
-                    handleTruckChange(e); // Maintain your existing functionality
-                  }}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                >
-                  {/* <option value="" disabled>Select Truck</option> */}
-                  {trucks.map((truck, index) => (
-                    <option onClick={(e)=>getTruck(e, truck.id)} key={truck.id || index} value={JSON.stringify({ name: truck.name, plate_id: truck.plate_id })}>
-                      {truck.name}
-                    
-                    </option>
-                  ))}
-                </select>
-              </div>
+    {/* Row 3 */}
+    <div className="mb-2 lg:mb-0">
+      <label htmlFor="from" className="block text-sm font-medium text-gray-700">
+        From
+      </label>
+      <input
+        type="text"
+        id="from"
+        name="from"
+        value={formData.from}
+        onChange={handleChange}
+        required
+        maxLength="40" 
+        placeholder="City/Town, Country"
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      />
+    </div>
+    <div className="mb-2 lg:mb-0">
+      <label htmlFor="to" className="block text-sm font-medium text-gray-700">
+        To
+      </label>
+      <input
+        type="text"
+        id="to"
+        name="to"
+        maxLength="40" 
+        value={formData.to}
+        onChange={handleChange}
+        required
+        placeholder="City/Town, Country"
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      />
+      
+    </div>
 
-              {/* Row 3 */}
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="from" className="block text-sm font-medium text-gray-700">
-                  From
-                </label>
-                <input
-                  type="text"
-                  id="from"
-                  name="from"
-                  value={formData.from}
-                  onChange={handleChange}
-                  placeholder="City/Town, Country"
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                />
-              </div>
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="to" className="block text-sm font-medium text-gray-700">
-                  To
-                </label>
-                <input
-                  type="text"
-                  id="to"
-                  name="to"
-                  value={formData.to}
-                  onChange={handleChange}
-                  placeholder="City/Town, Country"
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                />
-              </div>
+    {/* Row 4 */}
+    <div className="mb-2 lg:mb-0">
+      <label htmlFor="distance" className="block text-sm font-medium text-gray-700">
+        Distance (km)
+      </label>
+      <input
+        type="number"
+        id="distance"
+        name="distance"
+        max="1000000" 
+        value={formData.distance}
+        onChange={(e) => {
+          if (e.target.value.length <= 7) {
+            handleChange(e); // Allow only up to 7 digits
+          }
+        }}
+        required
+        placeholder="Enter distance in km"
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      />
+    </div>
+    <div className="mb-2 lg:mb-0">
+      <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+        Status
+      </label>
+      <select
+        id="status"
+        name="status"
+        value={formData.status}
+        onChange={handleChange}
+        required
+        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+      >
+        <option value="">Select Status</option>
+        <option value="Departure">Departure</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Breakdown">Breakdown</option>
+        <option value="Arrived">Arrived</option>
+      </select>
+    </div>
 
-              {/* Row 4 */}
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="distance" className="block text-sm font-medium text-gray-700">
-                  Distance (km)
-                </label>
-                <input
-                  type="number"
-                  id="distance"
-                  name="distance"
-                  value={formData.distance}
-                  onChange={handleChange}
-                  placeholder="Enter distance in km"
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                />
-              </div>
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                  Status
-                </label>
-                <select
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                >
-                  <option value="">Select Status</option>
-                  <option value="Departure">Departure</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Breakdown">Breakdown</option>
-                  <option value="Arrived">Arrived</option>
-                </select>
-              </div>
+    {/* Row 5 */}
+    <div className="col-span-2">
+      <div className="flex items-center space-x-4">
+        <label htmlFor="cargo" className="text-sm font-medium text-gray-700">
+          Cargo
+        </label>
+      </div>
+      <div className="mt-4 lg:w-2/5">
+        <input
+          type="text"
+          id="cargoDetails"
+          name="cargo"
+          value={formData.cargo}
+          onChange={handleChange}
+          required
+          placeholder="Enter cargo details"
+          className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
+        />
+      </div>
+    </div>
+  </div>
 
-              {/* Row 5 */}
-              <div className="col-span-2">
-                <div className="flex items-center space-x-4">
-  
-                  <label htmlFor="cargo" className="text-sm font-medium text-gray-700">
-                    Cargo
-                  </label>
-                </div>
+  <button
+    type="submit"
+    className="mt-6 px-4 py-2 bg-[#AC0000] text-white font-bold rounded shadow hover:bg-[#8A0000] focus:outline-none"
+  >
+    Save Journey
+  </button>
+</form>
 
-
-                  <div className="mt-4 lg:w-2/5">
-                    <input
-                      type="text"
-                      id="cargoDetails"
-                      name="cargo"
-                      value={formData.cargo}
-                      onChange={handleChange}
-                      placeholder="Enter cargo details"
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                    />
-                  </div>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="mt-6 px-4 py-2 bg-[#AC0000] text-white font-bold rounded shadow hover:bg-[#8A0000] focus:outline-none"
-            >
-              Save Journey
-            </button>
-          </form>
         </div>
-       
+        <Modal
+          isOpen={isModalOpen}
+          toggleModal={toggleModal}
+          type={modalType}
+          message={modalMessage}
+          color="gray"
+          onCancel={toggleModal}
+        />
       </Layout>
     </div>
   );

@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import Modal from "@/components/modal";
 
 
 
@@ -28,6 +29,11 @@ export default function Driver({params}) {
   const [cargoEnabled, setCargoEnabled] = useState(null);
   const [formData, setFormData] = useState(defaultForm);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("error");
+  const [modalMessage, setModalMessage] = useState("");
+
+  const toggleModal = () => setModalOpen(!isModalOpen);
 
   const router  = useRouter();
 
@@ -118,6 +124,36 @@ export default function Driver({params}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate "From" and "To" fields
+    const validateLocation = (location) => {
+      if (!location || location.length < 8) {
+        return false; // Must be at least 8 characters long
+      }
+      const isValidFormat = /^.+,.+$/.test(location); // At least one character before and after a single comma
+      return isValidFormat;
+    };
+  
+    if (!validateLocation(formData.from)) {
+      setModalMessage("The 'From' field must be at least 8 characters long and contain a single comma separating two parts.");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
+  
+    if (!validateLocation(formData.to)) {
+      setModalMessage("The 'To' field must be at least 8 characters long and contain a single comma separating two parts.");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.driver == "" || formData.truck==""){
+      setModalMessage("Please fill in the driver and truck fields.");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
   
     setIsLoading(true)
     // Filter formData to only include non-empty fields and valid values
@@ -272,6 +308,7 @@ export default function Driver({params}) {
                   type="text"
                   id="from"
                   name="from"
+                  maxLength="40" 
                   value={formData.from}
                   onChange={handleChange}
                   placeholder="City/Town, Country"
@@ -286,6 +323,7 @@ export default function Driver({params}) {
                   type="text"
                   id="to"
                   name="to"
+                  maxLength="40" 
                   value={formData.to}
                   onChange={handleChange}
                   placeholder="City/Town, Country"
@@ -302,8 +340,14 @@ export default function Driver({params}) {
                   type="number"
                   id="distance"
                   name="distance"
+                  max="1000000" 
                   value={formData.distance}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 7) {
+                      handleChange(e); // Allow only up to 7 digits
+                    }
+                  }}
+                  required
                   placeholder="Enter distance in km"
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
                 />
@@ -359,7 +403,14 @@ export default function Driver({params}) {
             </button>
           </form>
         </div>
-       
+        <Modal
+                isOpen={isModalOpen}
+                toggleModal={toggleModal}
+                type={modalType}
+                message={modalMessage}
+                color="gray"
+                onCancel={toggleModal}
+              />
       </Layout>
     </div>
   );
