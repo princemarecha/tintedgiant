@@ -6,6 +6,7 @@ import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Modal from "@/components/Modal";
 
 export default function MyComponent({params}) {
   const resolvedParams = use(params); // Unwrapping the promise
@@ -74,6 +75,11 @@ export default function MyComponent({params}) {
   const [photos, setPhotos] = useState([]) ;
   const [loading, setLoading] = useState(false) ;
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("error");
+  const [modalMessage, setModalMessage] = useState("");
+
+  const toggleModal = () => setModalOpen(!isModalOpen);
 
   // Handle input change
   const handleChange = (e) => {
@@ -137,6 +143,84 @@ export default function MyComponent({params}) {
 
   // Submit the form
   const handleSubmit = async () => {
+
+    const validateFieldLength = (field, length, exact = true) => {
+      console.log(field.length)
+      if (exact) return field && field.length === length;
+      return field && field.length >= length.min && field.length <= length.max;
+  };
+
+
+
+
+  if (!formData.date) {
+      setModalMessage("Please put date of occurence");
+      toggleModal()
+      return;
+  }
+
+
+  // Validate individual fields
+  if (formData.reference && !validateFieldLength(formData.reference, 13)) {
+      setModalMessage("Reference must be exactly 13 characters long.");
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.transporter, { min: 4, max: 25 }, false)) {
+      setModalMessage("Transporter must be between 4 and 25 characters long.");
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.exporter, { min: 4, max: 25 }, false)) {
+      setModalMessage("Exporter must be between 4 and 25 characters long.");
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.importer, { min: 4, max: 25 }, false)) {
+      setModalMessage("Importer must be between 4 and 25 characters long.");
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.horse_plate, 8)) {
+      setModalMessage("Horse Plate must be exactly 8 characters long.");
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.trailer_plate, 8)) {
+      setModalMessage("Trailer Plate must be exactly 8 characters long.");
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.BOE, 6)) {
+      setModalMessage("BOE must be exactly 6 characters long." + formData.BOE);
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.invoice, 10)) {
+      setModalMessage("Invoice must be exactly 10 characters long.");
+      toggleModal()
+      return;
+  }
+
+  if (!formData.duty|| formData.duty > 1000000) {
+      setModalMessage("Duty must not be empty or exceed 1 000 000.");
+      toggleModal()
+      return;
+  }
+
+  if (!validateFieldLength(formData.cargo, { min: 2, max: 25 }, false)) {
+      setModalMessage("Cargo must be between 2 and 25 characters long.");
+      toggleModal()
+      return;
+  }
+
 
     setIsLoading(true)
     // Prepare the payload
@@ -359,7 +443,7 @@ export default function MyComponent({params}) {
             </label>
             <input
               id="BOE"
-              type="number"
+              type="text"
               name="BOE"
               value={formData.BOE}
               onChange={handleChange}
@@ -551,7 +635,14 @@ export default function MyComponent({params}) {
           />
         </button>
       </div>
-
+     <Modal
+                    isOpen={isModalOpen}
+                    toggleModal={toggleModal}
+                    type={modalType}
+                    message={modalMessage}
+                    color="gray"
+                    onCancel={toggleModal}
+                  />
       </Layout>
     </div>
   );
