@@ -135,6 +135,20 @@ export default function Driver({params}) {
       setIsLoading(false);
       return;
     }
+
+    if (formData.driver == "" || formData.truck=="" || formData.cargo==""){
+      setModalMessage("Please fill in the driver and truck fields.");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.cargo.length <=2){
+      setModalMessage("Cargo should be more than 2 letters long");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
   
     // Filter formData to only include non-empty fields and valid values
     const filteredData = Object.fromEntries(
@@ -409,6 +423,7 @@ export default function Driver({params}) {
           type="text"
           id="cargoDetails"
           name="cargo"
+          maxLength="20" 
           value={formData.cargo}
           onChange={handleChange}
           required

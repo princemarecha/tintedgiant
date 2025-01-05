@@ -148,8 +148,15 @@ export default function Driver({params}) {
       return;
     }
 
-    if (formData.driver == "" || formData.truck==""){
+    if (formData.driver == "" || formData.truck=="" || formData.cargo==""){
       setModalMessage("Please fill in the driver and truck fields.");
+      toggleModal();
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.cargo.length <=2){
+      setModalMessage("Cargo should be more than 2 letters long");
       toggleModal();
       setIsLoading(false);
       return;
@@ -386,6 +393,7 @@ export default function Driver({params}) {
                       type="text"
                       id="cargoDetails"
                       name="cargo"
+                      maxLength="20" 
                       value={formData.cargo}
                       onChange={handleChange}
                       placeholder="Enter cargo details"
