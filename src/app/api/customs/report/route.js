@@ -6,23 +6,59 @@ export async function GET(req, context) {
     try {
         const { db } = await connectToDatabase();
 
-        // Get the current date and time
+        // Parse the query parameters
+        const { searchParams } = new URL(req.url);
+        const fromDate = searchParams.get('from');
+        const toDate = searchParams.get('to');
+
+        // Validate the date range
+        if (!fromDate || !toDate) {
+            return NextResponse.json(
+                { error: "Both 'from' and 'to' date parameters are required" },
+                { status: 400 }
+            );
+        }
+
+        const from = new Date(fromDate);
+        const to = new Date(toDate);
+
+        // Ensure the "to" date includes the entire day
+        to.setHours(23, 59, 59, 999);
+
+        // Check for invalid date formats
+        if (isNaN(from) || isNaN(to)) {
+            return NextResponse.json(
+                { error: "Invalid date format. Please use 'YYYY-MM-DD'" },
+                { status: 400 }
+            );
+        }
+
+        // Query the database with the date range using createdAt
+        const data = await db
+            .collection("customs")
+            .find({
+                createdAt: {
+                    $gte: from,
+                    $lte: to,
+                },
+            })
+            .toArray();
+
+        if (!data || data.length === 0) {
+            return NextResponse.json(
+                { error: "No data found for the given date range" },
+                { status: 404 }
+            );
+        }
+
+        // Get the current date for file naming
         const currentDate = new Date();
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         const monthIndex = currentDate.getMonth();
         const monthName = monthNames[monthIndex];
-        
         const day = currentDate.getDate();
-        const year = currentDate.getFullYear();          
-
+        const year = currentDate.getFullYear();
         const formattedDate = `${day}/${monthName}/${year}`;
-
-
-        // Fetch all records from the collection
-        const data = await db.collection("customs").find().toArray();
-        if (!data) {
-            return NextResponse.json({ error: "No data found for the given reference" }, { status: 404 });
-        }
 
         // Create a new Excel workbook
         const workbook = new ExcelJS.Workbook();
@@ -51,7 +87,6 @@ export async function GET(req, context) {
             },
         ];
 
-
         // Style header row
         worksheet.getRow(1).eachCell((cell) => {
             cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; // White text
@@ -61,7 +96,7 @@ export async function GET(req, context) {
                 fgColor: { argb: 'FF000000' }, // Black background
             };
         });
-        
+
         // Add rows dynamically from the data object
         data.forEach((record) => {
             const row = {};
@@ -70,7 +105,7 @@ export async function GET(req, context) {
             });
             worksheet.addRow(row);
         });
-        
+
         // Write the workbook to a buffer
         const buffer = await workbook.xlsx.writeBuffer();
 
@@ -78,7 +113,7 @@ export async function GET(req, context) {
         return new NextResponse(buffer, {
             headers: {
                 'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition': `attachment; filename= Customs Clearance as at ${formattedDate}.xlsx`,
+                'Content-Disposition': `attachment; filename=Customs_Clearance_${fromDate}_to_${toDate}.xlsx`,
             },
         });
     } catch (error) {

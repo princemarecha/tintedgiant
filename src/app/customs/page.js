@@ -5,10 +5,16 @@ import Layout from "@/components/Layout";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import ReportModal from "@/components/ReportModal";
 
 export default function Employee() {
   const [isLoading, setIsLoading] = useState(false);
-
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [modalType, setModalType] = useState("delete");
+    const [modalMessage, setModalMessage] = useState("");
+  
+    const toggleModal = () => setModalOpen(!isModalOpen);
+ 
   const handleDownload = async () => {
     setIsLoading(true);
     try {
@@ -78,7 +84,7 @@ export default function Employee() {
 
               
               <div
-                onClick={handleDownload}
+                onClick={toggleModal}
                 className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800 opacity-75 cursor-pointer"
               >
                 <Image
@@ -96,6 +102,14 @@ export default function Employee() {
               </div>
           </div>
         </div>
+        <ReportModal
+              isOpen={isModalOpen}
+              toggleModal={toggleModal}
+              type={modalType}
+              message={modalMessage}
+              color="gray"
+              onCancel={toggleModal}
+            />
       </Layout>
     </div>
   );
