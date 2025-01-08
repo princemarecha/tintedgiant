@@ -125,9 +125,10 @@ export default function ReportModal({
               </div>
               {!isDateValid() && fromDate && toDate && (
                 <p className="text-white text-sm">
-                  "From" date must be earlier than or equal to "To" date.
+                  &quot;From&quot; date must be earlier than or equal to &quot;To&quot; date.
                 </p>
               )}
+
             </div>
           </div>
 

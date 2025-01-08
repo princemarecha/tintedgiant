@@ -126,7 +126,7 @@ export default function Sidebar() {
 
   {/* Truck Management */}
   <li>
-    <a
+    <Link
       href="/trucks"
       className={`block px-4 py-2 rounded ${
         currentPath.startsWith("/trucks")
@@ -142,12 +142,12 @@ export default function Sidebar() {
       className="transition duration-75 group-hover:opacity-80" // Apply hover effect, for example, reduce opacity
     />
       <span className="ms-3">Truck Management</span>
-    </a>
+    </Link>
   </li>
 
   {/* Expenses Management */}
   <li>
-    <a
+    <Link
       href="/expenses"
       className={`block px-4 py-2 rounded ${
         currentPath.startsWith("/expenses")
@@ -163,12 +163,12 @@ export default function Sidebar() {
       className="transition duration-75 group-hover:opacity-80" // Apply hover effect, for example, reduce opacity
     />
       <span className="ms-3">Expenses Management</span>
-    </a>
+    </Link>
   </li>
 
   {/* Journey and Tracking */}
   <li>
-    <a
+    <Link
       href="/journeys"
       className={`block px-4 py-2 rounded ${
         currentPath.startsWith("/journeys")
@@ -184,12 +184,12 @@ export default function Sidebar() {
       className="transition duration-75 group-hover:opacity-80" // Apply hover effect, for example, reduce opacity
     />
       <span className="ms-3">Journey and Tracking</span>
-    </a>
+    </Link>
   </li>
 
   {/* Customs Clearance */}
   <li>
-    <a
+    <Link
       href="/customs"
       className={`block px-4 py-2 rounded ${
         currentPath.startsWith("/customs")
@@ -205,12 +205,12 @@ export default function Sidebar() {
       className="transition duration-75 group-hover:opacity-80" // Apply hover effect, for example, reduce opacity
     />
       <span className="ms-3">Customs Clearance</span>
-    </a>
+    </Link>
   </li>
 
   {/* My Account */}
   <li>
-    <a
+    <Link
       href="/my_account"
       className={`block px-4 py-2 rounded ${
         currentPath.startsWith("/my_account")
@@ -227,7 +227,7 @@ export default function Sidebar() {
       className="transition duration-75 group-hover:opacity-80" // Apply hover effect, for example, reduce opacity
     />
       <span className="ms-3">My Account</span>
-    </a>
+    </Link>
   </li>
 </ul>
       </div>
