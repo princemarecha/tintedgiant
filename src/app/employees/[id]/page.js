@@ -7,7 +7,7 @@ import axios from "axios";
 import { useParams,useRouter } from "next/navigation";
 import Link from "next/link";
 import { CldImage } from "next-cloudinary";
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 
 
 async function fetchEmployeeData(empID) {

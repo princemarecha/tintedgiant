@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 
 export default function MyComponent({ params }) {
   const router = useRouter();

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Layout from "@/components/Layout";
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 import Image from "next/image";
 
 export default function AddEmployee() {

@@ -6,7 +6,7 @@ import Layout from "@/components/Layout";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 
 export default function Manage() {
   const [rows, setRows] = useState([]);

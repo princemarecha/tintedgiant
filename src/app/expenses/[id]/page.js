@@ -6,7 +6,7 @@ import axios from "axios";
 import { useParams,useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import Modal from "@/components/modal";
+import Modal from "@/components/Modal";
 
 export default function Expense() {
   const { id } = useParams();
