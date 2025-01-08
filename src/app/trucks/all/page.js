@@ -23,7 +23,7 @@ export default function ViewTrucks() {
           page,
           limit: itemsPerPage,
           search,
-          make, // Pass the selected make to the backend
+          make, // Pass the selected make to the backend side
         },
       });
       setTrucks(response.data.trucks);
