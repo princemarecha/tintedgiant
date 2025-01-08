@@ -151,6 +151,11 @@ const fetchExpenses = async (e, currency) => {
   }
 };
 
+function getDate(){
+  const now = new Date();
+  return now.getFullYear()
+}
+
 // Prepare combined data (expenses + placeholders)
 const displayData = [
   ...expenses,
@@ -235,7 +240,7 @@ const displayData = [
             <div className="col-span-4 col-span-full lg:col-span-8 shadow-lg p-4 rounded-lg">
               <div className="flex justify-between mx-4">
                   <p className="text-[#AC0000] mx-6 mt-4 text-xl font-black">Journeys</p>
-                  <p className="text-[#AC0000] mx-6 mt-4 text-lg font-black">2024</p>
+                  <p className="text-[#AC0000] mx-6 mt-4 text-lg font-black">{getDate()}</p>
               </div>
           
             <hr className=""/>
@@ -282,7 +287,7 @@ const displayData = [
                 <div className="appendDown">
                   <div>
                     <p className="text-white mx-2 xl:mx-6 mt-4 text-xs font-semibold">Year</p>
-                    <p className="text-white mx-2 xl:mx-6 text-md font-black">2024</p>
+                    <p className="text-white mx-2 xl:mx-6 text-md font-black">{getDate()}</p>
                   </div>
 
                   <div>

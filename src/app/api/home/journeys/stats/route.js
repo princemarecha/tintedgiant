@@ -52,8 +52,17 @@ export async function GET(req) {
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
     ];
 
-    console.log("Initializing journey counts for 12 months...");
-    const journeys = months.reduce((acc, month) => {
+    // Dynamically reorder months based on the current month
+    const currentMonthIndex = now.getMonth(); // 0-based index for the current month
+    const orderedMonths = [
+      ...months.slice(currentMonthIndex + 1), // Months after the current month
+      ...months.slice(0, currentMonthIndex + 1), // Months up to and including the current month
+    ];
+
+    console.log("Ordered Months:", orderedMonths);
+
+    // Initialize journey counts based on ordered months
+    const journeys = orderedMonths.reduce((acc, month) => {
       acc[month] = 0; // Default count is 0
       return acc;
     }, {});
