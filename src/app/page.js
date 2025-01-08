@@ -24,7 +24,7 @@ const [selectedCurrency, setSelectedCurrency] = useState("USD")
 useEffect(() => {
   const fetchJourneys = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/home/journeys");
+      const response = await fetch("/api/home/journeys");
       if (!response.ok) {
         throw new Error("Failed to fetch journeys");
       }
@@ -44,7 +44,7 @@ useEffect(() => {
   // Fetch data from the API endpoint
   const fetchChartData = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/home/journeys/stats');
+      const response = await fetch('/api/home/journeys/stats');
       const result = await response.json();
 
       if (result.journeys) {
@@ -91,7 +91,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchExpenses = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/home/expenses");
+      const response = await fetch("/api/home/expenses");
       const data = await response.json();
       const expensesArray = Object.entries(data.expenses || {}).map(
         ([name, amount]) => ({ name, amount })
@@ -110,7 +110,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchSummary = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/home/summary");
+      const response = await fetch("/api/home/summary");
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
@@ -137,7 +137,7 @@ const fetchExpenses = async (e, currency) => {
   e.preventDefault();
   
   try {
-    const response = await fetch(`http://localhost:3000/api/home/expenses?currency=${currency}`);
+    const response = await fetch(`/api/home/expenses?currency=${currency}`);
     const data = await response.json();
     const expensesArray = Object.entries(data.expenses || {}).map(
       ([name, amount]) => ({ name, amount })
