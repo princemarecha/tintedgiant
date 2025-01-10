@@ -8,6 +8,7 @@ import Link from "next/link";
 import { CldImage } from "next-cloudinary";
 import BarChart from "@/components/Bar";
 
+
 export default function Dashboard() {
 
 const [journeys, setJourneys] = useState([]);
@@ -20,6 +21,7 @@ const [error, setError] = useState(null); // State to handle errors
 const [active, setActive] = useState(0)
 const [expenseData, setExpenseData] = useState([])
 const [selectedCurrency, setSelectedCurrency] = useState("USD")
+
  
 useEffect(() => {
   const fetchJourneys = async () => {
@@ -161,6 +163,7 @@ const displayData = [
   ...expenses,
   ...Array(Math.max(0, maxExpenses - expenses.length)).fill(null),
 ].slice(0, maxExpenses);
+
 
   return (
     <div className="bg-white h-screen relative">
