@@ -47,7 +47,7 @@ export default function Manage() {
   };
 
   // Handle page change for pagination
-  const handlePageChange = (page) => {
+  const handlePageChange = (page) => { 
     setCurrentPage(page);
     fetchExpenses(page, searchQuery, expenseType);
   };

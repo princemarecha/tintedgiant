@@ -15,43 +15,71 @@ export default function Manage() {
   const [loading, setLoading] = useState(true); // State to track loading
   const [isLoading, setIsLoading] = useState(true);
 
+  const [cargoTypes, setCargoTypes] = useState([]);
+  const [selectedCargo, setSelectedCargo] = useState("");
+ 
   const router = useRouter();
 
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Total pages returned from the server
 
-  // Fetch journeys from the API
-  useEffect(() => {
-    const fetchJourneys = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`/api/journey?page=${currentPage}`);
-        const { journeys, pagination } = response.data;
+  const fetchJourneys = async (page = 1, search = "", type = "") => {
+    setLoading(true);
+    try {
+      const response = await axios.get("/api/journey", {
+        params: { page, search, type },
+      });
+  
+      const data = response.data;
+  
+      // Update state with data from the API
+      setJourneys(data.journeys || []);
+      setTotalPages(data.pagination?.totalPages || 1); // Adjust to match backend's totalPages structure
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching journeys:", error);
+      setLoading(false);
+    }
+  };
 
-        // Update state with data from the API
-        setJourneys(journeys || []);
-        setTotalPages(pagination?.totalPages || 1);
-        setLoading(false);
+  //cargo types
+  useEffect(() => {
+    // Fetch cargo types from the backend
+    const fetchCargoTypes = async () => {
+      try {
+        const response = await axios.get("/api/journey/cargo-types"); // Replace with your actual endpoint
+        setCargoTypes(response.data.cargoTypes);
       } catch (error) {
-        console.error("Error fetching journeys:", error);
-        setLoading(false);
+        console.error("Error fetching cargo types:", error);
       }
     };
 
-    fetchJourneys();
+    fetchCargoTypes();
+  }, []);
+
+  // Fetch journeys from the API
+  useEffect(() => {
+
+    fetchJourneys(); 
     setIsLoading(false);
   }, [currentPage]); // Re-fetch data when the current page changes
 
   // Handle search input change
   const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
+    const query = e.target.value;
+    setSearchQuery(query);
+    setCurrentPage(1); // Reset to page 1
+    fetchJourneys(1, query, expenseType);
   };
 
   // Handle journey type dropdown change
   const handleTypeChange = (e) => {
-    setExpenseType(e.target.value);
-  };
+    const selectedType = e.target.value;
+    setExpenseType(selectedType);
+    setCurrentPage(1); // Reset to page 1
+    fetchJourneys(1, searchQuery, selectedType);
+  }; 
 
   // Handle pagination controls
   const handlePrevious = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -137,18 +165,21 @@ export default function Manage() {
 
           {/* Journey Type Dropdown */}
           <div className="flex flex-col col-span-12 md:col-span-4 lg:col-span-3 md:ml-2 lg:ml-0 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l ">
-            <select
-              id="dropdown"
-              className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
-              onChange={handleTypeChange}
-              value={expenseType}
-            >
-              <option value="" defaultValue>
-                Journey Type
-              </option>
-              <option value="Regular">Regular</option>
-              <option value="Other">Other</option>
-            </select>
+          <select
+        id="dropdown"
+        className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
+        onChange={handleTypeChange}
+        value={selectedCargo}
+      >
+        <option value="" defaultValue>
+          Cargo
+        </option>
+        {cargoTypes.map((cargo, index) => (
+          <option key={index} value={cargo}>
+            {cargo}
+          </option>
+        ))}
+      </select>
           </div>
         </div>
 

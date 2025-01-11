@@ -44,22 +44,38 @@ export async function GET(req) {
     // Establish connection
     await connectToDatabase();
 
-    // Parse query parameters for pagination
+    // Parse query parameters
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") || "1", 10); // Default to page 1 if not provided
+    const search = searchParams.get("search") || ""; // Default to an empty string
+    const type = searchParams.get("type") || ""; // Default to an empty string
     const itemsPerPage = 4; // Items per page
 
     // Calculate the number of items to skip
     const skip = (page - 1) * itemsPerPage;
 
-    // Fetch paginated journeys sorted from latest to oldest
-    const journeys = await Journey.find({})
+    // Build the query dynamically
+    const query = {};
+    if (search) {
+      query.$or = [
+        { from: { $regex: search, $options: "i" } },       // Case-insensitive search in 'from'
+        { to: { $regex: search, $options: "i" } },         // Case-insensitive search in 'to'
+        { "driver.name": { $regex: search, $options: "i" } } // Case-insensitive search in 'driver.name'
+      ];
+    }
+    if (type) {
+      query.cargo = { $regex: type, $options: "i" }; // Match 'type' against the 'cargo' field
+    }
+
+
+    // Fetch paginated results
+    const journeys = await Journey.find(query)
       .sort({ _id: -1 }) // Sort in descending order by ID
       .skip(skip)
       .limit(itemsPerPage);
 
-    // Get the total count of journeys for pagination metadata
-    const totalJourneys = await Journey.countDocuments();
+    // Get the total count of documents matching the query
+    const totalJourneys = await Journey.countDocuments(query);
 
     // Return response with pagination info
     return NextResponse.json({
