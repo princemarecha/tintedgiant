@@ -383,7 +383,7 @@ const displayData = [
           <p className="text-white mx-6 mt-4 text-lg font-semibold">Top Truck</p>
           <div className="grid grid-cols-3">
             <p className="text-white mx-6 text-xs">{summary?.topTruck?.name?.name}</p>
-            <p className="text-white mx-6 text-xs">{summary?.trips} Trips</p>
+            <p className="text-white mx-6 text-xs">{summary?.topTruck?.trips} Trips</p>
             <p className="text-white mx-6 text-xs">{summary?.topTruck?.kmTravelled} km travelled</p>
           </div>
         </div>
