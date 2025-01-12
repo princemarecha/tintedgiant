@@ -15,6 +15,9 @@ export default function ViewTrucks() {
   const [make, setMake] = useState(""); // State for selected make
   const itemsPerPage = 4; // Items to show per page
 
+  const [makeDrop, setmakeDrop] = useState([]);
+  const [selectedMake, setSelectedMake] = useState("");
+
   // Fetch truck data
   const fetchEmployees = async (page = 1, search = "", make = "") => {
     try {
@@ -32,6 +35,20 @@ export default function ViewTrucks() {
       console.error("Error fetching trucks:", error);
     }
   };
+
+  useEffect(() => {
+    // Fetch make types from the backend
+    const fetchMake = async () => {
+      try {
+        const response = await axios.get("/api/trucks/make"); // Replace with your actual endpoint
+        setmakeDrop(response.data.makeTypes);
+      } catch (error) {
+        console.error("Error fetching make types:", error);
+      }
+    };
+
+    fetchMake();
+  }, []);
 
   useEffect(() => {
     fetchEmployees(currentPage, searchTerm, make);
@@ -107,20 +124,20 @@ export default function ViewTrucks() {
 
             {/* make Dropdown */}
             <div className="flex flex-col col-span-12 md:col-span-4 lg:col-span-3 md:ml-2 lg:ml-0 justify-center h-12 font-bold bg-[#AC0000] mb-4 rounded-l ">
-              <select
+            <select
                 id="dropdown"
                 className="w-full h-full bg-[#AC0000] text-white placeholder-white border-none rounded-l focus:outline-none focus:ring-0 text-xs md:text-md lg:text-lg"
-                onChange={handleMakeChange} // Update make on change
+                onChange={handleMakeChange}
                 value={make}
               >
-                <option value=""  defaultValue>
-                  Select Make...
+                <option value="" defaultValue>
+                  Make
                 </option>
-                <option value="Toyota">Toyota</option>
-                <option value="Mitsubishi">Miysubishi</option>
-                <option value="Nissan">Nissan</option>
-                <option value="Mercedes">Mercedes</option>
-                <option value="Honda">Honda</option>
+                {makeDrop.map((cargo, index) => (
+                  <option key={index} value={cargo}>
+                    {cargo}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

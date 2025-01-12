@@ -224,7 +224,17 @@ export default function Manage() {
                   <div className="col-span-4 bg-[#AC0000] grid grid-cols-10 p-4 rounded-b mt-4 text-md ">
                         <div className="col-span-10 2xl:col-span-2">
                             <p className="2xl:text-lg font-bold">Status</p>
-                            <p className="bg-[#126928] border border-[#126928] text-center text-white p-1 m-1 2xl:w-3/4 rounded">{journey.status}</p>
+                            <p   className={`text-center p-1 m-1 2xl:w-3/4 rounded ${
+                              journey.status === "Arrived"
+                                ? "bg-[#126928] border border-[#126928]"
+                                : journey.status === "Breakdown"
+                                ? "bg-[#AC0000] border border-white"
+                                : journey.status === "In Progress"
+                                ? "bg-white border border-white text-[#AC0000]"
+                                : journey.status === "Departure"
+                                ? "bg-black border border-black text-white"
+                                : ""
+                            }`}>{journey.status}</p>
                         </div>
                         <div  className="col-span-5 2xl:col-span-4">
                             <p className="2xl:text-lg font-bold">Truck</p>
