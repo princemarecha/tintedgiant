@@ -174,7 +174,7 @@ export default function MyComponent({ params }) {
     
           // API call to fetch data
           const response = await fetch(
-            `http://localhost:3000/api/trucks/opCosts?plateId=${plateID}`
+            `/api/trucks/opCosts?plateId=${plateID}`
           );
     
           if (!response.ok) {

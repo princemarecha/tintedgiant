@@ -15,14 +15,14 @@ export async function GET(req, context) {
   const { id } = params;
 
   // Fetch data from the main employee endpoint
-  const employeeResponse = await fetch(`http://localhost:3000/api/employee/${id}`);
+  const employeeResponse = await fetch(`/api/employee/${id}`);
   if (!employeeResponse.ok) {
     return new Response("Employee not found", { status: 404 });
   }
   const employeeData = await employeeResponse.json();
 
   // Fetch operational costs and average costs
-  const operationalResponse = await fetch(`http://localhost:3000/api/employee/opCosts?userId=${id}`);
+  const operationalResponse = await fetch(`/api/employee/opCosts?userId=${id}`);
   if (!operationalResponse.ok) {
     return new Response("Operational costs not found", { status: 404 });
   }
@@ -34,9 +34,9 @@ export async function GET(req, context) {
   const pageWidth = 8.27;
   const pageHeight = 11.69;  
   
-  const logoBase64 = await getBase64ImageFromUrl("http://localhost:3000/images/logo.png");
-  const watermarkBase64 = await getBase64ImageFromUrl("http://localhost:3000/images/watermark.png");
-  const employeeImageBase64 = await getBase64ImageFromUrl(employeeData.photo || "http://localhost:3000/images/placeholder.webp");
+  const logoBase64 = await getBase64ImageFromUrl("/images/logo.png");
+  const watermarkBase64 = await getBase64ImageFromUrl("/images/watermark.png");
+  const employeeImageBase64 = await getBase64ImageFromUrl(employeeData.photo || "/images/placeholder.webp");
 
   const logoWidth = 5; // Width of the watermark (in inches)
   const logoHeight = 4; // Height of the watermark (in inches)

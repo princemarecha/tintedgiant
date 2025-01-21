@@ -119,7 +119,7 @@ export default function MyComponent({ params }) {
 
         // API call to fetch data
         const response = await fetch(
-          `http://localhost:3000/api/employee/opCosts?userId=${empID}`
+          `/api/employee/opCosts?userId=${empID}`
         );
 
         if (!response.ok) {
