@@ -1,61 +1,61 @@
-import NextAuth from "next-auth";
-import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import connectToDatabase from "@/utils/mongo/mongoose";
-import CredentialsProvider from "next-auth/providers/credentials";
+// pages/api/insertEmployee.js
+import connectToDatabase from '@/utils/mongo/mongoose';
+import Employee from '@/models/employees';
+import { NextResponse } from 'next/server';
 
-export default NextAuth({
-  // Configure providers
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const { email, password } = credentials;
-
-        // Connect to the database
-        await connectToDatabase();
-
-        // Use your existing User model
-        const User = mongoose.model("User");
-
-        // Find user and verify credentials
-        const user = await User.findOne({ email });
-        if (user && (await user.verifyPassword(password))) {
-          return {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-          };
-        }
-        return null;
-      },
-    }),
-  ],
-
-  // Use the MongoDB adapter with Mongoose connection
-  adapter: MongoDBAdapter(
-    connectToDatabase().then((mongoose) => mongoose.connection.getClient())
-  ),
-
-  session: {
-    strategy: "jwt",
-  },
-
-  callbacks: {
-    async session({ session, token }) {
-      session.userId = token.id;
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
+export async function GET(request) {
+    try {
+      // Establish connection
+      await connectToDatabase();
+  
+      // Parse query parameters for pagination and search
+      const { searchParams } = new URL(request.url);
+      const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
+      const limit = parseInt(searchParams.get('limit')) || 9; // Default limit to 9 items per page
+      const search = searchParams.get('search') || ''; // Search query (empty by default)
+  
+      // Calculate pagination
+      const skip = (page - 1) * limit;
+  
+      // Build query object with occupation filter for "Driver" or "driver"
+      let query = {
+        occupation: { $regex: /^driver$/i }, // Case-insensitive exact match for "Driver"
+      };
+  
+      // Add search filter
+      if (search) {
+        query.$or = [
+          { name: { $regex: search, $options: "i" } }, // Case-insensitive match on name
+        ];
       }
-      return token;
-    },
-  },
-
-  secret: process.env.NEXTAUTH_SECRET,
-});
+  
+      // Fetch total count for pagination
+      const totalEmployees = await Employee.countDocuments(query);
+  
+      // Fetch paginated employees with only name and id fields
+      const employees = await Employee.find(query)
+        .select("name _id") // Include only the name and _id fields
+        .skip(skip)
+        .limit(limit);
+  
+      // Calculate total pages
+      const totalPages = Math.ceil(totalEmployees / limit);
+  
+      return NextResponse.json({
+        employees,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalEmployees,
+          limit,
+        },
+      });
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      return NextResponse.json(
+        { message: 'Error fetching employees', error: error.message },
+        { status: 500 }
+      );
+    }
+  }
+  

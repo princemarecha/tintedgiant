@@ -1,6 +1,6 @@
 // pages/api/insertTruck.js
 import connectToDatabase from '@/utils/mongo/mongoose';
-import Truck from '@/models/trucks';
+import Truck from '../../../models/trucks';
 import { NextResponse } from 'next/server';
 
 

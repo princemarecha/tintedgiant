@@ -1,5 +1,5 @@
 import connectToDatabase from '@/utils/mongo/mongoose';
-import Truck from '@/models/trucks';
+import Truck from '../../../../models/trucks';
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
