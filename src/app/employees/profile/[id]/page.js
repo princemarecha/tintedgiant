@@ -83,7 +83,7 @@ export default function AddEmployee({params}) {
   
     try {
       // Prepare formData
-      const dataToSubmit = { ...formData, userId: id, name: employee.fullName };
+      const dataToSubmit = { ...formData, userId: id, name: employee.fullName, email: employee.email };
   
       // First, attempt to create the employee (POST)
       const postResponse = await axios.post("/api/employee/", dataToSubmit);
