@@ -10,6 +10,7 @@ export async function POST(request) {
 
     // Parse the JSON body
     const {
+      userId,
       name,
       age,
       current_journey,
@@ -28,6 +29,7 @@ export async function POST(request) {
     } = await request.json();
 
     console.log('Inserting Employee:', {
+      userId,
       name,
       age,
       current_journey,
@@ -47,6 +49,7 @@ export async function POST(request) {
 
     // Create a new Employee instance
     const newEmployee = new Employee({
+      userId,
       name,
       age,
       current_journey,

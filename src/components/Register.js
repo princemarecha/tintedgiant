@@ -10,7 +10,7 @@ export default function RegisterForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const router = useRouter()
+  const router = useRouter() 
 
   const handleRegister = async (e) => {
     e.preventDefault();

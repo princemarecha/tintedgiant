@@ -31,20 +31,25 @@ export async function POST(req) {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+    var occupation = "";
 
     // Create a new user
     const newUser = new User({
       fullName,
       email,
       password: hashedPassword,
+      occupation,
     });
 
     // Save the user to the database
-    await newUser.save();
+    const savedUser = await newUser.save();
 
-    // Respond with success
+    // Respond with success, including the user ID
     return NextResponse.json(
-      { message: "User registered successfully." },
+      {
+        message: "User registered successfully.",
+        userId: savedUser._id,
+      },
       { status: 201 }
     );
   } catch (error) {

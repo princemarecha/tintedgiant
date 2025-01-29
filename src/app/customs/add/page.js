@@ -18,6 +18,7 @@ export default function MyComponent() {
     trailer_plate: "",
     BOE: "",
     duty: "",
+    duty_currency:"USD",
     invoice: "",
     cargo: "",
     status: "Not Cleared",
@@ -73,8 +74,8 @@ export default function MyComponent() {
 
 
     // Validate individual fields
-    if (!validateFieldLength(formData.reference, 13)) {
-        setModalMessage("Reference must be exactly 13 characters long.");
+    if (!validateFieldLength(formData.reference, 6)) {
+        setModalMessage("Reference must be exactly 6 characters long. e.g. TGXXXX");
         toggleModal()
         return;
     }
@@ -97,14 +98,14 @@ export default function MyComponent() {
         return;
     }
 
-    if (!validateFieldLength(formData.horse_plate, 8)) {
-        setModalMessage("Horse Plate must be exactly 8 characters long.");
+    if (!validateFieldLength(formData.horse_plate, { min: 7, max: 8 }, false)) {
+        setModalMessage("Horse Plate must be between 7 and 8 characters long.");
         toggleModal()
         return;
     }
 
-    if (!validateFieldLength(formData.trailer_plate, 8)) {
-        setModalMessage("Trailer Plate must be exactly 8 characters long.");
+    if (!validateFieldLength(formData.trailer_plate, { min: 7, max: 8 }, false)) {
+        setModalMessage("Trailer Plate must be between 7 and 8 characters long.");
         toggleModal()
         return;
     }
@@ -115,8 +116,8 @@ export default function MyComponent() {
         return;
     }
 
-    if (!validateFieldLength(formData.invoice, 10)) {
-        setModalMessage("Invoice must be exactly 10 characters long.");
+    if (!validateFieldLength(formData.invoice, { min: 4, max: 16 }, false)) {
+        setModalMessage("Invoice must be between 4 and 16 characters long.");
         toggleModal()
         return;
     }
@@ -357,7 +358,7 @@ export default function MyComponent() {
             </label>
             <input
               id="BOE"
-              type="number"
+              type="text"
               name="BOE"
               value={formData.BOE}
               onChange={handleChange}
@@ -367,22 +368,48 @@ export default function MyComponent() {
           </div>
 
           {/* Invoice and Duty Row */}
-          <div className="col-span-3 lg:col-span-2 flex gap-4">
-            <div className="lg:w-1/2">
+         
+            <div className="md:col-span-3 lg:col-span-2">
               <label htmlFor="invoice" className="block text-md font-bold text-gray-700 mb-2">
                 Invoice
               </label>
               <input
                 id="invoice"
-                type="number"
+                type="text"
                 name="invoice"
                 value={formData.invoice}
                 onChange={handleChange}
                 placeholder="Enter invoice..."
                 className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none"
               />
-            </div>
-            <div className="lg:w-1/2">
+   
+
+          </div>
+
+
+          {/* Cargo Field */}
+          <div className="">
+            <label htmlFor="dutyCurrency" className="block text-md font-bold text-gray-700 mb-2">
+              Duty Currency
+            </label>
+            <select
+              id="dutyCurrency"
+              name="dutyCurrency"
+              value={formData.dutyCurrency}
+              onChange={handleChange}
+              className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none"
+            >
+              <option value="" disabled>
+                Select currency...
+              </option>
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="GBP">GBP - British Pound</option>
+              <option value="ZWL">ZWL - Zimbabwean Dollar</option>
+              <option value="ZAR">ZAR - South African Rand</option>
+            </select>
+          </div>
+          <div className="">
               <label htmlFor="duty" className="block text-md font-bold text-gray-700 mb-2">
                 Duty
               </label>
@@ -396,10 +423,7 @@ export default function MyComponent() {
                 className="w-full p-3 bg-white text-gray-700 border border-[#AC0000] rounded focus:outline-none"
               />
             </div>
-          </div>
 
-
-          {/* Cargo Field */}
             <div className="col-span-3 lg:col-span-4 mb-4">
               <label htmlFor="cargo" className="block text-md font-bold text-gray-700 mb-2">
                 Cargo

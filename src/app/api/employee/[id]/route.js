@@ -7,20 +7,12 @@ export async function GET(req, context) {
 
   // Extract `id` from context.params
   const { params } = context;
-  const { id } = await params;
- await
-  console.log("Fetching employee with ID:", id);
+  const { id } = params;
 
-  // Convert `id` to ObjectId
-  let objectId;
-  try {
-    objectId = new ObjectId(id);
-  } catch (error) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
-  }
+  console.log("Fetching employee with userId:", id);
 
-  // Fetch the employee document using `_id`
-  const data = await db.collection("employees").findOne({ _id: objectId });
+  // Fetch the employee document using `userId`
+  const data = await db.collection("employees").findOne({ userId: id });
 
   if (!data) {
     return NextResponse.json({ message: "Employee not found" }, { status: 404 });
@@ -32,20 +24,12 @@ export async function GET(req, context) {
 export async function DELETE(req, context) {
   const { db } = await connectToDatabase();
   const { params } = context;
-  const { id } = await params;
+  const { id } = params;
 
-  console.log("Deleting employee with ID:", id);
+  console.log("Deleting employee with userId:", id);
 
-  // Convert `id` to ObjectId
-  let objectId;
-  try {
-    objectId = new ObjectId(id);
-  } catch (error) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
-  }
-
-  // Delete the employee document using `_id`
-  const result = await db.collection("employees").deleteOne({ _id: objectId });
+  // Delete the employee document using `userId`
+  const result = await db.collection("employees").deleteOne({ userId: id });
 
   if (result.deletedCount === 0) {
     return NextResponse.json({ message: "Employee not found" }, { status: 404 });
@@ -57,24 +41,16 @@ export async function DELETE(req, context) {
 export async function PATCH(req, context) {
   const { db } = await connectToDatabase();
   const { params } = context;
-  const { id } = await params;
+  const { id } = params;
 
   // Parse the request body for updated fields
   const updates = await req.json();
 
-  console.log("Updating employee with ID:", id, "with fields:", updates);
+  console.log("Updating employee with userId:", id, "with fields:", updates);
 
-  // Convert `id` to ObjectId
-  let objectId;
-  try {
-    objectId = new ObjectId(id);
-  } catch (error) {
-    return NextResponse.json({ message: "Invalid ID format" }, { status: 400 });
-  }
-
-  // Update the employee document with the provided fields
+  // Update the employee document with the provided fields using `userId`
   const result = await db.collection("employees").updateOne(
-    { _id: objectId },
+    { userId: id },
     { $set: updates }
   );
 

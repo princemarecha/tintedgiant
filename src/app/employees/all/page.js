@@ -20,7 +20,7 @@ export default function ViewEmployees() {
   // Fetch employee data
   const fetchEmployees = async (page = 1, search = "", role = "") => {
     try {
-      const response = await axios.get(`/api/employee`, {
+      const response = await axios.get(`/api/employee/user`, {
         params: {
           page,
           limit: itemsPerPage,
@@ -28,7 +28,7 @@ export default function ViewEmployees() {
           role, // Pass the selected role to the backend
         },
       });
-      setEmployees(response.data.employees);
+      setEmployees(response.data.users);
       setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -153,7 +153,7 @@ export default function ViewEmployees() {
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16 font-bold md:p-2">
             {employees.map((employee, index) => (
               <div id="emp" key={index}>
-                <Link href= {getLink(employee._id)} passHref>
+                <Link href= {getLink(employee.id)} passHref>
                 <div className="grid grid-cols-4 flex flex-col items-center h-20 md:h-24 xl:h-32 2xl:h-40 rounded bg-white border shadow-2xl">
                   <div className="col-span-1 flex items-center  justify-center font-bold">
                   <CldImage
@@ -165,8 +165,8 @@ export default function ViewEmployees() {
                     />
                   </div>
                   <div className="col-span-3 text-[#5F5F5F]">
-                    <p className="text-xs xl:text-lg 2xl:text-xl ml-1">{employee.name}</p>
-                    <p className="text-xs xl:text-lg 2xl:text-xl mt-1 2xl:mt-3 ml-1">{employee.phone}</p>
+                    <p className="text-xs xl:text-lg 2xl:text-xl ml-1">{employee.fullName}</p>
+                    {/* <p className="text-xs  mt-1 2xl:mt-3 ml-1">{employee.email}</p> */}
                     <div className="flex justify-between mt-1 2xl:mt-3 ml-1">
                       <div className="flex">
                         <Image

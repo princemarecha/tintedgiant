@@ -111,7 +111,7 @@ export default function Clearance({ params }) {
             { label: "Trailer Plate", value: clearance?.trailer_plate || "N/A" },
             { label: "BOE", value: clearance?.BOE || "N/A" },
             { label: "Invoice", value: clearance?.invoice || "N/A" },
-            { label: "Duty", value: clearance?.duty || "N/A" },
+            { label: "Duty", value: clearance?.duty_currency + clearance?.duty || "N/A" },
             { label: "Cargo", value: clearance?.cargo || "N/A" },
             { label: "Cleared", value: clearance?.status == "Cleared" ? "Yes" : "No" },
           ].map((item, index) => (

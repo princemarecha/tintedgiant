@@ -23,6 +23,7 @@ export async function POST(request) {
       trailer_plate,
       invoice,
       duty,
+      duty_currency,
       attachments, // Added attachments field for storing image URLs
     } = await request.json();
 
@@ -40,6 +41,7 @@ export async function POST(request) {
       trailer_plate,
       invoice,
       duty,
+      duty_currency,
       attachments,
     });
 
@@ -58,6 +60,7 @@ export async function POST(request) {
       trailer_plate,
       invoice,
       duty,
+      duty_currency,
       attachments, // Store the attachments URLs here
     });
 
