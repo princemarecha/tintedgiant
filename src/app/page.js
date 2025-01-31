@@ -199,7 +199,7 @@ const displayData = [
               
               </div>
 
-              {/* Active Journeys */}
+              {/* Active Journeyss */}
 
               <div className="grid grid-cols-1 overflow-y-scroll h-96 scrollbar scrollbar-thumb-white scrollbar-track-[#5A4F05]">
               {journeys.map((journey, index) => (
