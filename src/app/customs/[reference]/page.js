@@ -97,7 +97,7 @@ export default function Clearance({ params }) {
         </p>
 
         {/* Error Message */}
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>} 
 
         {/* Clearance Details */}
         <div className="p-4 text-black grid grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-2 mb-4 text-sm">
