@@ -83,7 +83,7 @@ export default function AddEmployee({params}) {
   
     try {
       // Prepare formData
-      const dataToSubmit = { ...formData, userId: id, name: employee.fullName, email: employee.email };
+      const dataToSubmit = { ...formData, userId: id, name: employee.name, email: employee.email };
   
       // First, attempt to create the employee (POST)
       const postResponse = await axios.post("/api/employee/", dataToSubmit);
@@ -166,7 +166,7 @@ export default function AddEmployee({params}) {
       )}
       <Layout>
         <div>
-          <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Employee Profile{employee? <span className="text-gray-400"> [{`${employee.fullName}`}]</span>:""}</p>
+          <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Employee Profile{employee? <span className="text-gray-400"> [{`${employee.name}`}]</span>:""}</p>
 
           <p className="text-sm text-[#AC0000] font-bold mt-8 md:mt-6 mb-8">
             <span>Home </span> <span>&gt;</span> <span> Employee Management </span> <span>&gt;</span>

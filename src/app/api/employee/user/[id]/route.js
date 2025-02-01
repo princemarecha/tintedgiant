@@ -36,7 +36,7 @@ export async function GET(req, { params }) {
         message: "User retrieved successfully.",
         user: {
           id: user._id,
-          fullName: user.fullName,
+          name: user.name,
           email: user.email,
         },
       },
@@ -98,7 +98,7 @@ export async function PATCH(req, { params }) {
         message: "User updated successfully.",
         user: {
           id: updatedUser._id,
-          fullName: updatedUser.fullName,
+          name: updatedUser.name,
           email: updatedUser.email,
         },
       },

@@ -41,7 +41,7 @@ export async function GET(req) {
         message: "Users retrieved successfully.",
         users: users.map((user) => ({
           id: user._id,
-          fullName: user.fullName,
+          name: user.name,
           email: user.email,
           occupation: user.occupation,
         })),

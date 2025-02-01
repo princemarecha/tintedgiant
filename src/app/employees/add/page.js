@@ -7,7 +7,7 @@ import Layout from "@/components/Layout";
 import Link from "next/link";
 
 export default function RegisterForm() {
-  const [fullName, setFullName] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -23,19 +23,19 @@ export default function RegisterForm() {
     setSuccessMessage("");
 
     try {
-      if (!fullName || !email || !password) {
+      if (!name || !email || !password) {
         throw new Error("All fields are required.");
       }
 
       const response = await axios.post("/api/employee/register", {
-        fullName,
+        name,
         email,
         password,
       });
 
       // Handle success
       setSuccessMessage(response.data.message || "Registration successful!");
-      setFullName("");
+      setName("");
       setEmail("");
       setPassword("");
       router.push(`/employees/profile/${response.data.userId}`)
@@ -87,8 +87,8 @@ export default function RegisterForm() {
             <input
               type="text"
               className="mt-1 text-black block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Enter your full name"
             />
           </div>
