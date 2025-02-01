@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { signIn } from "next-auth/react";
-import { redirect } from "next/dist/server/api-utils";
 import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
@@ -16,21 +14,30 @@ export default function LoginForm() {
     setIsLoading(true);
     setErrorMessage("");
 
-    // Simulate API call
     try {
       if (!email || !password) {
         throw new Error("Both fields are required.");
       }
-      console.log("Logging in with", { email, password });
 
-      await signIn('credentials',{
-        email, 
-        password,
-        redirect : false,
+      const response = await fetch("/api/employee/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed.");
       }
-      );
+
+      // Store token in localStorage (or cookies for better security)
+      localStorage.setItem("token", data.token);
+
       setIsLoading(false);
-      router.replace('/')
+      router.replace("/");
     } catch (error) {
       setErrorMessage(error.message);
       setIsLoading(false);
