@@ -165,7 +165,7 @@ export default function ViewEmployees() {
                     />
                   </div>
                   <div className="col-span-3 text-[#5F5F5F]">
-                    <p className="text-xs xl:text-lg 2xl:text-xl ml-1">{employee.fullName}</p>
+                    <p className="text-xs xl:text-lg 2xl:text-xl ml-1">{employee.name}</p>
                     {/* <p className="text-xs  mt-1 2xl:mt-3 ml-1">{employee.email}</p> */}
                     <div className="flex justify-between mt-1 2xl:mt-3 ml-1">
                       <div className="flex">
