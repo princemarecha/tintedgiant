@@ -10,10 +10,10 @@ export async function POST(req) {
     await connectToDatabase();
 
     // Parse request body
-    const { fullName, email, password } = await req.json();
+    const { name, email, password } = await req.json();
 
     // Validate input
-    if (!fullName || !email || !password) {
+    if (!name || !email || !password) {
       return NextResponse.json(
         { message: "All fields are required." },
         { status: 400 }
@@ -35,7 +35,7 @@ export async function POST(req) {
 
     // Create a new user
     const newUser = new User({
-      fullName,
+      name,
       email,
       password: hashedPassword,
       occupation,
