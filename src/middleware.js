@@ -18,5 +18,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/", "/profile/:path*"], // Protected routes
+  matcher:  ["/", "/employees/:path*", "/trucks/:path*", "/expenses/:path*", "/journeys/:path*", "/customs/:path*","/my_account/:path*"], // Protected routes
 };

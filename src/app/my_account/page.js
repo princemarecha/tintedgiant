@@ -36,7 +36,6 @@ export default function MyComponent({ params }) {
   const [data, setData] = useState(null); // To store API response
   const [loading, setLoading] = useState(true); // To handle loading state
   const [isLoading, setIsLoading] = useState(true);
- 
   const [userId, setUserId] = useState(null);
 
   const { id } = useParams();
@@ -44,27 +43,28 @@ export default function MyComponent({ params }) {
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
 
-  // useEffect(() => {
-  //   const fetchProfile = async () => {
-  //     try {
-    
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+          const email = localStorage.getItem("email");
 
+          console.log("Fetching profile for:", email);
 
-  //         const response = await axios.get(`/api/employee/my_account/${email}`);
+          const response = await axios.get(`/api/employee/my_account/${email}`);
 
-  //         if (response.status === 200) {
-  //           setEmployeeData(response.data);
-  //         } else {
-  //           console.error("Failed to fetch employee profile:", response.data.message);
-  //         }
-     
-  //     } catch (error) {
-  //       console.error("Error fetching employee profile:", error);
-  //     }
-  //   };
+          if (response.status === 200) {
+            setEmployeeData(response.data);
+          } else {
+            console.error("Failed to fetch employee profile:", response.data.message);
+          }
+      
+      } catch (error) {
+        console.error("Error fetching employee profile:", error);
+      }
+    };
 
-  //   fetchProfile();
-  // }, []);
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     // Fetch the national ID and set the state
@@ -72,7 +72,7 @@ export default function MyComponent({ params }) {
         setEmpID(id);
   }, [params]); // Dependency array ensures it runs when `params` change
 
-
+  // useEffect(() => {
   //   // Fetch employee data when empID is available
   //   if (empID) {
   //     async function fetchEmployee() {

@@ -41,7 +41,7 @@ export async function DELETE(req, context) {
 export async function PATCH(req, context) {
   const { db } = await connectToDatabase();
   const { params } = context;
-  const { email } = params;
+  const { email } = await params;
 
   // Parse the request body for updated fields
   const updates = await req.json();

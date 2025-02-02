@@ -8,7 +8,6 @@ export default function LoginForm() {
   const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -33,12 +32,13 @@ export default function LoginForm() {
         throw new Error(data.message || "Login failed.");
       }
   
-      // Store token in localStorage (or use cookies for better security)
+      // Store token and email in localStorage
       localStorage.setItem("token", data.token);
+      localStorage.setItem("email", email); // Save user's email
   
       setIsLoading(false);
   
-      // Small delay before redirecting to ensure token is saved
+      // Small delay before redirecting to ensure data is saved
       setTimeout(() => {
         router.push("/");
       }, 100);
@@ -48,6 +48,7 @@ export default function LoginForm() {
       setIsLoading(false);
     }
   };
+  
   
 
   return (
