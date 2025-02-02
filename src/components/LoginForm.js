@@ -13,12 +13,12 @@ export default function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
-
+  
     try {
       if (!email || !password) {
         throw new Error("Both fields are required.");
       }
-
+  
       const response = await fetch("/api/employee/login", {
         method: "POST",
         headers: {
@@ -26,23 +26,29 @@ export default function LoginForm() {
         },
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await response.json();
-
+  
       if (!response.ok) {
         throw new Error(data.message || "Login failed.");
       }
-
-      // Store token in localStorage (or cookies for better security)
+  
+      // Store token in localStorage (or use cookies for better security)
       localStorage.setItem("token", data.token);
-
+  
       setIsLoading(false);
-      router.replace("/");
+  
+      // Small delay before redirecting to ensure token is saved
+      setTimeout(() => {
+        router.push("/");
+      }, 100);
+  
     } catch (error) {
       setErrorMessage(error.message);
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen ">
