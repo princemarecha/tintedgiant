@@ -5,7 +5,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
 
 export default function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -13,6 +12,20 @@ export default function Sidebar() {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/employee/logout", { method: "POST" });
+  
+      if (response.ok) {
+        localStorage.removeItem("token"); // Optional: Remove localStorage token if stored
+        window.location.href = "/auth/login"; // Redirect to login page
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+  
   
   const currentPath = usePathname();
 
@@ -235,7 +248,7 @@ export default function Sidebar() {
 
     <div className="flex flex-col justify-end h-[15%] ">
   <div className="flex items-center">
-  <button onClick={() => signOut()} className="mr-3">Sign Out</button>
+  <button onClick={handleLogout} className="mr-3">Sign Out</button>
     <Image
       src="/images/icons/logout.png"
       alt="Account Icon"
