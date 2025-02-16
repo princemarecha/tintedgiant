@@ -21,22 +21,55 @@ export async function GET(req, context) {
   return NextResponse.json(data);
 }
 
-export async function DELETE(req, context) {
-  const { db } = await connectToDatabase();
-  const { params } = context;
-  const { id } = params;
+export async function DELETE(request, context) {
+  try {
+    const { db } = await connectToDatabase();
 
-  console.log("Deleting employee with userId:", id);
+    const { params } = context;
+    const { id } = params;
 
-  // Delete the employee document using `userId`
-  const result = await db.collection("employees").deleteOne({ userId: id });
+    if (!id) {
+      return NextResponse.json(
+        { message: 'Employee ID is required' },
+        { status: 400 }
+      );
+    }
 
-  if (result.deletedCount === 0) {
-    return NextResponse.json({ message: "Employee not found" }, { status: 404 });
+    console.log(`Deleting Employee and User with ID: ${id}`);
+
+    // Delete employee from "employees" collection
+    const employeeResult = await db.collection("employees").deleteOne({ userId: id });
+
+    if (employeeResult.deletedCount === 0) {
+      return NextResponse.json(
+        { message: 'Employee not found' },
+        { status: 404 }
+      );
+    }
+
+    // Delete user from "users" collection
+    const userResult = await db.collection("users").deleteOne({ _id: new ObjectId(id) });
+
+    console.log(
+      userResult.deletedCount > 0
+        ? `Deleted User associated with Employee ID: ${id}`
+        : 'No matching user found in the users collection'
+    );
+
+    return NextResponse.json({
+      message: 'Employee and associated user deleted successfully',
+      deletedEmployeeCount: employeeResult.deletedCount,
+      deletedUserCount: userResult.deletedCount,
+    });
+  } catch (error) {
+    console.error('Error deleting employee:', error);
+    return NextResponse.json(
+      { message: 'Error deleting employee', error: error.message },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({ message: "Employee deleted successfully" });
 }
+
 
 export async function PATCH(req, context) {
   const { db } = await connectToDatabase();

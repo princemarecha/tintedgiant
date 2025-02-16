@@ -11,14 +11,24 @@ import Modal from "@/components/Modal";
 
 
 async function fetchEmployeeData(empID) {
-  // Fetch employee data from the endpoint
+  try {
+    const response = await fetch(`/api/employee/${empID}`);
+    
+    if (response.status === 404) {
+      window.location.href = `http://localhost:3000/employees/profile/${empID}`;
+      return;
+    }
 
-  const response = await fetch(`/api/employee/${empID}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch employee data"+empID);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch employee data: ${empID}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching employee data:", error);
   }
-  return response.json();
 }
+
 
 export default function MyComponent({ params }) {
   const router = useRouter();

@@ -1,13 +1,37 @@
 // components/Sidebar.js
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [occupation, setOccupation] = useState("");
+
+   useEffect(() => {
+    const fetchOccupation = async () => {
+      try {
+        var email =  localStorage.getItem("email")
+        const response = await fetch(`http://localhost:3000/api/employee/my_account/${email}`);
+        if (response.ok) {
+          const data = await response.json();
+          setOccupation(data.occupation);
+          localStorage.setItem("occupation", data.occupation);
+        }
+      } catch (error) {
+        console.error("Failed to fetch occupation:", error);
+      }
+    };
+
+    const storedOccupation = localStorage.getItem("occupation");
+    if (!storedOccupation) {
+      fetchOccupation();
+    } else {
+      setOccupation(storedOccupation);
+    }
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -19,6 +43,8 @@ export default function Sidebar() {
   
       if (response.ok) {
         localStorage.removeItem("token"); // Optional: Remove localStorage token if stored
+        localStorage.removeItem("occupation");
+        localStorage.removeItem("email");
         window.location.href = "/auth/login"; // Redirect to login page
       }
     } catch (error) {
@@ -96,7 +122,7 @@ export default function Sidebar() {
         {/* Sidebar Menu */}
     <ul className="space-y-2 font-medium">
       {/* Dashboard */}
-      <li>
+      {occupation== "Administrator" || occupation== "Accounting"?<li>
         <Link
           href="/"
           className={`block px-4 py-2 rounded ${
@@ -114,10 +140,10 @@ export default function Sidebar() {
         />
           <span className="ms-3">Dashboard</span>
         </Link>
-      </li>
+      </li>:""}
 
       {/* Employee Management */}
-      <li>
+      {occupation== "Administrator"?<li>
         <Link
           href="/employees"
 
@@ -136,10 +162,10 @@ export default function Sidebar() {
         />
           <span className="ms-3">Employee Management</span>
         </Link>
-      </li>
+      </li>:""}
 
       {/* Truck Management */}
-      <li>
+      {occupation== "Administrator" ?<li>
         <Link
           href="/trucks"
           className={`block px-4 py-2 rounded ${
@@ -157,7 +183,7 @@ export default function Sidebar() {
         />
           <span className="ms-3">Truck Management</span>
         </Link>
-      </li>
+      </li>:""}
 
       {/* Expenses Management */}
       <li>
@@ -181,7 +207,7 @@ export default function Sidebar() {
       </li>
 
       {/* Journey and Tracking */}
-      <li>
+      {occupation== "Administrator" || occupation== "Driver"?<li>
         <Link
           href="/journeys"
           className={`block px-4 py-2 rounded ${
@@ -199,10 +225,10 @@ export default function Sidebar() {
         />
           <span className="ms-3">Journey and Tracking</span>
         </Link>
-      </li>
+      </li>:""}
 
       {/* Customs Clearance */}
-      <li>
+      {occupation== "Administrator" || occupation== "Accounting"?<li>
         <Link
           href="/customs"
           className={`block px-4 py-2 rounded ${
@@ -220,7 +246,7 @@ export default function Sidebar() {
         />
           <span className="ms-3">Customs Clearance</span>
         </Link>
-      </li>
+      </li>:""}
 
       {/* My Account */}
       <li>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -53,10 +54,23 @@ export default function LoginForm() {
 
   return (
     <div className="flex justify-center items-center min-h-screen ">
+
+
       <div className="w-full max-w-sm bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">
+        <div className="flex justify-center">
+          <Image
+                    src="/images/logo.png"
+                    alt="Expense Icon"
+                    width={150}
+                    height={150}
+                    className="transition duration-75 group-hover:opacity-80 ml-2"
+                  />
+        </div>
+                  
+{/* 
+        <h2 className="text-lg  text-gray-200 mb-6">
           Login
-        </h2>
+        </h2> */}
         {errorMessage && (
           <p className="text-sm text-red-500 text-center mb-4">{errorMessage}</p>
         )}

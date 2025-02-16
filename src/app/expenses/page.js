@@ -13,7 +13,7 @@ export default function Expenses() {
           <div className="">
           
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-              <Link href="/expenses/manage" passHref>
+              {localStorage.getItem("occupation") != "Driver"?<Link href="/expenses/manage" passHref>
                 <div className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800">
                   <Image
                     src="/images/icons/expenses.png" // Replace with your image path
@@ -26,9 +26,9 @@ export default function Expenses() {
                     Manage Expenses
                   </p>
                 </div>
-              </Link>
+              </Link>:""}
 
-              <Link href="/expenses/log" passHref>
+              {localStorage.getItem("occupation") != "Accounting"?<Link href="/expenses/log" passHref>
                 <div className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800 opacity-75">
                   <Image
                     src="/images/icons/add.png" // Replace with your image path
@@ -42,9 +42,10 @@ export default function Expenses() {
                     Log Expense
                   </p>
                 </div>
-              </Link>
+              </Link>:""}
               <div>
-              <Link href="/expenses/add" passHref>
+
+               {localStorage.getItem("occupation") != "Driver"?<Link href="/expenses/add" passHref>
                  <div className="flex flex-col items-center justify-center h-40 md:h-56 sm:h-48 font-bold rounded bg-[#AC0000] dark:bg-gray-800 opacity-75">
                 <Image
                   src="/images/icons/add.png" // Replace with your image path
@@ -58,7 +59,7 @@ export default function Expenses() {
                   Add New Expense
                 </p>
               </div>
-              </Link>
+              </Link>:""}
               </div>
              
 

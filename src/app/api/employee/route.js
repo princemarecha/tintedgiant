@@ -145,5 +145,43 @@ export async function GET(request) {
       { status: 500 }
     );
   }
+
+}
+
+// DELETE request handler
+export async function DELETE(request) {
+  try {
+    await connectToDatabase();
+
+    const { searchParams } = new URL(request.url);
+    const employeeId = searchParams.get('id');
+
+    if (!employeeId) {
+      return NextResponse.json(
+        { message: 'Employee ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const deletedEmployee = await Employee.findByIdAndDelete(employeeId);
+
+    if (!deletedEmployee) {
+      return NextResponse.json(
+        { message: 'Employee not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      message: 'Employee deleted successfully',
+      deletedEmployee,
+    });
+  } catch (error) {
+    console.error('Error deleting employee:', error);
+    return NextResponse.json(
+      { message: 'Error deleting employee', error: error.message },
+      { status: 500 }
+    );
+  }
 }
 

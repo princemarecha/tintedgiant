@@ -250,6 +250,7 @@ export default function AddEmployee({params}) {
                   <option value="">Select Occupation</option>
                   <option value="Accounting">Accounting</option>
                   <option value="Driver">Driver</option>
+                  <option value="Administrator">Administrator</option>
                 </select>
               </div>
             </div>
