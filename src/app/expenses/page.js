@@ -4,14 +4,22 @@
 import Layout from "@/components/Layout";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 
 export default function Expenses() {
 
   const [occupation, setOccupation] = useState("");
 
-  setOccupation(occupation)
+  useEffect(() => {
+    const fetchOccupation = async () => {
+     
+      const storedOccupation = localStorage.getItem("occupation") || "Guest";
+      setOccupation(storedOccupation);
+    };
+    fetchOccupation();
+  }, []); 
+  
 
   return (
     <div className="bg-white h-screen">
