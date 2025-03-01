@@ -62,13 +62,14 @@ export default function Driver({params}) {
         setDrivers(response.data.employees || []);
         setTrucks(responseTrucks.data.trucks || []);
         // Initialize IDs safely
-        setDriverID(response.data?.employees?.length ? response.data.employees[0]._id : null);
+        setDriverID(response.data?.employees?.length ? response.data.employees[0].userId : null);
+        console.log(response.data?.employees?.length ? response.data.employees : null)
         setTruckID(responseTrucks.data?.trucks?.length ? responseTrucks.data.trucks[0].plate_id : null);
 
 
         setFormData(prev => ({
           ...prev,
-          driver: response.data?.employees?.length > 0 ? {"name":response.data.employees[0].name, "id":response.data.employees[0]._id} : "",
+          driver: response.data?.employees?.length > 0 ? {"name":response.data.employees[0].name, "id":response.data.employees[0].userId} : "",
           truck: responseTrucks.data?.trucks?.length > 0 ? responseTrucks.data.trucks[0] : "",
         }));
       } catch (error) {
@@ -90,6 +91,9 @@ export default function Driver({params}) {
   };
 
   const handleDriverChange = (e) => {
+
+    console.log("The driver info is" + JSON.stringify(e.target.value))
+
     const { name, value } = e.target;
     if (value!="")
       {setFormData((prev) => ({
@@ -212,8 +216,8 @@ export default function Driver({params}) {
   
   function getDriver(thisDriver) {
     let driver  = JSON.parse(thisDriver)
-    setDriverID(driver.id); // Update state with the selected driver ID
-    console.log("Selected driver ID:", driver.id);
+    setDriverID(driver.userId); // Update state with the selected driver ID
+    console.log("Selected driver ID:", driver);
   }
   
 

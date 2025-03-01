@@ -140,11 +140,15 @@ export default function ViewEmployees() {
                 <option value=""  defaultValue>
                   Select Role...
                 </option>
-                <option value="Driver">Driver</option>
-                <option value="Accountant">Accountant</option>
-                <option value="Manager">Manager</option>
-                <option value="Administrator">Administrator</option>
-                <option value="Software Engineer">Software Engineer</option>
+                <option value="">Select Occupation</option>
+                  <option value="Accounting">Accounting</option>
+                  <option value="Driver">Driver</option>
+                  <option value="Managing Director">Managing Director</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Administrator">Administrator</option>
+                  <option value="Transport Supervisor">Transport Supervisor</option>
+                  <option value="Deputy Transport Supervisor">Dpt Transport Supervisor</option>
+                  <option value="Runner">Runner</option>
               </select>
             </div>
           </div>

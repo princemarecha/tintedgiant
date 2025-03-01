@@ -34,12 +34,12 @@ export async function GET(request) {
   
       // Fetch paginated employees with only name and id fields
       const employees = await Employee.find(query)
-        .select("name _id") // Include only the name and _id fields
+        .select("name _id userId") // Include only the name and _id fields
         .skip(skip)
         .limit(limit);
   
       // Calculate total pages
-      const totalPages = Math.ceil(totalEmployees / limit);
+      const totalPages = Math.ceil(totalEmployees / limit); 
   
       return NextResponse.json({
         employees,
