@@ -50,6 +50,8 @@ export default function MyComponent({ params }) {
 
   const toggleModal = () => setIsModalOpen(!isModalOpen);
 
+  
+
 
   useEffect(() => {
     // Fetch the national ID and set the state
@@ -63,6 +65,7 @@ export default function MyComponent({ params }) {
       async function fetchEmployee() {
         try {
           const data = await fetchEmployeeData(empID);
+          console.log(data)
           setEmployeeData(data);
         } catch (err) {
           setError("Failed to fetch employee data");
@@ -179,7 +182,10 @@ export default function MyComponent({ params }) {
   
     try {
       const response = await axios.delete(`/api/employee/${empID}`);
-      if (response.status === 200) {
+      //const responseUser  = await axios.delete(`/api/employee/user/${employeeData.userId}`);
+
+
+      if (response.status === 200 ) {
         // Navigate to the employees list on successful deletion
         router.push("/employees/all");
       } else {

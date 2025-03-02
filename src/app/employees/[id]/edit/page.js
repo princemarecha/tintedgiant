@@ -12,6 +12,7 @@ export default function UpdateEmployee() {
   const [formData, setFormData] = useState({
     name: "",
     age: "",
+    userId: "",
     phoneNumber: "",
     gender: "Male",
     nationality: "",
@@ -105,6 +106,23 @@ export default function UpdateEmployee() {
       );
 
       const response = await axios.patch(`/api/employee/${id}`, nonEmptyFields);
+
+      if (formData.name){
+        const nameData = { 
+          name: formData.name,
+          occupation: formData.occupation
+        }; // Only sending the name field
+
+        
+      }
+
+      const updateData = {};
+      if (formData.name) updateData.name = formData.name;
+      if (formData.email) updateData.email = formData.email;
+      if (formData.occupation) updateData.occupation = formData.occupation;
+
+      const responseUser = await axios.patch(`/api/employee/${formData.userId}/update`, updateData);
+
 
       if (response.status === 200) {
         alert("Employee updated successfully!");

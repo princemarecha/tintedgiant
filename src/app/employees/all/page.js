@@ -29,7 +29,7 @@ export default function ViewEmployees() {
         },
       });
       setEmployees(response.data.users);
-      setTotalPages(response.data.pagination.totalPages);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       console.error("Error fetching employees:", error);
     }

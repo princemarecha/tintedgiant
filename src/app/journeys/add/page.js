@@ -92,7 +92,7 @@ export default function Driver({params}) {
 
   const handleDriverChange = (e) => {
 
-    console.log("The driver info is" + JSON.stringify(e.target.value))
+    console.log("The driver info really is" + JSON.stringify(e.target.value))
 
     const { name, value } = e.target;
     if (value!="")
@@ -216,7 +216,7 @@ export default function Driver({params}) {
   
   function getDriver(thisDriver) {
     let driver  = JSON.parse(thisDriver)
-    setDriverID(driver.userId); // Update state with the selected driver ID
+    setDriverID(driver.id); // Update state with the selected driver ID
     console.log("Selected driver ID:", driver);
   }
   
@@ -299,6 +299,7 @@ export default function Driver({params}) {
         value={formData.name}
         onChange={(e) => {
           const selectedTruckID = e.target.value;
+          console.log("this is selected driver ID "+selectedTruckID)
           getDriver(selectedTruckID);
           handleDriverChange(e);
         }}
@@ -307,7 +308,7 @@ export default function Driver({params}) {
       >
         <option value="" disabled>Select Driver</option>
         {drivers.map((driver, index) => (
-          <option key={driver.id || index} value={JSON.stringify({ name: driver.name, id: driver._id })}>
+          <option key={driver.id || index} value={JSON.stringify({ name: driver.name, id: driver.userId })}>
             {driver.name}
           </option>
         ))}

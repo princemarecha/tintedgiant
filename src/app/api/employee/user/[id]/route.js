@@ -112,3 +112,40 @@ export async function PATCH(req, { params }) {
     );
   }
 }
+// DELETE request handler
+export async function DELETE (req, { params }) {
+  try {
+    await connectToDatabase();
+
+    const {id}  = params;
+    console.log(id)
+
+    if (!id) {
+      return NextResponse.json(
+        { message: 'user ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const deletedEmployee = await User.findByIdAndDelete(id);
+
+    if (!deletedEmployee) {
+      return NextResponse.json(
+        { message: 'user not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      message: 'user deleted successfully',
+      deletedEmployee,
+    });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return NextResponse.json(
+      { message: 'Error deleting user', error: error.message },
+      { status: 500 }
+    );
+  }
+}
+

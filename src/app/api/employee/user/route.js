@@ -1,4 +1,3 @@
-// app/api/user/route.js
 import { NextResponse } from "next/server";
 import connectToDatabase from "@/utils/mongo/mongoose";
 import User from "@/models/users";
@@ -8,27 +7,41 @@ export async function GET(req) {
     // Connect to the database
     await connectToDatabase();
 
-    // Extract query parameters for pagination
+    // Extract query parameters
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page")) || 1; // Default to page 1
-    const limit = parseInt(searchParams.get("limit")) || 10; // Default to 10 users per page
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 10;
+    const search = searchParams.get("search") || "";
+    const role = searchParams.get("role") || "";
 
-    // Calculate skip value
+    // Construct the filter query
+    let filter = {};
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } }, // Case-insensitive name search
+        { email: { $regex: search, $options: "i" } } // Case-insensitive email search
+      ];
+    }
+
+    if (role) {
+      filter.occupation = role; // Exact match for occupation
+    }
+
+    // Pagination
     const skip = (page - 1) * limit;
 
-    // Fetch users with pagination
-    const users = await User.find({})
+    // Fetch filtered users
+    const users = await User.find(filter)
       .skip(skip)
       .limit(limit);
 
-    // Count total users
-    const totalUsers = await User.countDocuments();
-
-    // Calculate total pages
+    // Count total matching users
+    const totalUsers = await User.countDocuments(filter);
     const totalPages = Math.ceil(totalUsers / limit);
 
     // Check if users exist
-    if (!users || users.length === 0) {
+    if (!users.length) {
       return NextResponse.json(
         { message: "No users found." },
         { status: 404 }
@@ -39,7 +52,7 @@ export async function GET(req) {
     return NextResponse.json(
       {
         message: "Users retrieved successfully.",
-        users: users.map((user) => ({
+        users: users.map(user => ({
           id: user._id,
           name: user.name,
           email: user.email,
