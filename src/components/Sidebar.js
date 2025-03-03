@@ -122,7 +122,7 @@ export default function Sidebar() {
         {/* Sidebar Menu */}
     <ul className="space-y-2 font-medium">
       {/* Dashboard */}
-      {occupation== "Administrator" || occupation== "Accounting"?<li>
+      {occupation== "Administrator" || occupation== "Accounting" || occupation== "Managing Director" ||  occupation== "Manager"?<li>
         <Link
           href="/"
           className={`block px-4 py-2 rounded ${
@@ -143,7 +143,7 @@ export default function Sidebar() {
       </li>:""}
 
       {/* Employee Management */}
-      {occupation== "Administrator"?<li>
+      {occupation== "Administrator" || occupation== "Managing Director" ||  occupation== "Manager"?<li>
         <Link
           href="/employees"
 
@@ -165,7 +165,7 @@ export default function Sidebar() {
       </li>:""}
 
       {/* Truck Management */}
-      {occupation== "Administrator" ?<li>
+      {occupation== "Administrator" || occupation== "Managing Director" ||  occupation== "Manager" || occupation== "Supervisor" ?<li>
         <Link
           href="/trucks"
           className={`block px-4 py-2 rounded ${
@@ -207,7 +207,7 @@ export default function Sidebar() {
       </li>
 
       {/* Journey and Tracking */}
-      {occupation== "Administrator" || occupation== "Driver"?<li>
+      {occupation== "Administrator" || occupation== "Driver" || occupation== "Managing Director" ||  occupation== "Manager" ||   occupation== "Supervisor"?<li>
         <Link
           href="/journeys"
           className={`block px-4 py-2 rounded ${
@@ -228,7 +228,7 @@ export default function Sidebar() {
       </li>:""}
 
       {/* Customs Clearance */}
-      {occupation== "Administrator" || occupation== "Accounting"?<li>
+      {occupation== "Administrator" || occupation== "Accounting" || occupation== "Managing Director" ||  occupation== "Manager"?<li>
         <Link
           href="/customs"
           className={`block px-4 py-2 rounded ${
