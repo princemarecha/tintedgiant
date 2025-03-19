@@ -14,7 +14,7 @@ export default function Sidebar() {
     const fetchOccupation = async () => {
       try {
         var email =  localStorage.getItem("email")
-        const response = await fetch(`http://localhost:3000/api/employee/my_account/${email}`);
+        const response = await fetch(`/api/employee/my_account/${email}`);
         if (response.ok) {
           const data = await response.json();
           setOccupation(data.occupation);

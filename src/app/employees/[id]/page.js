@@ -15,7 +15,7 @@ async function fetchEmployeeData(empID) {
     const response = await fetch(`/api/employee/${empID}`);
     
     if (response.status === 404) {
-      window.location.href = `http://localhost:3000/employees/profile/${empID}`;
+      window.location.href = `/employees/profile/${empID}`;
       return;
     }
 
