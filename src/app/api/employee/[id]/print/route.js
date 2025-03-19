@@ -2,11 +2,23 @@ import { jsPDF } from "jspdf";
 import { NextResponse } from "next/server";
 
 // Helper function to fetch and convert an image to base64 using Buffer
+
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
 async function getBase64ImageFromUrl(url) {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  return `data:image/png;base64,${buffer.toString("base64")}`;
+  try{
+    const response = await fetch(`${baseURL}${url}`);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return `data:image/png;base64,${buffer.toString("base64")}`;
+  }
+  catch{
+    const response = await fetch(`${url}`);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return `data:image/png;base64,${buffer.toString("base64")}`;
+  }
+ 
 }
 
 // This function handles the PDF generation for a specific employee
@@ -15,14 +27,14 @@ export async function GET(req, context) {
   const { id } = params;
 
   // Fetch data from the main employee endpoint
-  const employeeResponse = await fetch(`/api/employee/${id}`);
+  const employeeResponse = await fetch(`${baseURL}/api/employee/${id}`);
   if (!employeeResponse.ok) {
     return new Response("Employee not found", { status: 404 });
   }
   const employeeData = await employeeResponse.json();
 
   // Fetch operational costs and average costs
-  const operationalResponse = await fetch(`/api/employee/opCosts?userId=${id}`);
+  const operationalResponse = await fetch(`${baseURL}/api/employee/opCosts?userId=${id}`);
   if (!operationalResponse.ok) {
     return new Response("Operational costs not found", { status: 404 });
   }
