@@ -165,6 +165,7 @@ export default function Driver({params}) {
         return true; // Include the field if none of the above conditions are met
       })
     );
+    
   
     // Safeguards for truckID and journeyID
     if (!truckID) {
@@ -184,13 +185,17 @@ export default function Driver({params}) {
       const payload = {
         current_journey: response.data?.newJourney?._id,
       };
+
+      const payloadTruck = {
+        status: formData.status
+      };
   
-      const responseTruck = await axios.patch(`/api/trucks/${truckID}`, payload);
+      const responseTruck = await axios.patch(`/api/trucks/${truckID}?journeyId=${response.data?.newJourney?._id}&km=456`, payloadTruck);
       const responseDriver = await axios.patch(`/api/employee/${driverID}`, payload);
   
       console.log("Journey added:", response.data);
       console.log("Truck updated:", responseTruck.data);
-      console.log("Driver updated:", responseDriver.data);
+      console.log("Driver updated:", responseDriver.data); 
   
       // Reset form
       setFormData(defaultForm);

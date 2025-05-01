@@ -19,20 +19,20 @@ export async function GET(request) {
     // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Build query object
-    let query = {};
-    if (search) {
-      query = {
-        ...query,
-        $or: [
-          { name: { $regex: search, $options: "i" } }, // Case-insensitive match on name
-        ],
-      };
-    }
+// Build query object
+let query = {
+  status: { $in: ["Arrived", "N/A"] }
+};
 
-    if (make) {
-      query.make = make; // Filter by selected make
-    }
+if (search) {
+  query.$or = [
+    { name: { $regex: search, $options: "i" } },
+  ];
+}
+
+if (make) {
+  query.make = make;
+}
 
     // Fetch total count for pagination
     const totalTrucks = await Truck.countDocuments(query);

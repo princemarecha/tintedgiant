@@ -363,13 +363,13 @@ export default function MyComponent({ params }) {
         <div className="">{truckData.fuel || "Not provided"}</div> 
       
         <div className="font-bold">Journeys</div> 
-        <div className="">{data?.totalJourneys || "0"}</div> 
+        <div className="">{truckData.journeys || "0"}</div> 
       
         <div className="font-bold">Km Travelled</div> 
-        <div className="">{data?.totalKmTravelled || "0"} km</div> 
+        <div className="">{truckData.kilometers || "0"} km</div> 
 
         <div className="font-bold">Avg Km</div> 
-        <div className="">{data?.avgKmTravelled || "0"} km</div> 
+        <div className="">{truckData?.avg_km || "0"} km</div> 
       
       
       </div>
@@ -398,7 +398,7 @@ export default function MyComponent({ params }) {
 
               </div>
             ) : (
-              plateID && <div>Loading truck data...</div>
+              plateID && <div className="col-span-3 md:col-span-2 lg:col-span-6 xl:col-span-3 text-center">No Active Journey</div>
             )}
 
           {data?.totalExpenses?.length?<div className="col-span-3 md:col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded ">

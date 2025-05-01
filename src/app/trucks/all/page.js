@@ -150,11 +150,11 @@ export default function ViewTrucks() {
                 <div className="grid border border-gray-300 grid-cols-4 gap-1 flex flex-col items-center  md:h-full xl:h-full 2xl:h-96 rounded bg-white shadow-2xl">
                   <div className="col-span-2 flex items-center justify-center  2xl:p-8">
                     <Image
-                      src="/images/truck.png" // Use truck image or default
+                      src="https://res.cloudinary.com/dix6sop3b/image/upload/v1733117711/u0y0mh6rtjgwqvtgoelr.png" // Use truck image or default
                       alt={`${truck.name} Profile`}
                       width={320}
                       height={320}
-                      className="mb-2 transition duration-75 group-hover:opacity-80 rounded 2xl:w-200 2xl:h-200  ml-1"
+                      className="mb-2 transition duration-75 group-hover:opacity-80 rounded 2xl:w-56 2xl:h-56  ml-1"
                     />
                   </div>
                   <div className=" col-span-2 text-gray-600 grid grid-cols-2 gap-y-1 pt-2">
@@ -170,7 +170,7 @@ export default function ViewTrucks() {
 
 
                   </div>
-                  <div className="col-span-4 bg-[#AC0000] grid grid-cols-3 p-4 rounded-b gap-x-3 sm:gap-x-1">
+                  {truck.status == "Travelling"? <div className="col-span-4 bg-[#AC0000] grid grid-cols-3 p-4 rounded-b gap-x-3 sm:gap-x-1">
                         <div>
                             <p className="2xl:text-lg font-bold">From</p>
                             <p >Harare,Zimbabwe</p>
@@ -184,7 +184,23 @@ export default function ViewTrucks() {
                             <p className="2xl:text-lg font-bold">Driver</p>
                             <p className="bg-white text-center text-[#AC0000] p-1 rounded">Prince Marecha</p>
                         </div>
+                  </div>:
+                  <div className="col-span-4 bg-[#AC0000] grid grid-cols-3 p-4 rounded-b gap-x-3 sm:gap-x-">
+                  <div>
+                      <p className="2xl:text-lg font-bold">From</p>
+                      <p >Not Applicable</p>
                   </div>
+                  <div>
+                      <p className="2xl:text-lg font-bold">To</p>
+                      <p>Not Applicable</p>
+                  </div>
+
+                  <div>
+                      <p className="2xl:text-lg font-bold">Driver</p>
+                      <p className="bg-white text-center text-[#AC0000] p-1 rounded">Not Applicable</p>
+                  </div>
+            </div>
+                  }
                 </div>
                 </Link>
               </div>

@@ -37,24 +37,51 @@ export async function DELETE(req, context) {
 
 export async function PATCH(req, context) {
   const { db } = await connectToDatabase();
-  const {params} = context;
+  const { params } = context;
+  const { plate_id } = await params;
 
-  const {plate_id} = await params
+  const url = new URL(req.url);
+  const kmParam = url.searchParams.get("km");
+  const journeyId = url.searchParams.get("journeyId");
+  const kmToAdd = parseInt(kmParam || "0", 10);
 
-  // Parse the request body for updated fields
-  const updates = await req.json();
+  const updatesFromBody = await req.json();
 
-  console.log("Updating truck with truck ID:", plate_id, "with fields:", updates);
+  // Fetch the truck
+  const truck = await db.collection("trucks").findOne({ plate_id });
 
-  // Update the truck document with the provided fields
+  if (!truck) {
+    return NextResponse.json({ message: "Truck not found" }, { status: 404 });
+  }
+
+  // Default to 0 if not numeric
+  const currentJourneys = isFinite(truck.journeys) ? truck.journeys : 0;
+  const currentKilometers = isFinite(truck.kilometers) ? truck.kilometers : 0;
+
+  const newJourneys = currentJourneys + (journeyId ? 1 : 0);
+  const newKilometers = currentKilometers + (journeyId && !isNaN(kmToAdd) ? kmToAdd : 0);
+  const avgKm = newJourneys > 0 ? newKilometers / newJourneys : 0;
+
+  const updatePayload = {
+    $set: {
+      ...updatesFromBody,
+      ...(journeyId && {
+        current_journey: journeyId,
+        journeys: newJourneys,
+        kilometers: newKilometers,
+        avg_km: avgKm,
+      }),
+    },
+  };
+
   const result = await db.collection("trucks").updateOne(
-    { plate_id: plate_id },
-    { $set: updates }
+    { plate_id },
+    updatePayload
   );
 
   if (result.matchedCount === 0) {
-    return NextResponse.json({ message: "truck not found" }, { status: 404 });
+    return NextResponse.json({ message: "Truck not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ message: "truck updated successfully" });
+  return NextResponse.json({ message: "Truck updated successfully" });
 }
