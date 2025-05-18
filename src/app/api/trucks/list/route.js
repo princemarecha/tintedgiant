@@ -2,52 +2,55 @@
 import connectToDatabase from '@/utils/mongo/mongoose';
 import Truck from '../../../../models/trucks';
 import { NextResponse } from 'next/server';
+import Journey from '../../../../models/journey';
 
 // Add GET handler to retrieve all trucks
 export async function GET(request) {
   try {
-    // Establish connection
     await connectToDatabase();
 
-    // Parse query parameters for pagination, search, and make
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page')) || 1; // Default to page 1
-    const limit = parseInt(searchParams.get('limit')) || 9; // Default limit to 9 items per page
-    const search = searchParams.get('search') || ''; // Search query (empty by default)
-    const make = searchParams.get('make') || ''; // Make filter (empty by default)
-
-    // Calculate pagination
+    const page = parseInt(searchParams.get("page")) || 1;
+    const limit = parseInt(searchParams.get("limit")) || 9;
+    const search = searchParams.get("search") || "";
+    const make = searchParams.get("make") || "";
     const skip = (page - 1) * limit;
 
-// Build query object
-let query = {
-  status: { $in: ["Arrived", "N/A"] }
-};
+    // Base truck query
+    const baseQuery = {};
+    if (search) {
+      baseQuery.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { plate_id: { $regex: search, $options: "i" } }
+      ];
+    }
+    if (make) {
+      baseQuery.make = make;
+    }
 
-if (search) {
-  query.$or = [
-    { name: { $regex: search, $options: "i" } },
-  ];
-}
+    // Fetch all matching trucks
+    const allTrucks = await Truck.find(baseQuery).select("name plate_id");
 
-if (make) {
-  query.make = make;
-}
+    const eligibleTrucks = [];
 
-    // Fetch total count for pagination
-    const totalTrucks = await Truck.countDocuments(query);
+    for (const truck of allTrucks) {
+      // Check for any journey with this truck that is not 'Arrived'
+      const activeJourney = await Journey.findOne({
+        "truck.plate_id": truck.plate_id,
+        status: { $ne: "Arrived" },
+      });
 
-    // Fetch paginated trucks with only name and plate_id fields
-    const trucks = await Truck.find(query)
-      .select("name plate_id") // Include only the name and plate_id fields
-      .skip(skip)
-      .limit(limit);
+      if (!activeJourney) {
+        eligibleTrucks.push(truck);
+      }
+    }
 
-    // Calculate total pages
+    const totalTrucks = eligibleTrucks.length;
     const totalPages = Math.ceil(totalTrucks / limit);
+    const paginatedTrucks = eligibleTrucks.slice(skip, skip + limit);
 
     return NextResponse.json({
-      trucks,
+      trucks: paginatedTrucks,
       pagination: {
         currentPage: page,
         totalPages,
@@ -56,10 +59,11 @@ if (make) {
       },
     });
   } catch (error) {
-    console.error('Error fetching trucks:', error);
+    console.error("Error fetching trucks:", error);
     return NextResponse.json(
-      { message: 'Error fetching trucks', error: error.message },
+      { message: "Error fetching trucks", error: error.message },
       { status: 500 }
     );
   }
 }
+

@@ -27,14 +27,6 @@ async function fetchTruckData(plateID) {
   return response.json();
 }
 
-async function fetchJourneyData(journeyID) {
-  // Fetch truck data from the endpoint
-  const response = await fetch(`/api/journey/${journeyID}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch truck data"+journeyID);
-  }
-  return response.json();
-}
 
 export default function MyComponent({ params }) {
   const router = useRouter();
@@ -78,8 +70,8 @@ export default function MyComponent({ params }) {
         try {
           const data = await fetchTruckData(plateID);
           setTruckData(data);
-          if (data.current_journey)
-          {const journey = await fetchJourneyData(data.current_journey); setJourneyData(journey)}
+          setJourneyData (data?.journey)
+         
           if (data.photos)
             {
               if (data.photos[0])
@@ -90,7 +82,7 @@ export default function MyComponent({ params }) {
               }
              
         } catch (err) {
-          setError("Failed to fetch truck data");
+          setError(err);
         }
       }
 
@@ -268,7 +260,6 @@ export default function MyComponent({ params }) {
       }
   }
   
-
   const deleteImage = (e, publicID)=>{
 
     e.preventDefault();
@@ -310,7 +301,7 @@ export default function MyComponent({ params }) {
       <Layout>
         <p className="text-xl lg:text-4xl text-[#AC0000] font-bold mt-8 md:mt-12 mb-4">Trucks</p>
 
-        <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><span>Home </span> <span>&gt;</span> <span>Truck Management</span> <span>&gt;</span><span>Trucks </span><span>&gt;</span><span>{plateID}</span></p>
+        <p className="text-sm 2xl:text-lg text-[#AC0000] font-bold mt-8 md:mt-6 mb-8"><Link href={`/`}><span>Home </span> </Link><span>&gt;</span> <Link href={`/trucks`}><span>Truck Management</span></Link> <span>&gt;</span><Link href={`/trucks/all`}><span>Trucks </span></Link><span>&gt;</span><span>{plateID}</span></p>
         <div className="grid  grid-cols-1 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-12 gap-x-2 gap-y-2">
         <div id="truck image" className="relative col-span-3 md:col-span-4 lg:col-span-6 xl:col-span-5 bg-gray-100 h-96 lg:h-full">
           {truckData?<Image

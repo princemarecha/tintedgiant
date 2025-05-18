@@ -18,7 +18,6 @@ const TruckSchema = new Schema({
     opCosts: { type: Number, required: false },
     avg_opCosts: { type: Number, required: false },
     photos: { type: [String], required: false },
-    current_journey: { type: String, required: false },
 }, { timestamps: true });
 
 

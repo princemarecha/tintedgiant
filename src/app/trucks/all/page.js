@@ -36,6 +36,15 @@ export default function ViewTrucks() {
     }
   };
 
+  function truncateString(inputString) {
+    const maxLength = 15;
+    if (inputString.length > maxLength) {
+        return inputString.substring(0, maxLength) + "...";
+    } else {
+        return inputString;
+    }
+}
+
   useEffect(() => {
     // Fetch make types from the backend
     const fetchMake = async () => {
@@ -173,16 +182,16 @@ export default function ViewTrucks() {
                   {truck.status == "Travelling"? <div className="col-span-4 bg-[#AC0000] grid grid-cols-3 p-4 rounded-b gap-x-3 sm:gap-x-1">
                         <div>
                             <p className="2xl:text-lg font-bold">From</p>
-                            <p >Harare,Zimbabwe</p>
+                            <p >{truck.journey?.from}</p>
                         </div>
                         <div>
                             <p className="2xl:text-lg font-bold">To</p>
-                            <p>Pretoria,South Africa</p>
+                            <p>{truck.journey?.to}</p>
                         </div>
 
                         <div>
                             <p className="2xl:text-lg font-bold">Driver</p>
-                            <p className="bg-white text-center text-[#AC0000] p-1 rounded">Prince Marecha</p>
+                            <p className="bg-white text-center text-[#AC0000] p-1 rounded">{truncateString(truck.journey?.driver)}</p>
                         </div>
                   </div>:
                   <div className="col-span-4 bg-[#AC0000] grid grid-cols-3 p-4 rounded-b gap-x-3 sm:gap-x-">

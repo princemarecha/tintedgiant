@@ -109,8 +109,9 @@ export default function Journey({ params }) {
 
       await axios.delete(`/api/journey/${journeyID}`);
       alert("journey deleted successfully!");
+      if (expenseData?._id) {
       await axios.patch(`/api/expense/${expenseData._id}`, payload)
-      
+      }
       // Optionally, redirect to another page or refresh the list
       router.push("/journeys/manage");
     } catch (error) {

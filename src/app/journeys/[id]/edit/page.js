@@ -14,8 +14,6 @@ export default function Driver({params}) {
   const defaultForm = {
     departure: "",
     arrival: "",
-    driver: "",
-    truck: "",
     from: "",
     to: "",
     distance: "",
@@ -81,8 +79,6 @@ export default function Driver({params}) {
         setFormData({
           departure: journey.departure || "",
           arrival: journey.arrival || "",
-          driver: journey.driver?.name || "",
-          truck: journey.truck?.name || "",
           from: journey.from || "",
           to: journey.to || "",
           distance: journey.distance || "",
@@ -148,8 +144,8 @@ export default function Driver({params}) {
       return;
     }
 
-    if (formData.driver == "" || formData.truck=="" || formData.cargo==""){
-      setModalMessage("Please fill in the driver and truck fields.");
+    if (formData.cargo==""){
+      setModalMessage("Please fill in the cargo fields.");
       toggleModal();
       setIsLoading(false);
       return;
@@ -265,47 +261,7 @@ export default function Driver({params}) {
               </div>
 
               {/* Row 2 */}
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
-                  Driver
-                </label>
-                <select
-                  id="driver"
-                  name="driver"
-                  value={formData.name}
-                  onChange={handleDriverChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                >
-                  <option value="">Select Driver</option>
-                  {drivers.map((driver, index) => (
-                    <option key={driver.id || index} value={JSON.stringify({ name: driver.name, id: driver._id })}>
-                      {driver.name}
-                    </option>
-                  ))}
-                </select>
-
-              </div>
-
-              <div className="mb-2 lg:mb-0">
-                <label htmlFor="driver" className="block text-sm font-medium text-gray-700">
-                  Truck
-                </label>
-                <select
-                  id="truck"
-                  name="truck"
-                  value={formData.plate_id}
-                  onChange={handleTruckChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-[#AC0000] focus:border-[#AC0000]"
-                >
-                  <option value="">Select Truck</option>
-                  {trucks.map((truck, index) => (
-                    <option key={truck.id || index} value={JSON.stringify({ name: truck.name, plate_id: truck.plate_id })}>
-                      {truck.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+  
               {/* Row 3 */}
               <div className="mb-2 lg:mb-0">
                 <label htmlFor="from" className="block text-sm font-medium text-gray-700">

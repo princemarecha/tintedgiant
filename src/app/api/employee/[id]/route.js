@@ -5,20 +5,30 @@ import { ObjectId } from "mongodb"; // Import ObjectId to handle MongoDB IDs
 export async function GET(req, context) {
   const { db } = await connectToDatabase();
 
-  // Extract `id` from context.params
   const { params } = context;
-  const { id } = params;
+  const { id } = await params;
 
   console.log("Fetching employee with userId:", id);
 
-  // Fetch the employee document using `userId`
-  const data = await db.collection("employees").findOne({ userId: id });
+  // Fetch employee by userId
+  const employee = await db.collection("employees").findOne({ userId: id });
 
-  if (!data) {
+  if (!employee) {
     return NextResponse.json({ message: "Employee not found" }, { status: 404 });
   }
 
-  return NextResponse.json(data);
+  // Check if employee is a driver by looking for an active journey
+  const journey = await db.collection("journeys").findOne({
+    'driver.id': id,
+    status: { $ne: 'Arrived' },
+  });
+
+  // Append journey if found
+  if (journey) {
+    employee.journey = journey;
+  }
+
+  return NextResponse.json(employee);
 }
 
 export async function DELETE(request, context) {

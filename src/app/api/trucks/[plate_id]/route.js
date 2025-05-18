@@ -4,18 +4,32 @@ import { NextResponse } from "next/server";
 export async function GET(req, context) {
   const { db } = await connectToDatabase();
 
-  // Access empID directly from context.params
-  const {params} = context;
+  const { params } = context;
+  const { plate_id } = params;
 
-  const {plate_id} = await params
-  console.log(plate_id)
+  console.log('Requested plate_id:', plate_id);
 
-  // Fetch the truck document using the specified field
-  const data = await db.collection("trucks").findOne({ plate_id: plate_id });
+  // Fetch the truck
+  const truck = await db.collection('trucks').findOne({ plate_id });
 
-  // Return the truck data as a JSON response
-  return NextResponse.json(data);
+  if (!truck) {
+    return NextResponse.json({ message: 'Truck not found' }, { status: 404 });
+  }
+
+  // Fetch associated journey if its status is NOT "Arrived"
+  const journey = await db.collection('journeys').findOne({
+    'truck.plate_id': plate_id,
+    status: { $ne: 'Arrived' },
+  });
+
+  // Append full journey object if it exists
+  if (journey) {
+    truck.journey = journey;
+  }
+
+  return NextResponse.json(truck);
 }
+
 
 export async function DELETE(req, context) {
   const { db } = await connectToDatabase();
@@ -66,7 +80,6 @@ export async function PATCH(req, context) {
     $set: {
       ...updatesFromBody,
       ...(journeyId && {
-        current_journey: journeyId,
         journeys: newJourneys,
         kilometers: newKilometers,
         avg_km: avgKm,

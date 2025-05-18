@@ -43,6 +43,15 @@ export default function Manage() {
     }
   };
 
+  function truncateString(inputString) {
+    const maxLength = 15;
+    if (inputString.length > maxLength) {
+        return inputString.substring(0, maxLength) + "...";
+    } else {
+        return inputString;
+    }
+}
+  
   //cargo types
   useEffect(() => {
     // Fetch cargo types from the backend
@@ -195,7 +204,7 @@ export default function Manage() {
               <div id="emp" key={index}>
                 <Link href= {getLink(journey._id)} passHref>
                 <div className="grid grid-cols-4 flex flex-col items-center p-4 xl:p-10  2xl:h-96 rounded bg-white shadow-2xl text-xs lg:text-sm border border-gray-200">
-                <div className="col-span-full text-[#AC0000] font-bold text-sm lg:text-xl mb-4">
+                <div className="col-span-full text-[#AC0000] font-bold text-sm lg:text-lg mb-4">
                 {journey.from} - {journey.to}
                 </div>
                   <div className=" col-span-4 text-gray-600 grid grid-cols-2 gap-y-3 text-xs lg:text-sm">
@@ -238,12 +247,12 @@ export default function Manage() {
                         </div>
                         <div  className="col-span-5 2xl:col-span-4">
                             <p className="2xl:text-lg font-bold">Truck</p>
-                            <p onClick={(e) => goTo("truck", journey.truck ? journey.truck.plate_id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded 2xl:w-3/4">{journey.truck?journey.truck.name:""}</p>
+                            <p onClick={(e) => goTo("truck", journey.truck ? journey.truck.plate_id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded 2xl:w-3/4">{journey.truck?truncateString(journey.truck.name):""}</p>
                         </div>
 
                         <div className="col-span-5 2xl:col-span-4">
                             <p className="2xl:text-lg font-bold">Driver</p>
-                            <p onClick={(e) => goTo("driver", journey.driver ? journey.driver.id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded 2xl:w-3/4">{journey.driver?journey.driver.name:""}</p>
+                            <p onClick={(e) => goTo("driver", journey.driver ? journey.driver.id : "", e)} className="border border-white text-center text-white p-1 m-1 rounded 2xl:w-3/4">{journey.driver?truncateString(journey.driver.name):""}</p>
                         </div>
                   </div>
                 </div>

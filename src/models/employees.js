@@ -18,7 +18,6 @@ const EmployeeSchema = new Schema({
     opCosts: { type: Number, required: false },
     avg_op_costs: { type: Number, required: false },
     photo: { type: String, required: false },
-    current_journey: { type: String, required: false },
 }, { timestamps: true });
 
 

@@ -4,10 +4,8 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request) {
   try {
-    // Connect to the database
     await connectToDatabase();
 
-    // Extract user ID from query parameters
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
 
@@ -18,40 +16,32 @@ export async function GET(request) {
       );
     }
 
-    console.log("Received userId:", userId);
-
-    // Fetch journeys where expenses.totals exists and driver.id matches
+    // Fetch only journeys for this driver that have expenses and status is 'Arrived'
     const journeys = await Journey.find({
-      "expenses.totals": { $exists: true, $ne: [] },
+     // "expenses.totals": { $exists: true, $ne: [] },
       "driver.id": userId,
+      status: "Arrived",
     });
 
-    console.log("Fetched journeys:", journeys);
-
-    // Initialize storage for totals and averages
     const totalExpensesByCurrency = {};
     const avgOperationalCostsByCurrency = {};
 
     let totalJourneys = 0;
     let totalKmTravelled = 0;
 
-    // Process the fetched journeys
     journeys.forEach((journey) => {
-      totalJourneys += 1; // Increment the journey count
-      totalKmTravelled += journey.distance || 0; // Add journey distance safely
+      totalJourneys += 1;
+      totalKmTravelled += journey.distance || 0;
 
-      // Safely access the expenses.totals array
       if (journey.expenses && Array.isArray(journey.expenses.totals)) {
         journey.expenses.totals.forEach(({ currency, amount }) => {
-          if (!currency || isNaN(amount)) return; // Skip invalid entries
+          if (!currency || isNaN(amount)) return;
 
-          const numericAmount = parseFloat(amount); // Ensure amount is a number
+          const numericAmount = parseFloat(amount);
 
-          // Total expenses per currency
           totalExpensesByCurrency[currency] =
             (totalExpensesByCurrency[currency] || 0) + numericAmount;
 
-          // Average operational costs per currency
           if (!avgOperationalCostsByCurrency[currency]) {
             avgOperationalCostsByCurrency[currency] = { total: 0, count: 0 };
           }
@@ -61,7 +51,6 @@ export async function GET(request) {
       }
     });
 
-    // Calculate average costs
     const averageOperationalCosts = Object.entries(avgOperationalCostsByCurrency).map(
       ([currency, data]) => ({
         currency,
@@ -69,7 +58,6 @@ export async function GET(request) {
       })
     );
 
-    // Prepare total expenses
     const totalExpenses = Object.entries(totalExpensesByCurrency).map(
       ([currency, total]) => ({
         currency,
@@ -77,10 +65,8 @@ export async function GET(request) {
       })
     );
 
-    // Calculate average kilometers traveled
     const avgKmTravelled = totalJourneys > 0 ? totalKmTravelled / totalJourneys : 0;
 
-    // Return the response
     return NextResponse.json({
       totalExpenses,
       averageOperationalCosts,

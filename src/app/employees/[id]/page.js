@@ -267,28 +267,34 @@ export default function MyComponent({ params }) {
             ) : (
               empID && <div>Loading employee data...</div>
             )}
-            {employeeData ? (
+            {employeeData?.journey ? (
               <div className="col-span-3 md:col-span-2 lg:col-span-5 xl:col-span-3  py-4  text-black shadow-xl rounded bg-[#AC0000] ">
                 <p className="xl:text-lg mx-6 font-black text-white 2xl:text-2xl">Current Journey</p> 
                 <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">From</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Harare, Zimbabwe</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">{employeeData.journey?.to}</p> 
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">To</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">Pretoria, South Africa</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-white mb-1">{employeeData.journey?.from}</p> 
                 <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-black text-white">Truck</p> 
-                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-1">Toyota Streamliner</p> 
+                <p className="text-sm xl:text-md 2xl:text-lg mx-6 font-medium text-[#AC0000] bg-white text-center rounded my-1">{employeeData.journey?.truck?.name}</p> 
 
                 <hr className="my-2 2xl:my-4 border-white" /> {/* Horizontal line */}
                 <div className="text-sm 2xl:text-lg grid grid-cols-4 mx-6 text-white gap-y-2">
-                <div className="font-bold col-span-2" >Departure</div> <div className="col-span-2">21/11/24</div> 
-                <div className="font-bold col-span-2" >Arrival(Est) </div> <div className="col-span-2">23/11/24</div> 
-                <div className="font-bold col-span-2" >Distance</div> <div className="col-span-2">243 km</div> 
-                <div className="font-bold col-span-2" >Estimate Cost </div> <div className="col-span-2">$670.20</div> 
+                <div className="font-bold col-span-2" >Departure</div> <div className="col-span-2">{employeeData.journey?.departure}</div> 
+                <div className="font-bold col-span-2" >Arrival(Est) </div> <div className="col-span-2">{employeeData.journey?.arrival}</div> 
+                <div className="font-bold col-span-2" >Distance</div> <div className="col-span-2">{employeeData.journey?.distance} km</div> 
+                <div className="font-bold col-span-2" >Estimate Cost </div> <div className="col-span-2">{Array.isArray(employeeData.journey?.expenses?.totals) && employeeData.journey.expenses.totals.length > 0 
+                ? employeeData.journey.expenses.totals 
+                : "N/A"}
+              </div> 
                 </div>
 
               </div>
             ) : (
-              empID && <div>Loading employee data...</div>
+              empID &&  <div className="col-span-3 md:col-span-2 lg:col-span-6 xl:col-span-3 text-center">
+              {employeeData?.occupation === "Driver" ? "No Active Journey" : "Journey Information Not Applicable"}
+            </div>
+            
             )}
         </div>
         {data?.totalExpenses?.length?<div className="col-span-full grid grid-cols-6 bg-[#6B0303] p-4 my-4 gap-y-2 rounded">

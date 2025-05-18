@@ -182,21 +182,8 @@ export default function Driver({params}) {
   
       const response = await axios.post(`/api/journey`, filteredData);
   
-      const payload = {
-        current_journey: response.data?.newJourney?._id,
-      };
-
-      const payloadTruck = {
-        status: formData.status
-      };
-  
-      const responseTruck = await axios.patch(`/api/trucks/${truckID}?journeyId=${response.data?.newJourney?._id}&km=456`, payloadTruck);
-      const responseDriver = await axios.patch(`/api/employee/${driverID}`, payload);
-  
       console.log("Journey added:", response.data);
-      console.log("Truck updated:", responseTruck.data);
-      console.log("Driver updated:", responseDriver.data); 
-  
+
       // Reset form
       setFormData(defaultForm);
       setIsLoading(false);
