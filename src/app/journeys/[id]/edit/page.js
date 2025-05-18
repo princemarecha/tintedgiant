@@ -96,10 +96,28 @@ export default function Driver({params}) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  
+    setFormData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: value,
+      };
+  
+      const departureDate = new Date(updated.departure);
+      const arrivalDate = new Date(updated.arrival);
+  
+      // If updating arrival and it's earlier than departure, reset to match departure
+      if (name === "arrival" && arrivalDate < departureDate) {
+        updated.arrival = updated.departure;
+      }
+  
+      // If updating departure and it's after arrival, reset to match arrival
+      if (name === "departure" && arrivalDate < departureDate) {
+        updated.departure = updated.arrival;
+      }
+  
+      return updated;
+    });
   };
 
   const handleDriverChange = (e) => {
